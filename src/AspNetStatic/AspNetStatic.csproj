@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="StaticSiteGeneratorCore" Version="0.5.0" />
+		<PackageReference Include="StaticSiteLib" Version="0.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,5 +1,5 @@
 ﻿using AspNetStatic;
-using StaticSiteGeneratorCore;
+using StaticSiteLib;
 
 namespace Sample.PartialStaticSite
 {
