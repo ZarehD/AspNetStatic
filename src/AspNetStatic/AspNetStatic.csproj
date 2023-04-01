@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<!--<PackageIcon></PackageIcon>-->
+		<!--<PackageLicenseFile>Apache2.0</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>-->
+		<PackageTags>C# AspNetCore Static Site Generator</PackageTags>
+
+		<AssemblyName>AspNetStatic</AssemblyName>
+		<RootNamespace>AspNetStatic</RootNamespace>
+		<PackageId>AspNetStatic</PackageId>
+
+		<Authors>Zareh D</Authors>
+		<Company>Zareh D</Company>
+		<Copyright>Copyright © 2023 Zareh D. All rights reserved</Copyright>
+		<Product>AspNetCore Static Site Generator</Product>
+		<Description>Static site generator for AspNetCore.</Description>
+		<Version>0.5.0</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="StaticSiteGeneratorCore" Version="0.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>
