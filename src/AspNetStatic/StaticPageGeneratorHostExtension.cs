@@ -58,7 +58,6 @@ namespace AspNetStatic
 			{
 				throw new ArgumentNullException(nameof(destinationRoot));
 			}
-
 			if (!Directory.Exists(destinationRoot))
 			{
 				throw new InvalidOperationException(
@@ -80,32 +79,39 @@ namespace AspNetStatic
 			lifetime.ApplicationStarted.Register(
 				async () =>
 				{
-					var hostFeatures = host.Services.GetRequiredService<IServer>().Features;
-					var serverAddresses = hostFeatures.Get<IServerAddressesFeature>() ??
-						throw new InvalidOperationException($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
-					var hostUrls = serverAddresses.Addresses;
+					try
+					{
+						var hostFeatures = host.Services.GetRequiredService<IServer>().Features;
+						var serverAddresses = hostFeatures.Get<IServerAddressesFeature>() ??
+							throw new InvalidOperationException($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
+						var hostUrls = serverAddresses.Addresses;
 
-					var baseUri =
-						hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttps)) ??
-						hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp)) ??
-						throw new InvalidOperationException(Properties.Resources.Err_HostNotHttpService);
+						var baseUri =
+							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttps)) ??
+							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp)) ??
+							throw new InvalidOperationException(Properties.Resources.Err_HostNotHttpService);
 
-					using var httpClient =
-						new HttpClient()
-						{
-							BaseAddress = new Uri(baseUri)
-						};
+						using var httpClient =
+							new HttpClient()
+							{
+								BaseAddress = new Uri(baseUri)
+							};
 
-					await StaticPageGenerator.Execute(new(
-						httpClient,
-						pageUrlProvider.Pages,
-						destinationRoot,
-						alwaysDefautFile,
-						!dontUpdateLinks,
-						pageUrlProvider.DefaultFileName,
-						pageUrlProvider.PageFileExtension.AssureStartsWith('.'),
-						pageUrlProvider.DefaultFileExclusions),
-						loggerFactory);
+						await StaticPageGenerator.Execute(new(
+							httpClient,
+							pageUrlProvider.Pages,
+							destinationRoot,
+							alwaysDefautFile,
+							!dontUpdateLinks,
+							pageUrlProvider.DefaultFileName,
+							pageUrlProvider.PageFileExtension.AssureStartsWith('.'),
+							pageUrlProvider.DefaultFileExclusions),
+							loggerFactory);
+					}
+					catch (Exception ex)
+					{
+						logger.Exception(ex);
+					}
 
 					if (commandLineArgs.Any(a => a.Equals(
 						STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase)))
