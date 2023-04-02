@@ -45,6 +45,7 @@ namespace AspNetStatic
 		/// </param>
 		public static void GenerateStaticPages(
 			this IHost host,
+			string[] commandLineArgs,
 			string destinationRoot,
 			bool alwaysDefautFile = default,
 			bool dontUpdateLinks = default)
@@ -105,8 +106,18 @@ namespace AspNetStatic
 						pageUrlProvider.PageFileExtension.AssureStartsWith('.'),
 						pageUrlProvider.DefaultFileExclusions),
 						loggerFactory);
+
+					if (commandLineArgs.Any(a => a.Equals(
+						STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase)))
+					{
+						logger.Exiting();
+						await Task.Delay(500);
+						await host.StopAsync();
+					}
 				});
 		}
+
+		private const string STATIC_ONLY = "static-only";
 	}
 
 
@@ -177,6 +188,19 @@ namespace AspNetStatic
 		[LoggerMessage(EventId = 1010, EventName = "NoPagesToProcess", Level = LogLevel.Information,
 			Message = "StaticPageGeneratorHost: No pages to process. Exiting...")]
 		private static partial void Imp_NoPagesToProcess(
+			this ILogger logger);
+
+		#endregion
+
+		#region 1020 - Exiting
+
+		public static void Exiting(
+			this ILogger logger) =>
+			logger.Imp_Exiting();
+
+		[LoggerMessage(EventId = 1020, EventName = "Exiting", Level = LogLevel.Information,
+			Message = "StaticPageGeneratorHost: Completed generating static pages. Exiting...")]
+		private static partial void Imp_Exiting(
 			this ILogger logger);
 
 		#endregion
