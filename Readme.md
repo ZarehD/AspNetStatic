@@ -136,6 +136,8 @@ app.GenerateStaticPages(
 
 ## Senarios
 
+> #### In all senarios, ensure that routes for static pages are unincumbered by authentication or authorization requirements.
+
 ### Standalone Static Site
 
 In this senario, you want to host a completely static website (on Netlify, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
@@ -189,7 +191,7 @@ app.UseRouting();
 app.Map...();
 ...
 app.GenerateStaticPages(
-  args,
+  args,                          // no static-only parameter
   app.Environment.WebRoot,       // must specify wwwroot
   alwaysDefautFile: true/false,
   dontUpdateLinks: false);       // must update links
