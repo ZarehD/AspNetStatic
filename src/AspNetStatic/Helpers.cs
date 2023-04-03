@@ -5,7 +5,7 @@
 		public static bool IncludesRoute(this IEnumerable<PageInfo> pages, string route) =>
 			(pages is not null) && pages.Any() &&
 			pages.Select(
-				p => p.RelativePath
+				p => p.Route
 				.AssureStartsWith(RouteConsts.FwdSlash)
 				.AssureEndsWith(RouteConsts.FwdSlash)
 				//.ToLowerInvariant()

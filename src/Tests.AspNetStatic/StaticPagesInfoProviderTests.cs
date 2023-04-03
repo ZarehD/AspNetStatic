@@ -46,10 +46,10 @@ namespace Tests.AspNetStatic
             }
 
             Assert.AreEqual(Test_Pages.Count, sut.Pages.Count());
-            foreach (var url in Test_Pages.Select(p => p.RelativePath))
+            foreach (var url in Test_Pages.Select(p => p.Route))
             {
                 Assert.IsTrue(sut.Pages.Any(
-                    p => p.RelativePath.Equals(
+                    p => p.Route.Equals(
                         url, StringComparison.InvariantCultureIgnoreCase)));
             }
         }
