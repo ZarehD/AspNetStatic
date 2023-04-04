@@ -30,7 +30,7 @@ It's a peace of cake!
    ```
    dotnet add package AspNetStatic
    ```
-1. Create a class that implements `IStaticPagesInfoProvider`, and register it
+1. Create and register a class that implements `IStaticPagesInfoProvider`
 	- Derrive from `StaticPagesInfoProviderBase` or implement the interface directly
 	- Populate the `Pages` collection to specify the routes for which to generate static pages
 	- Set other properties as appropriate
@@ -38,7 +38,7 @@ It's a peace of cake!
       ``` C#
       builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>
       ```
-1. Add the AspNetStatic module in the website startup code
+1. Add the AspNetStatic module
    ``` C#
    ...
    app.MapRazorPages();
@@ -76,7 +76,7 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash.
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property). You can specify the same `Route` with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
-- Routes can refer to any text-based, non-binary resource (.js or .css, for instance, but not image files). For such routes, always specify a value for `OutFilePathname`. Note that links in generated files are not updated for such routes at this time.
+- Routes can refer to any text-based, non-binary resource (.js or .css, for instance, but not image files). For such routes, always specify a value for `OutFilePathname`. Note that, currently, links in generated files are not updated for such routes if they appear in __\<link\>__ and __\<script\>__ tags (but will in __\<a\>__ and __\<area\>__ tags).
 
 
 ### Routes vs. Generated Static Files
@@ -143,15 +143,14 @@ app.GenerateStaticPages(
 
 ### Standalone Static Site
 
-In this senario, you want to generate a completely static website (to host on Netlify, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
+In this senario, you want to generate a completely static website (to host on Netlify or Azure/AWS storage, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
 
 > #### NOTE: You can use our CLI or desktop app to generate a standalone site from ANY website.
 
 Sample Configuration 1:
   - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
   - Generate a defailt file only for routes ending with a slash.
-  - Update href attribute value for <a> and <area> tags that refer to static pages (from /page to /page.html).
-  - Allow links in generaed static files to be updated.
+  - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (from /page to /page.html).
     ``` C#
     app.GenerateStaticPages(
       args,
@@ -163,8 +162,7 @@ Sample Configuration 1:
 Sample Configuration 2:
   - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
   - Generate a defailt file for all routes (/page and /page/ to /page/index.html).
-  - Update href attribute value for <a> and <area> tags that refer to static pages (from /page and /page/ to /page.html).
-  - Allow links in generaed static files to be updated.
+  - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (from /page and /page/ to /page/index.html).
     ``` C#
     app.GenerateStaticPages(
       args,
@@ -178,14 +176,14 @@ Sample Configuration 2:
 
 ### Partial Static Site
 
-In this senario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request. When the app runs, static (.html) files will be generated (for routes you specify). The website will serve the generated static files for static routes (you specified) and with dynamic content, as usual, for other routes.
+In this senario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request (pages/views and JSON API's). When the app runs, static (.html) files will be generated for routes you specify. The website will then serve these static files for the specified routes, and dynamic content, as usual, for others.
 
 > While static files are being generated, requests for which the static file hasn't yet been generated will be served as dynamic content using the source (.cshtml) page. Once the static file has been generated, it will be used to statisfy requests.
 
 The configuration options are the same as for a standalone static site, except the following:
- - Destination root folder must be `app.Environment.WebRoot`.
+ - The destination root folder must be `app.Environment.WebRoot`.
  - You must do one of the following (can do both):
-   - Use the AspNetStatic static page fallback middleware.
+   - Use the AspNetStatic static-page fallback middleware.
    - Allow links in generaed static files to be updated.
  - Do not specify the static-only command-line parameter when running the app (obviously, right?)
  
