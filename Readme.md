@@ -74,21 +74,25 @@ Now, whenever you start your app, your static pages will be regenerated to refle
 
 Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
 
+- As a rule, don't specify an 'index' page name; instead opt for a route with a terminating slash.
+- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property of collection elements). The only requirement is that the specified path be relative to the destination root folder. If you do not specify the pathname of the generated file, the pathname will be constructed as demonstrated below.
+- You can specify a query string or route parameters for routes you add to the `Pages` collection (see `QueryString` property of collection elements). You can specify the same route with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
+
+
 ### Routes vs. Generated Static Files
 
-Assume destination root folder is "__C:\Site__".
+> Assume destination root folder is "__C:\MySite__".
 
 <br/>Route | Always Default <br/>false | <br/>true
 ---|---|---
-/                       | C:\Site\index.html                  | C:\Site\index.html
-/index                  | C:\Site\index.html                  | C:\Site\index.html
-/index/                 | C:\Site\index\index.html            | C:\Site\index\index.html
-/page                   | C:\Site\page.html                   | C:\Site\page\index.html
-/page/                  | C:\Site\page\index.html             | C:\Site\page\index.html
-/blog/articles/         | C:\Site\blog\articles/index.html    | C:\Site\blog\articles\index.html
-/blog/articles/article1 | C:\Site\blog\articles/article1.html | C:\Site\blog\articles\article1/index.html
+/                       | C:\MySite\index.html                  | C:\MySite\index.html
+/index                  | C:\MySite\index.html                  | C:\MySite\index.html
+/index/                 | C:\MySite\index\index.html            | C:\MySite\index\index.html
+/page                   | C:\MySite\page.html                   | C:\MySite\page\index.html
+/page/                  | C:\MySite\page\index.html             | C:\MySite\page\index.html
+/blog/articles/         | C:\MySite\blog\articles/index.html    | C:\MySite\blog\articles\index.html
+/blog/articles/article1 | C:\MySite\blog\articles/article1.html | C:\MySite\blog\articles\article1/index.html
 
-> #### As a rule, don't specify an 'index' page name; instead opt for a route with a terminating slash.
 
 
 ### Routes vs. Served Content (using fallback middleware)
