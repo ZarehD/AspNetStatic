@@ -73,10 +73,10 @@ Now, whenever you start your app, your static pages will be regenerated to refle
 
 Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
 
-- As a rule, don't specify an 'index' page name; instead opt for a route with a terminating slash.
-- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property of collection elements). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
-- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property of collection elements). You can specify the same `Route` with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
-- Routes can refer to any resource (.js or .css, for instance) but only for text-based, non-binary content (e.g. no image files). For such routes, be sure to specify a value for `OutFilePathname`.
+- As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash.
+- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
+- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property). You can specify the same `Route` with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
+- Routes can refer to any text-based, non-binary resource (.js or .css, for instance, but not image files). For such routes, always specify a value for `OutFilePathname`. Note that links in generated files are not updated for such routes at this time.
 
 
 ### Routes vs. Generated Static Files
@@ -111,17 +111,16 @@ Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always
 > #### The same rules apply when links in static files are updated to refer to other generated static files.
 
 
-__Important Note__: In ASP.NET Core, UrlHelper (and the asp-xxx tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
+__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-xxx tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
 ``` C#
 builder.Services.AddRouting(
 	options =>
 	{ // default configuration in ASP.NET Core
 		options.AppendTrailingSlash = false;   // generated links: / and /page
 	});
-
+...
 app.GenerateStaticPages(
-  ...
-  alwaysDefaultFile = false);   // generated pages: /index.html and /page.index.html
+  alwaysDefaultFile: false);   // generated pages: /index.html and /page.index.html
 
 --OR--
 
@@ -130,10 +129,9 @@ builder.Services.AddRouting(
 	{
 		options.AppendTrailingSlash = true;   // generated links: / and /page/
 	});
-
+...
 app.GenerateStaticPages(
-  ...
-  alwaysDefaultFile = true);   // generated pages: /index.html and /page/index.html
+  alwaysDefaultFile: true);   // generated pages: /index.html and /page/index.html
 ```
 
 
