@@ -111,7 +111,7 @@ Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always
 > #### The same rules apply when links in static files are updated to refer to other generated static files.
 
 
-__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-xxx tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
+__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
 ``` C#
 builder.Services.AddRouting(
 	options =>
