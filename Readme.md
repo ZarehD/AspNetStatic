@@ -148,45 +148,51 @@ In this senario, you want to generate a completely static website (to host on Ne
 > #### NOTE: You can use our CLI or desktop app to generate a standalone site from ANY website.
 
 Sample Configuration 1:
-  - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files;
-  - Generate a defailt file only for routes ending with a slash;
+  - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
+  - Generate a defailt file only for routes ending with a slash.
   - Update href attribute value for <a> and <area> tags that refer to static pages (from /page to /page.html).
+  - Allow links in generaed static files to be updated.
     ``` C#
     app.GenerateStaticPages(
       args,
       app.Environment.WebRoot,
-      alwaysDefautFile: false);
+      alwaysDefautFile: false,
+      dontUpdateLinks: false);
     ```
 
 Sample Configuration 2:
-  - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files;
-  - Generate a defailt file for all routes (/page and /page/ to /page/index.html);
+  - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
+  - Generate a defailt file for all routes (/page and /page/ to /page/index.html).
   - Update href attribute value for <a> and <area> tags that refer to static pages (from /page and /page/ to /page.html).
+  - Allow links in generaed static files to be updated.
     ``` C#
     app.GenerateStaticPages(
       args,
       "C:\path\to\destination\root\folder",
-      alwaysDefautFile: true);
+      alwaysDefautFile: true,
+      dontUpdateLinks: false);
     ```
 
+> #### If you opt not to update links in the generated files (`dontUpdateLinks: true`), you will need to configure your web host to use a redirect or url-rewrite module so that pages referenced by links can be accessed (e.g. \<a href="/page" \> attempting to access "/page.html").
 
 
 ### Partial Static Site
 
-In this senario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request. When the app runs, static (.html) files will be generated (for routes you specify). 
+In this senario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request. When the app runs, static (.html) files will be generated (for routes you specify). The website will serve the generated static files for static routes (you specified) and with dynamic content, as usual, for other routes.
 
 > While static files are being generated, requests for which the static file hasn't yet been generated will be served as dynamic content using the source (.cshtml) page. Once the static file has been generated, it will be used to statisfy requests.
 
 The configuration options are the same as for a standalone static site, except the following:
- - Destination root folder must be `app.Environment.WebRoot`
- - You must use the AspNetStatic static page fallback middleware
- - You must allow links in generaed static files to be updated
+ - Destination root folder must be `app.Environment.WebRoot`.
+ - You must do one of the following (can do both):
+   - Use the AspNetStatic static page fallback middleware.
+   - Allow links in generaed static files to be updated.
  - Do not specify the static-only command-line parameter when running the app (obviously, right?)
  
 Like this:
 ``` C#
 ...
-app.UseStaticPageFallback();     // must use fallback middleware
+app.UseStaticPageFallback();     // use fallback middleware to route to .html page
 app.UseStaticFiles();
 ...
 app.UseRouting();
@@ -197,7 +203,7 @@ app.GenerateStaticPages(
   args,                          // no static-only parameter
   app.Environment.WebRoot,       // must specify wwwroot
   alwaysDefautFile: true/false,
-  dontUpdateLinks: false);       // must update links
+  dontUpdateLinks: false);       // update links so they refer to the .html page
 ...
 app.Run();
 ```
