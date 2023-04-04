@@ -81,20 +81,23 @@ namespace AspNetStatic
 						: string.Empty
 						;
 
-					var physicalPath =
-						Path.Combine(this._webRoot, newPath
-						.Replace(RouteConsts.BakSlash, Path.DirectorySeparatorChar)
-						.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar)
-						.AssureNotStartsWith(Path.DirectorySeparatorChar));
+					if (!string.IsNullOrEmpty(newPath))
+					{
+						var physicalPath =
+							Path.Combine(this._webRoot, newPath
+							.Replace(RouteConsts.BakSlash, Path.DirectorySeparatorChar)
+							.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar)
+							.AssureNotStartsWith(Path.DirectorySeparatorChar));
 
-					if (!string.IsNullOrEmpty(newPath) && File.Exists(physicalPath))
-					{
-						this._logger?.ProcessedRoute(path, newPath);
-						ctx.Request.Path = newPath;
-					}
-					else
-					{
-						this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+						if (File.Exists(physicalPath))
+						{
+							this._logger?.ProcessedRoute(path, newPath);
+							ctx.Request.Path = newPath;
+						}
+						else
+						{
+							this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+						}
 					}
 				}
 			}
