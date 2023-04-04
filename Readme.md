@@ -51,8 +51,9 @@ It's a peace of cake!
    ```
    dotnet run
    -OR-
-   dotnet run -- static-only  // exist the app after generating static pages
+   dotnet run -- static-only  // exits the app after generating static pages
    ```
+
    Via launchSettings.json:
    ```
    "StaticOnly": {
@@ -62,8 +63,6 @@ It's a peace of cake!
       "applicationUrl": "https://localhost:5000",
    }
    ```
-
-
 
 Now, whenever you start your app, your static pages will be regenerated to reflect any changes you may have made to their source Razor pages (or controller action views).
 
@@ -75,15 +74,16 @@ Now, whenever you start your app, your static pages will be regenerated to refle
 Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
 
 - As a rule, don't specify an 'index' page name; instead opt for a route with a terminating slash.
-- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property of collection elements). The only requirement is that the specified path be relative to the destination root folder. If you do not specify the pathname of the generated file, the pathname will be constructed as demonstrated below.
-- You can specify a query string or route parameters for routes you add to the `Pages` collection (see `QueryString` property of collection elements). You can specify the same route with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
+- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property of collection elements). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
+- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property of collection elements). You can specify the same `Route` with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
+- Routes can refer to any resource (.js or .css, for instance) but only for text-based, non-binary content (e.g. no image files). For such routes, be sure to specify a value for `OutFilePathname`.
 
 
 ### Routes vs. Generated Static Files
 
 > Assume destination root folder is "__C:\MySite__".
 
-<br/>Route | Always Default <br/>false | <br/>true
+<br/>Route | Always Default<br/>false | Always Default<br/>true
 ---|---|---
 /                       | C:\MySite\index.html                  | C:\MySite\index.html
 /index                  | C:\MySite\index.html                  | C:\MySite\index.html
@@ -97,7 +97,7 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 
 ### Routes vs. Served Content (using fallback middleware)
 
-Route<br/> | Is Static Page Route: false<br/><br/> | Is Static Page Route: true<br/>Always Default: false | Is Static Page Route: true<br/>Always Default: true
+Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always Default: false | Is Static Route: true<br/>Always Default: true
 ---|---|---|---
 /                       | /index.cshtml                  | /index.html                  | /index.html
 /index                  | /index.cshtml                  | /index.html                  | /index.html
@@ -110,7 +110,8 @@ Route<br/> | Is Static Page Route: false<br/><br/> | Is Static Page Route: true<
 
 > #### The same rules apply when links in static files are updated to refer to other generated static files.
 
-In ASP.NET Core, UrlHelper (and the asp-xxx tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
+
+__Important Note__: In ASP.NET Core, UrlHelper (and the asp-xxx tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
 ``` C#
 builder.Services.AddRouting(
 	options =>
@@ -144,9 +145,9 @@ app.GenerateStaticPages(
 
 ### Standalone Static Site
 
-In this senario, you want to host a completely static website (on Netlify, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
+In this senario, you want to generate a completely static website (to host on Netlify, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
 
-> #### NOTE: You can also use our CLI or desktop apps to generate standalone sites.
+> #### NOTE: You can use our CLI or desktop app to generate a standalone site from ANY website.
 
 Sample Configuration 1:
   - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files;
@@ -182,7 +183,7 @@ The configuration options are the same as for a standalone static site, except t
  - Destination root folder must be `app.Environment.WebRoot`
  - You must use the AspNetStatic static page fallback middleware
  - You must allow links in generaed static files to be updated
- - Do not specify the static-only command-line parameter when running the app
+ - Do not specify the static-only command-line parameter when running the app (obviously, right?)
  
 Like this:
 ``` C#
