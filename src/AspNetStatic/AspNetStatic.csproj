@@ -22,7 +22,7 @@
 		<Copyright>Copyright © 2023 Zareh D. All rights reserved</Copyright>
 		<Product>AspNetCore Static Site Generator</Product>
 		<Description>Static site generator for AspNetCore.</Description>
-		<Version>0.7.0</Version>
+		<Version>0.7.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="StaticSiteLib" Version="0.8.0" />
+	  <PackageReference Include="StaticSiteLib" Version="0.8.1" />
 	</ItemGroup>
 
 	<ItemGroup>
