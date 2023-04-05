@@ -2,23 +2,6 @@
 {
 	public static class Helpers
 	{
-		public static bool IncludesRoute(this IEnumerable<PageInfo> pages, string route) =>
-			(pages is not null) && pages.Any() &&
-			pages.Select(
-				p => p.Route
-				.AssureStartsWith(RouteConsts.FwdSlash)
-				.AssureEndsWith(RouteConsts.FwdSlash)
-				//.ToLowerInvariant()
-				)
-			.Any(x => x.Equals(
-				route
-				.AssureStartsWith(RouteConsts.FwdSlash)
-				.AssureEndsWith(RouteConsts.FwdSlash)
-				//.ToLowerInvariant()
-				, StringComparison.InvariantCultureIgnoreCase))
-			;
-
-
 		public static string ToDefaultFileFallback(
 			this string route, string[] exclusions,
 			string defaultFileName, string pageFileExtension)

@@ -62,7 +62,7 @@ namespace AspNetStatic
 			{
 				var path = ctx.Request.Path.Value.AssureStartsWith(RouteConsts.FwdSlash);
 
-				if (this._pageInfoProvider.Pages.IncludesRoute(path))
+				if (this._pageInfoProvider.Pages.ContainsPageForRoute(path))
 				{
 					var hasExtension = Path.HasExtension(path);
 					var endsWithSlash = path.EndsWith(RouteConsts.FwdSlash);
