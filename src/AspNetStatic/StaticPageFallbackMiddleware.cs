@@ -12,6 +12,7 @@ namespace AspNetStatic
 		private readonly IStaticPagesInfoProvider _pageInfoProvider;
 		private readonly bool _haveStaticPages;
 		private readonly bool _alwaysDefaultFile;
+		private readonly bool _ignoreOutFilePathname;
 		private readonly string _webRoot;
 		private readonly string[] _exclusions;
 		private readonly string _defaultFileName;
@@ -39,16 +40,19 @@ namespace AspNetStatic
 			options ??= new StaticPageFallbackMiddlewareOptions();
 
 			this._haveStaticPages = this._pageInfoProvider.Pages.Any();
-			this._alwaysDefaultFile = options.AlwaysDefaultFile;
-			this._exclusions = this._pageInfoProvider.DefaultFileExclusions;
 			this._pageFileExtension = this._pageInfoProvider.PageFileExtension.AssureStartsWith(".");
 			this._defaultFileName = $"{this._pageInfoProvider.DefaultFileName}{this._pageFileExtension}";
+			this._exclusions = this._pageInfoProvider.DefaultFileExclusions;
+
+			this._alwaysDefaultFile = options.AlwaysDefaultFile;
+			this._ignoreOutFilePathname = options.IgnoreOutFilePathname;
 
 			this._webRoot = environment.WebRootPath;
 
 			this._logger?.Configuration(
 				this._pageInfoProvider.Pages.Count(),
 				this._alwaysDefaultFile,
+				this._ignoreOutFilePathname,
 				this._webRoot,
 				this._defaultFileName,
 				this._pageFileExtension,
@@ -61,42 +65,69 @@ namespace AspNetStatic
 			if (this._haveStaticPages)
 			{
 				var path = ctx.Request.Path.Value.AssureStartsWith(RouteConsts.FwdSlash);
+				var page = this._pageInfoProvider.Pages.GetForRoute(path);
 
-				if (this._pageInfoProvider.Pages.ContainsPageForRoute(path))
+				if (page is not null)
 				{
-					var hasExtension = Path.HasExtension(path);
-					var endsWithSlash = path.EndsWith(RouteConsts.FwdSlash);
-					var alwaysDefault = this._alwaysDefaultFile;
-
-					this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
-
-					var newPath =
-						(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
-						? path.ToDefaultFileFallback(
-							this._exclusions,
-							this._defaultFileName,
-							this._pageFileExtension)
-						: (!endsWithSlash && !hasExtension && !alwaysDefault)
-						? path + this._pageFileExtension
-						: string.Empty
-						;
-
-					if (!string.IsNullOrEmpty(newPath))
+					if (!this._ignoreOutFilePathname &&
+						!string.IsNullOrWhiteSpace(page.OutFilePathname))
 					{
 						var physicalPath =
-							Path.Combine(this._webRoot, newPath
-							.Replace(RouteConsts.BakSlash, Path.DirectorySeparatorChar)
-							.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar)
-							.AssureNotStartsWith(Path.DirectorySeparatorChar));
+							Path.Combine(this._webRoot,
+							page.OutFilePathname.AssureNotStartsWith(
+								Path.DirectorySeparatorChar));
 
 						if (File.Exists(physicalPath))
 						{
+							var newPath = page.OutFilePathname.Replace(
+								Path.DirectorySeparatorChar, RouteConsts.FwdSlash)
+								.AssureStartsWith(RouteConsts.FwdSlash);
+
 							this._logger?.ProcessedRoute(path, newPath);
+
 							ctx.Request.Path = newPath;
 						}
 						else
 						{
-							this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+							this._logger?.NoFileAtProposedRoute(path, "N/A", physicalPath);
+						}
+					}
+					else
+					{
+						var hasExtension = Path.HasExtension(path);
+						var endsWithSlash = path.EndsWith(RouteConsts.FwdSlash);
+						var alwaysDefault = this._alwaysDefaultFile;
+
+						this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
+
+						var newPath =
+							(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
+							? path.ToDefaultFileFallback(
+								this._exclusions,
+								this._defaultFileName,
+								this._pageFileExtension)
+							: (!endsWithSlash && !hasExtension && !alwaysDefault)
+							? path + this._pageFileExtension
+							: string.Empty
+							;
+
+						if (!string.IsNullOrEmpty(newPath))
+						{
+							var physicalPath =
+								Path.Combine(this._webRoot, newPath
+								.Replace(RouteConsts.BakSlash, Path.DirectorySeparatorChar)
+								.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar)
+								.AssureNotStartsWith(Path.DirectorySeparatorChar));
+
+							if (File.Exists(physicalPath))
+							{
+								this._logger?.ProcessedRoute(path, newPath);
+								ctx.Request.Path = newPath;
+							}
+							else
+							{
+								this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+							}
 						}
 					}
 				}
@@ -122,6 +153,20 @@ namespace AspNetStatic
 		///		Default is <c>False</c>.
 		/// </remarks>
 		public bool AlwaysDefaultFile { get; set; }
+
+		/// <summary>
+		///		Gets or sets a value that, when true, indicates that 
+		///		the fallback route should ignore the value specified 
+		///		in <see cref="PageInfo.OutFilePathname"/>, and instead 
+		///		use apply the usual rules to determine the fallback route; 
+		///		otherwise, if <see cref="PageInfo.OutFilePathname"/> 
+		///		specifies a file pathname, it should be used as 
+		///		the fallback route.
+		/// </summary>
+		/// <remarks>
+		///		Default is <c>False</c>.
+		/// </remarks>
+		public bool IgnoreOutFilePathname { get; set; }
 	}
 
 
@@ -148,6 +193,7 @@ namespace AspNetStatic
 			this ILogger<StaticPageFallbackMiddleware> logger,
 			int pageCount,
 			bool alwaysDefaultFile,
+			bool ignoreOutFilePathname,
 			string webroot,
 			string defaultFileName,
 			string pageFileExtension,
@@ -155,6 +201,7 @@ namespace AspNetStatic
 			logger.Imp_Configuration(
 				pageCount,
 				alwaysDefaultFile,
+				ignoreOutFilePathname,
 				webroot,
 				defaultFileName,
 				pageFileExtension,
@@ -162,11 +209,12 @@ namespace AspNetStatic
 
 		[LoggerMessage(
 			EventId = 1001, EventName = "Configuration", Level = LogLevel.Information,
-			Message = "StaticPageFallbackMiddleware: Configuration > PageCount = {PageCount}, AlwaysDefaultFile = {AlwaysDefaultFile}, DefaultFileName = {DefaultFileName}, PageFileExtension = {PageFileExtension}, DefaultFileExclusions = {DefaultFileExclusions}, WebRoot = {WebRoot}")]
+			Message = "StaticPageFallbackMiddleware: Configuration > PageCount = {PageCount}, AlwaysDefaultFile = {AlwaysDefaultFile}, IgnoreOutFilePathname = {IgnoreOutFilePathname}, DefaultFileName = {DefaultFileName}, PageFileExtension = {PageFileExtension}, DefaultFileExclusions = {DefaultFileExclusions}, WebRoot = {WebRoot}")]
 		private static partial void Imp_Configuration(
 			this ILogger<StaticPageFallbackMiddleware> logger,
 			int pageCount,
 			bool alwaysDefaultFile,
+			bool ignoreOutFilePathname,
 			string webroot,
 			string defaultFileName,
 			string pageFileExtension,

@@ -15,6 +15,7 @@ namespace Tests.AspNetStatic
 				new("/"),
 				new("/blog/"),
 				new("/blog/article1"),
+				new("/doc/p1") { OutFilePathname = "docs\\page1.htm" },
 			});
 
 		private class PageInfoProvider : StaticPagesInfoProviderBase
@@ -76,7 +77,7 @@ namespace Tests.AspNetStatic
 		[DataRow("/blog/article1/", "/blog/article1/index.html", false)]
 		[DataRow("/page/", "/page/", false)]
 		[DataRow("/page/p1", "/page/p1", true)]
-		public async Task Test_Should_fallback_to_correct_path(
+		public async Task Test_Fallbacks_AutoPath(
 			string requestPath, string expectedPath,
 			bool alwaysDefaultfile)
 		{
@@ -100,6 +101,68 @@ namespace Tests.AspNetStatic
 				new()
 				{
 					AlwaysDefaultFile = alwaysDefaultfile
+				});
+
+			var pathname = string.Empty;
+			var createFile =
+				!expectedPath.EndsWith(RouteConsts.FwdSlash) &&
+				Path.HasExtension(expectedPath) &&
+				pageInfoProvider.Pages.Any(p => p.Route.Equals(requestPath))
+				;
+
+			if (createFile)
+			{
+				pathname = expectedPath.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar);
+				CreateFileInWebRoot(pathname);
+			}
+			try
+			{
+				await sut.InvokeAsync(httpContext);
+			}
+			finally
+			{
+				if (createFile) DeleteFile(pathname);
+			}
+
+			if (createFile)
+			{
+				httpContextMoq.VerifySet(x => x.Request.Path = new PathString(expectedPath)); //new PathString(expectedPath)
+			}
+			else
+			{
+				httpContextMoq.VerifySet(x => x.Request.Path = It.IsAny<PathString>(), Times.Never);
+			}
+		}
+
+
+		[DataTestMethod]
+		[DataRow("/doc/p1", "/docs/page1.htm", false)]
+		[DataRow("/doc/", "/doc/index.html", true)]
+		[DataRow("/doc/p1", "/doc/p1.html", true)]
+		public async Task Test_Fallback_OutFilePathname(
+			string requestPath, string expectedPath,
+			bool ignoreOutFilePathname)
+		{
+			var httpContextMoq = new Mock<HttpContext>();
+			httpContextMoq
+				.Setup(x => x.Request.Path)
+				.Returns(new PathString(requestPath));
+			httpContextMoq
+				.SetupSet(x => x.Request.Path = new PathString(expectedPath))
+				.Verifiable();
+
+			var httpContext = httpContextMoq.Object;
+
+			var pageInfoProvider = GetPagenfoProvider();
+
+			var sut = new StaticPageFallbackMiddleware(
+				GetMiddlewareLogger(),
+				GetNextMiddleware(),
+				pageInfoProvider,
+				GetWebHostEnvironment(),
+				new()
+				{
+					IgnoreOutFilePathname = ignoreOutFilePathname
 				});
 
 			var pathname = string.Empty;
