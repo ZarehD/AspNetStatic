@@ -9,19 +9,22 @@
 	<PropertyGroup>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<!--<PackageIcon></PackageIcon>-->
-		<!--<PackageLicenseFile>Apache2.0</PackageLicenseFile>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>-->
-		<PackageTags>C# AspNetCore Static Site Generator</PackageTags>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<RepositoryUrl>https://github.com/ZarehD/AspNetStatic</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/ZarehD/AspNetStatic</PackageProjectUrl>
 
 		<AssemblyName>AspNetStatic</AssemblyName>
 		<RootNamespace>AspNetStatic</RootNamespace>
 		<PackageId>AspNetStatic</PackageId>
+		<PackageTags>C# AspNetCore Static Site Generator</PackageTags>
 
-		<Authors>Zareh D</Authors>
-		<Company>Zareh D</Company>
-		<Copyright>Copyright © 2023 Zareh D. All rights reserved</Copyright>
-		<Product>AspNetCore Static Site Generator</Product>
-		<Description>Static site generator for AspNetCore.</Description>
+		<Authors>Zareh Dergevorkian</Authors>
+		<Company>Zareh Dergevorkian</Company>
+		<PublisherName>Zareh Dergevorkian</PublisherName>
+		<Copyright>Copyright © 2023 Zareh Dergevorkian. All rights reserved</Copyright>
+		<Product>AspNetStatic</Product>
+		<Description>Transforms ASP.NET Core into a static site generator.</Description>
 		<Version>0.7.1</Version>
 	</PropertyGroup>
 
