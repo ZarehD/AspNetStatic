@@ -78,7 +78,7 @@ Now, whenever you start your app, your static pages will be regenerated to refle
 
 Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
 
-- Routes must exclude the site's base URI (e.g. __http<nolink>://localhost:5000__, __https<nolink>://www.mysite.com__)
+- Routes must exclude the site's base URI (e.g. __http:<span>://</span>localhost:5000__, __https<span>://www</span>.mysite.com__)
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property). You can specify the same `Route` with different `QueryString` values, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
