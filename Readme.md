@@ -78,10 +78,10 @@ Now, whenever you start your app, your static pages will be regenerated to refle
 
 Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
 
-- As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash.
+- Routes must exclude the site's base URI (e.g. __http[]()://localhost:5000__, __https[]()://www.mysite.com__)
+- As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
-- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property). You can specify the same `Route` with different `QueryString` values in order to vary the generated content, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
-- Routes can refer to any text-based, non-binary resource (.js or .css, for instance, but not image files). For such routes, always specify a value for `OutFilePathname`. Note that, currently, links in generated files are not updated for such routes if they appear in __\<link\>__ and __\<script\>__ tags (but will in __\<a\>__ and __\<area\>__ tags).
+- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property). You can specify the same `Route` with different `QueryString` values, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
 
 
 ### Routes vs. Generated Static Files
