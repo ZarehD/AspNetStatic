@@ -4,12 +4,12 @@
 ![License: Apache 2](https://img.shields.io/badge/license-Apache%202-blue?style=for-the-badge)
 
 
-## Transforms ASP.NET Core into a static site generator.
+## Transforms ASP.NET Core into a Static Site Generator
 
 
-Okay, so you want to create a static website, and after doing a bit of research, you learn that all the cool kids are using tools like __Jekyll__, __Hugo__, __Gatsby__, or __Statiq__ if you want to use .NET and C#. 
+Okay, so you want to create a static website, and after doing some research, you learn that all the cool kids are using tools like __Jekyll__, __Hugo__, __Gatsby__, or __Statiq__. 
 But what you also learn is that all of these tools require you to learn an entirely new way of constructing sites and pages.
-And then it occurs to you, hey wait a minute, I already know how to use ASP.NET Core to create websites, so why oh why do I have to learn a whole new stack just for this? Isn't there a better way that lets me use the tools and skills I already know?
+And then it occurs to you, hey wait a minute, I already know how to use ASP.NET Core to create websites, so why oh why do I have to learn a whole new stack just for this? Isn't there a better way? Can't I just use the tools and skills I already know?
 
 Well, now there is!
 
@@ -17,7 +17,12 @@ AspNetStatic lets you generate a static website with the same ASP.NET Core tools
 
 But wait, there's more!
 
-AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (that use the same _layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See Partial Static Site under Senarios section below.
+AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same _layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See Partial Static Site under Senarios section below.
+
+### No Frameworks. No Engines. No Opinions!
+
+AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. AspNetStatic does just one thing, and one thing only: create static HTML files for selected routes in your ASP.NET Core app.
+That means you can use whatever framework, component, or package (or architectural style) you want in your app. Want to use a blog engine like BlogEngine.NET? No problem. Want to use a CMS like Orchard or Umbraco? No problem. Want to create a product documentation site with some newfangled framework? No problem! AspNetStatic doesn't care; it will create static files no matter how the content was produced.
 
 
 <br/>
@@ -35,11 +40,11 @@ It's a peace of cake!
 	- Populate the `Pages` collection to specify the routes for which to generate static pages
 	- Set other properties as appropriate
 	- Register the class in the DI container
-      ``` C#
+      ```c#
       builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>
       ```
 1. Add the AspNetStatic module
-   ``` C#
+   ```c#
    ...
    app.MapRazorPages();
    ...
@@ -112,7 +117,7 @@ Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always
 
 
 __IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
-``` C#
+```c#
 builder.Services.AddRouting(
 	options =>
 	{ // default configuration in ASP.NET Core
@@ -145,13 +150,11 @@ app.GenerateStaticPages(
 
 In this senario, you want to generate a completely static website (to host on Netlify or Azure/AWS storage, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
 
-> #### NOTE: You can use our CLI or desktop app to generate a standalone site from ANY website.
-
 Sample Configuration 1:
   - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
   - Generate a defailt file only for routes ending with a slash.
   - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (from /page to /page.html).
-    ``` C#
+    ```c#
     app.GenerateStaticPages(
       args,
       app.Environment.WebRoot,
@@ -163,7 +166,7 @@ Sample Configuration 2:
   - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
   - Generate a defailt file for all routes (/page and /page/ to /page/index.html).
   - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (from /page and /page/ to /page/index.html).
-    ``` C#
+    ```c#
     app.GenerateStaticPages(
       args,
       "C:\path\to\destination\root\folder",
@@ -188,7 +191,7 @@ The configuration options are the same as for a standalone static site, except t
  - Do not specify the static-only command-line parameter when running the app (obviously, right?)
  
 Like this:
-``` C#
+```c#
 ...
 app.UseStaticPageFallback();     // use fallback middleware to route to .html page
 app.UseStaticFiles();
