@@ -69,7 +69,7 @@ It's a peace of cake!
    }
    ```
 
-Now, whenever you start your app, your static pages will be regenerated to reflect any changes you may have made to their source Razor pages (or controller action views).
+Now, whenever you start your app, the static files will be (re-)created from their source Razor pages (or controller action views).
 
 
 <br/>
@@ -151,9 +151,9 @@ app.GenerateStaticPages(
 In this senario, you want to generate a completely static website (to host on Netlify or Azure/AWS storage, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
 
 Sample Configuration 1:
-  - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
-  - Generate a defailt file only for routes ending with a slash.
-  - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (from /page to /page.html).
+  - Specify any accessible folder (e.g. _wwwroot_) as the destination-root for the generated static files.
+  - Generate a default file only for routes ending with a slash.
+  - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (e.g. _/page_ to _/page.html_).
     ```c#
     app.GenerateStaticPages(
       args,
@@ -163,18 +163,17 @@ Sample Configuration 1:
     ```
 
 Sample Configuration 2:
-  - Specify any accessible folder (e.g. __wwwroot__) as the destination-root for the generated static files.
-  - Generate a defailt file for all routes (/page and /page/ to /page/index.html).
-  - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (from /page and /page/ to /page/index.html).
+  - Specify any accessible folder (e.g. _wwwroot_) as the destination-root for the generated static files.
+  - Generate a default file for all routes (e.g. _/page_ and _/page/_ to _/page/index.html_).
+  - Don't update href attribute value for \<a\> and \<area\> tags that refer to static pages.
+  - Use your web server's redirect or url-rewrite module to re-route requests (e.g. _/page/_ or _/page/index_ to _/page/index.html_).
     ```c#
     app.GenerateStaticPages(
       args,
       "C:\path\to\destination\root\folder",
       alwaysDefautFile: true,
-      dontUpdateLinks: false);
+      dontUpdateLinks: true);
     ```
-
-> #### If you opt not to update links in the generated files (`dontUpdateLinks: true`), you will need to configure your web host to use a redirect or url-rewrite module so that pages referenced by links can be accessed (e.g. \<a href="/page" \> attempting to access "/page.html").
 
 
 ### Partial Static Site
@@ -186,14 +185,14 @@ In this senario, you want some of the pages in your ASP.NET Core app to be stati
 The configuration options are the same as for a standalone static site, except the following:
  - The destination root folder must be `app.Environment.WebRoot`.
  - You must do one of the following (can do both):
-   - Use the AspNetStatic static-page fallback middleware.
+   - Use the AspNetStatic fallback middleware.
    - Allow links in generaed static files to be updated.
  - Do not specify the static-only command-line parameter when running the app (obviously, right?)
  
 Like this:
 ```c#
 ...
-app.UseStaticPageFallback();     // use fallback middleware to route to .html page
+app.UseStaticPageFallback();     // re-route to the static file
 app.UseStaticFiles();
 ...
 app.UseRouting();
@@ -204,10 +203,12 @@ app.GenerateStaticPages(
   args,                          // no static-only parameter
   app.Environment.WebRoot,       // must specify wwwroot
   alwaysDefautFile: true/false,
-  dontUpdateLinks: false);       // update links so they refer to the .html page
+  dontUpdateLinks: false);       // update links so they refer to the static file
 ...
 app.Run();
 ```
+
+> #### The fallback middleware only re-routes requests for routes that are specified in the `Pages` collection, and only if the static file exists.
 
 
 <br/>
