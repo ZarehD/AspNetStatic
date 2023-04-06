@@ -214,4 +214,4 @@ app.Run();
 
 ## License
 
-Apache 2.0
+[Apache 2.0](https://github.com/ZarehD/AspNetStatic/blob/master/LICENSE)
