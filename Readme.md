@@ -41,7 +41,7 @@ It's a peace of cake!
 	- Set other properties as appropriate
 	- Register the class in the DI container
       ```c#
-      builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>
+      builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>();
       ```
 1. Add the AspNetStatic module
    ```c#
