@@ -21,8 +21,8 @@ AspNetStatic can also be used in a mixed mode configuration where some of the pa
 
 ### No Frameworks. No Engines. No Opinions!
 
-AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. AspNetStatic does just one thing, and one thing only: create static HTML files for selected routes in your ASP.NET Core app.
-That means you can use whatever framework, component, or package (or architectural style) you want in your app. Want to use a blog engine like BlogEngine.NET? No problem. Want to use a CMS like Orchard or Umbraco? No problem. Want to create a product documentation site with some newfangled framework? No problem! AspNetStatic doesn't care; it will create static files no matter how the content was produced.
+AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. AspNetStatic does just one thing (well, two, if you count the fallback middleware): create static HTML files for selected routes in your ASP.NET Core app.
+That means you can use whatever framework, component, or package (or architectural style) you want in your app. Want to use a blog engine like BlogEngine.NET? No problem. Want to use a CMS like Orchard or Umbraco? No problem. Want to create a documentation site that uses a markdown processor to render page content? No problem! AspNetStatic doesn't care; it will create static files no matter how the content was produced.
 
 
 <br/>
