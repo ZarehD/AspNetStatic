@@ -213,6 +213,48 @@ app.Run();
 
 <br/>
 
+## Content Optimization
+
+AspNetStatic minifies HTML content (and any embedded CSS and Javascript) in generated static files by default.
+To disable this feature, specify `true` for the `dontOptimizeContent` parameter:
+```c#
+app.GenerateStaticPages(
+  ...
+  dontOptimizeContent: true);
+```
+
+### Configuration
+
+To customize the settings AspNetStatic uses when performing minification operations, register the appropriate objects in the DI container, as shown below.
+
+> AspNetStatic uses the excellent WebMarkupMin package to implement the minification feature. For details about the configuration settings, please consult the WebMarkupMin [documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
+
+- __HTML__: To configure the HTML minifier, register a configured instance of `HtmlMinificationSettings`:
+  ```c#
+  using WebMarkupMin.Core;
+  builder.Services.AddSingleton(
+    sp => new HtmlMinificationSettings()
+    {
+      ...
+    });
+  ```
+
+- __CSS__: To configure the CSS minifier, register an object that implements the `ICssMinifier` interface:
+  ```c#
+  using WebMarkupMin.Core;
+  builder.Services.AddSingleton<ICssMinifier>(
+    sp => new YuiCssMinifier(...));
+  ```
+
+- __Javascript__: To configure the Javascript minifier, register an object that implements the `IJsMinifier` interface:
+  ```c#
+  using WebMarkupMin.Core;
+  builder.Services.AddSingleton<IJsMinifier>(
+    sp => new YuiJsMinifier(...));
+  ```
+
+<br/>
+
 ## License
 
 [Apache 2.0](https://github.com/ZarehD/AspNetStatic/blob/master/LICENSE)
