@@ -151,7 +151,7 @@ namespace AspNetStatic
 							new HttpClient()
 							{
 								BaseAddress = new Uri(baseUri),
-								Timeout = TimeSpan.FromSeconds(15)
+								Timeout = TimeSpan.FromSeconds(90)
 							};
 
 						httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(AspNetStatic));
