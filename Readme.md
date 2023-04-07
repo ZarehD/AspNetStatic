@@ -215,7 +215,7 @@ app.Run();
 
 ## Content Optimization
 
-AspNetStatic minifies HTML content (and any embedded CSS and Javascript) in generated static files by default.
+AspNetStatic automatically minifies HTML content (and any embedded CSS or Javascript) in generated static files.
 To disable this feature, specify `true` for the `dontOptimizeContent` parameter:
 ```c#
 app.GenerateStaticPages(
