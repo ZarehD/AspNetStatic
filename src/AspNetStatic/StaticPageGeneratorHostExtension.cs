@@ -12,9 +12,11 @@ the specific language governing permissions and limitations under the License.
 
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace AspNetStatic
 {
@@ -106,8 +108,11 @@ namespace AspNetStatic
 						using var httpClient =
 							new HttpClient()
 							{
-								BaseAddress = new Uri(baseUri)
+								BaseAddress = new Uri(baseUri),
+								Timeout = TimeSpan.FromSeconds(15)
 							};
+
+						httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(AspNetStatic));
 
 						await StaticPageGenerator.Execute(new(
 							httpClient,
