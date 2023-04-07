@@ -49,8 +49,8 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.GenerateStaticPages(
-	args,
 	app.Environment.WebRootPath,
+	args,
 	alwaysDefautFile: false,
 	dontUpdateLinks: false);
 

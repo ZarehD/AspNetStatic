@@ -25,10 +25,38 @@ namespace AspNetStatic
 		/// <summary>
 		///		Generates static pages for the configured pages.
 		/// </summary>
+		/// <param name="host"></param>
+		/// <param name="commandLineArgs">
+		///		The commandline arguments passed to your web app. The args 
+		///		are examined for the "static-only" parameter.
+		/// </param>
+		/// <param name="destinationRoot"></param>
+		/// <param name="alwaysDefautFile"></param>
+		/// <param name="dontUpdateLinks"></param>
+		/// <param name="dontOptimizeContent"></param>
+		public static void GenerateStaticPages(
+			this IHost host,
+			string destinationRoot,
+			string[] commandLineArgs,
+			bool alwaysDefautFile = default,
+			bool dontUpdateLinks = default,
+			bool dontOptimizeContent = default) =>
+			host.GenerateStaticPages(
+				destinationRoot,
+				commandLineArgs.Any(a => a.Equals(STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase)),
+				alwaysDefautFile, dontUpdateLinks, dontOptimizeContent);
+
+		/// <summary>
+		///		Generates static pages for the configured pages.
+		/// </summary>
 		/// <param name="host">An instance of the AspNetCore app host.</param>
 		/// <param name="destinationRoot">
 		///		The path to the root folder where generated static page 
 		///		files (and subfolders) will be placed.
+		/// </param>
+		/// <param name="exitWhenDone">
+		///		Specifies whether to exit the app (gracefully shut the web app down) 
+		///		after generating the static files.
 		/// </param>
 		/// <param name="alwaysDefautFile">
 		///		<para>
@@ -57,10 +85,19 @@ namespace AspNetStatic
 		///			<paramref name="alwaysDefautFile"/>.
 		///		</para>
 		/// </param>
+		/// <param name="dontOptimizeContent">
+		///		<para>
+		///			Specifies whether to NOT optimize the content of generated static fiels.
+		///		</para>
+		///		<para>
+		///			By default, when this parameter is <c>false</c>, content of the generated 
+		///			static file will be minified. Specify <c>true</c> to omit the optimizations.
+		///		</para>
+		/// </param>
 		public static void GenerateStaticPages(
 			this IHost host,
-			string[] commandLineArgs,
 			string destinationRoot,
+			bool exitWhenDone = default,
 			bool alwaysDefautFile = default,
 			bool dontUpdateLinks = default,
 			bool dontOptimizeContent = default)
@@ -139,8 +176,7 @@ namespace AspNetStatic
 						logger.Exception(ex);
 					}
 
-					if (commandLineArgs.Any(a => a.Equals(
-						STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase)))
+					if (exitWhenDone)
 					{
 						logger.Exiting();
 						await Task.Delay(500);
