@@ -12,11 +12,11 @@ the specific language governing permissions and limitations under the License.
 
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using WebMarkupMin.Core;
 
 namespace AspNetStatic
 {
@@ -62,7 +62,8 @@ namespace AspNetStatic
 			string[] commandLineArgs,
 			string destinationRoot,
 			bool alwaysDefautFile = default,
-			bool dontUpdateLinks = default)
+			bool dontUpdateLinks = default,
+			bool dontOptimizeContent = default)
 		{
 			if (host is null)
 			{
@@ -87,6 +88,10 @@ namespace AspNetStatic
 				logger.NoPagesToProcess();
 				return;
 			}
+
+			var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
+			var cssMinifier = host.Services.GetService<ICssMinifier>();
+			var jsMinifier = host.Services.GetService<IJsMinifier>();
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
@@ -122,7 +127,11 @@ namespace AspNetStatic
 							!dontUpdateLinks,
 							pageUrlProvider.DefaultFileName,
 							pageUrlProvider.PageFileExtension.AssureStartsWith('.'),
-							pageUrlProvider.DefaultFileExclusions),
+							pageUrlProvider.DefaultFileExclusions,
+							dontOptimizeContent,
+							htmlMinifierSettings,
+							cssMinifier,
+							jsMinifier),
 							loggerFactory);
 					}
 					catch (Exception ex)
