@@ -225,7 +225,7 @@ app.GenerateStaticPages(
 
 ### Configuration
 
-To customize the settings AspNetStatic uses when performing minification operations, register the appropriate objects in the DI container, as shown below.
+To customize the minification settings used by AspNetStatic, register the appropriate objects in the DI container, as shown below.
 
 > AspNetStatic uses the excellent WebMarkupMin package to implement the minification feature. For details about the configuration settings, please consult the WebMarkupMin [documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
 
