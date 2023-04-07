@@ -43,7 +43,7 @@ namespace AspNetStatic
 			bool dontOptimizeContent = default) =>
 			host.GenerateStaticPages(
 				destinationRoot,
-				commandLineArgs.Any(a => a.Equals(STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase)),
+				commandLineArgs.HasExitAfterStaticGenerationParameter(),
 				alwaysDefautFile, dontUpdateLinks, dontOptimizeContent);
 
 		/// <summary>
@@ -186,6 +186,10 @@ namespace AspNetStatic
 		}
 
 		private const string STATIC_ONLY = "static-only";
+
+		public static bool HasExitAfterStaticGenerationParameter(this string[] args) => 
+			(args is not null) && args.Any(a => a.Equals(
+				STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase));
 	}
 
 
