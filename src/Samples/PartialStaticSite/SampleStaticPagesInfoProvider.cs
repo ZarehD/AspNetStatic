@@ -1,7 +1,6 @@
 ﻿using AspNetStatic;
-using StaticSiteLib;
 
-namespace Sample.PartialStaticSite
+namespace PartialStaticSite
 {
 	public class SampleStaticPagesInfoProvider : StaticPagesInfoProviderBase
 	{

@@ -18,7 +18,7 @@
 		<RootNamespace>AspNetStatic</RootNamespace>
 		<PackageId>AspNetStatic</PackageId>
 		<Title>AspNetStatic</Title>
-		<PackageTags>net;asp.net core;asp.static;.net;C#;site;html;generator</PackageTags>
+		<PackageTags>.net;.net core;asp.net core;C#;static;site;website;html;generator</PackageTags>
 
 		<Authors>Zareh DerGevorkian</Authors>
 		<Company>Zareh DerGevorkian</Company>
@@ -26,7 +26,7 @@
 		<Copyright>Copyright © 2023 Zareh DerGevorkian. All rights reserved</Copyright>
 		<Product>AspNetStatic</Product>
 		<Description>Transforms ASP.NET Core into a static site generator.</Description>
-		<Version>0.8.2</Version>
+		<Version>0.9.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="StaticSiteLib" Version="0.9.0" />
+	  <PackageReference Include="WebMarkupMin.Core" Version="2.13.9" />
 	</ItemGroup>
 
 	<ItemGroup>

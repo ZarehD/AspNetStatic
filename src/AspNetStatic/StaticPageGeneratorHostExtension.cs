@@ -195,7 +195,7 @@ namespace AspNetStatic
 
 	#region Logger Extensions...
 
-	internal static partial class StaticPageGeneratorLoggerExtensions
+	internal static partial class StaticPageGeneratorHostExtensionLoggerExtensions
 	{
 		#region 1001 - Trace
 

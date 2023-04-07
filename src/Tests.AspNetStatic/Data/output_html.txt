@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy - PartialStaticSite</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=pAGv4ietcJNk_EwsQZ5BN9-K4MuNYS2a9wl4Jw-q9D0" />
+    <link rel="stylesheet" href="/PartialStaticSite.styles.css" />
+</head>
+<body>
+    <header>
+        <nav b-j6gudk29q9 class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div b-j6gudk29q9 class="container">
+                <a class="navbar-brand" href="/index.html">PartialStaticSite</a>
+                <button b-j6gudk29q9 class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span b-j6gudk29q9 class="navbar-toggler-icon"></span>
+                </button>
+                <div b-j6gudk29q9 class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul b-j6gudk29q9 class="navbar-nav flex-grow-1">
+                        <li b-j6gudk29q9 class="nav-item">
+                            <a class="nav-link text-dark" href="/index.html">Home</a>
+                        </li>
+                        <li b-j6gudk29q9 class="nav-item">
+                            <a class="nav-link text-dark" href="/Privacy.html">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div b-j6gudk29q9 class="container">
+        <main b-j6gudk29q9 role="main" class="pb-3">
+            <h1>Privacy Policy</h1>
+
+<p>Use this page to detail your site's privacy policy.</p>
+
+<p>Extra Links for testing...</p>
+<a href="/blogs/blog/Articles/index.html">
+<a href="/blogs/blog/Articles/article1.html">
+
+        </main>
+    </div>
+
+    <footer b-j6gudk29q9 class="border-top footer text-muted">
+        <div b-j6gudk29q9 class="container">
+            &copy; 2023 - PartialStaticSite - <a href="/Privacy.html">Privacy</a> <a class='abcd' href='/Privacy.html'></a>
+        </div>
+    </footer>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js?v=4q1jwFhaPaZgr8WAUSrux6hAuh0XDg9kPS3xIVq36I0"></script>
+
+    
+</body>
+</html>

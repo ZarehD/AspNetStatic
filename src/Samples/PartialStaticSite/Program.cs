@@ -1,8 +1,10 @@
 #define ENABLE_STATIC_PAGE_FALLBACK
 
 using AspNetStatic;
-using Sample.PartialStaticSite;
+using PartialStaticSite;
 
+
+var exitWhenDone = args.HasExitAfterStaticGenerationParameter();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,7 @@ builder.Services.AddRouting(
 	{
 		options.LowercaseUrls = true;
 		options.LowercaseQueryStrings = true;
-		options.AppendTrailingSlash = true;
+		options.AppendTrailingSlash = false;
 	});
 
 builder.Services.AddRazorPages();
@@ -35,6 +37,7 @@ app.UseStaticPageFallback(
 	cfg =>
 	{
 		cfg.AlwaysDefaultFile = false;
+		cfg.IgnoreOutFilePathname = false;
 	});
 
 #endif
@@ -50,7 +53,7 @@ app.MapRazorPages();
 
 app.GenerateStaticPages(
 	app.Environment.WebRootPath,
-	args,
+	exitWhenDone: false,
 	alwaysDefautFile: false,
 	dontUpdateLinks: false);
 

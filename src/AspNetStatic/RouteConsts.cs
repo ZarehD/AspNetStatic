@@ -10,4 +10,11 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
-global using System.Globalization;
+namespace AspNetStatic
+{
+	public static class RouteConsts
+	{
+		public static readonly char BakSlash = '\\';
+		public static readonly char FwdSlash = '/';
+	}
+}

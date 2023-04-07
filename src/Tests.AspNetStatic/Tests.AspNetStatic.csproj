@@ -23,4 +23,28 @@
     <ProjectReference Include="..\AspNetStatic\AspNetStatic.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Remove="Data\input.txt" />
+		<None Remove="Data\output_default.txt" />
+		<None Remove="Data\output_html.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Data\input.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Include="Data\output_default.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Include="Data\output_html.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
 </Project>
