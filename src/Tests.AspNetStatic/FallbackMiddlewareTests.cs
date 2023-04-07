@@ -45,7 +45,7 @@ namespace Tests.AspNetStatic
 		{
 			var webRoot = GetWebHostEnvironment().WebRootPath;
 			var fullPathname = Path.Combine(
-				webRoot, filePathname.AssureNotStartsWith(
+				webRoot, filePathname.EnsureNotStartsWith(
 					RouteConsts.BakSlash));
 			if (!Directory.Exists(Path.GetDirectoryName(fullPathname)))
 			{
@@ -60,7 +60,7 @@ namespace Tests.AspNetStatic
 
 			var webRoot = GetWebHostEnvironment().WebRootPath;
 			var fullPathname = Path.Combine(
-				webRoot, filePathname.AssureNotStartsWith(
+				webRoot, filePathname.EnsureNotStartsWith(
 					RouteConsts.BakSlash));
 
 			if (File.Exists(fullPathname))

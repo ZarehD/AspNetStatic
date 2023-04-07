@@ -12,7 +12,7 @@
         [DataRow("z", 'a', "az")]
         public void Test_AssureStartsWith_Char(string src, char pfx, string expected)
         {
-            var actual = src.AssureStartsWith(pfx);
+            var actual = src.EnsureStartsWith(pfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -23,7 +23,7 @@
         [DataRow("xyz", "abc", "abcxyz")]
         public void Test_AssureStartsWith_Str(string src, string pfx, string expected)
         {
-            var actual = src.AssureStartsWith(pfx);
+            var actual = src.EnsureStartsWith(pfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -36,7 +36,7 @@
         [DataRow("az", 'a', "z")]
         public void Test_AssureNotStartsWith_Char(string src, char pfx, string expected)
         {
-            var actual = src.AssureNotStartsWith(pfx);
+            var actual = src.EnsureNotStartsWith(pfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -49,7 +49,7 @@
         [DataRow("xyz", "abc", "xyz")]
         public void Test_AssureNotStartsWith_Str(string src, string pfx, string expected)
         {
-            var actual = src.AssureNotStartsWith(pfx);
+            var actual = src.EnsureNotStartsWith(pfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -64,7 +64,7 @@
         [DataRow("a", 'z', "az")]
         public void Test_AssureEndsWith_Char(string src, char sfx, string expected)
         {
-            var actual = src.AssureEndsWith(sfx);
+            var actual = src.EnsureEndsWith(sfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -75,7 +75,7 @@
         [DataRow("abc", "xyz", "abcxyz")]
         public void Test_AssureEndsWith_Str(string src, string sfx, string expected)
         {
-            var actual = src.AssureEndsWith(sfx);
+            var actual = src.EnsureEndsWith(sfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -88,7 +88,7 @@
         [DataRow("az", 'z', "a")]
         public void Test_AssureNotEndsWith_Char(string src, char sfx, string expected)
         {
-            var actual = src.AssureNotEndsWith(sfx);
+            var actual = src.EnsureNotEndsWith(sfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 
@@ -101,7 +101,7 @@
         [DataRow("xyz", "z", "xy")]
         public void Test_AssureNotEndsWith_Str(string src, string sfx, string expected)
         {
-            var actual = src.AssureNotEndsWith(sfx);
+            var actual = src.EnsureNotEndsWith(sfx);
             Assert.AreEqual(expected, actual, ignoreCase: true);
         }
 

@@ -12,41 +12,41 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public static class AspNetStaticExtensions
+	internal static class AspNetStaticExtensions
 	{
-		public  static string AssureStartsWith(this string? src, char pfx) =>
+		public  static string EnsureStartsWith(this string? src, char pfx) =>
 			(src is null) ? pfx.ToString()
 			: src.StartsWith(pfx)
 			? src : $"{pfx}{src}";
-		public  static string AssureStartsWith(this string? src, string pfx) =>
+		public  static string EnsureStartsWith(this string? src, string pfx) =>
 			(src is null) ? pfx
 			: src.StartsWith(pfx, StringComparison.InvariantCultureIgnoreCase)
 			? src : $"{pfx}{src}";
 
-		public  static string AssureNotStartsWith(this string? src, char pfx) =>
+		public  static string EnsureNotStartsWith(this string? src, char pfx) =>
 			(src is null) ? string.Empty
 			: src.StartsWith(pfx)
 			? src[1..] : src;
-		public  static string AssureNotStartsWith(this string? src, string pfx) =>
+		public  static string EnsureNotStartsWith(this string? src, string pfx) =>
 			(src is null) ? string.Empty
 			: src.StartsWith(pfx, StringComparison.InvariantCultureIgnoreCase)
 			? src[pfx.Length..] : src;
 
 
-		public  static string AssureEndsWith(this string? src, char sfx) =>
+		public  static string EnsureEndsWith(this string? src, char sfx) =>
 			(src is null) ? sfx.ToString() :
 			src.EndsWith(sfx)
 			? src : $"{src}{sfx}";
-		public  static string AssureEndsWith(this string? src, string sfx) =>
+		public  static string EnsureEndsWith(this string? src, string sfx) =>
 			(src is null) ? sfx :
 			src.EndsWith(sfx, StringComparison.InvariantCultureIgnoreCase)
 			? src : $"{src}{sfx}";
 
-		public  static string AssureNotEndsWith(this string? src, char sfx) =>
+		public  static string EnsureNotEndsWith(this string? src, char sfx) =>
 			(src is null) ? string.Empty :
 			src.EndsWith(sfx)
 			? src[0..^1] : src;
-		public  static string AssureNotEndsWith(this string? src, string sfx) =>
+		public  static string EnsureNotEndsWith(this string? src, string sfx) =>
 			(src is null) ? string.Empty :
 			src.EndsWith(sfx, StringComparison.InvariantCultureIgnoreCase)
 			? src[0..^sfx.Length] : src;

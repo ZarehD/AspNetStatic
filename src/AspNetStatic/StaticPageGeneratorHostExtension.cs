@@ -163,7 +163,7 @@ namespace AspNetStatic
 							alwaysDefautFile,
 							!dontUpdateLinks,
 							pageUrlProvider.DefaultFileName,
-							pageUrlProvider.PageFileExtension.AssureStartsWith('.'),
+							pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 							pageUrlProvider.DefaultFileExclusions,
 							dontOptimizeContent,
 							htmlMinifierSettings,

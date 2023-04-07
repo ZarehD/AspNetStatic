@@ -91,7 +91,7 @@ namespace AspNetStatic
 
 			return
 				Path.Combine(rootFolder,
-				pagePath.AssureNotStartsWith(Path.DirectorySeparatorChar));
+				pagePath.EnsureNotStartsWith(Path.DirectorySeparatorChar));
 		}
 
 

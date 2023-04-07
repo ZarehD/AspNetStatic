@@ -28,7 +28,7 @@ namespace AspNetStatic
 
 		public string PageFileExtension { get; } = ".html";
 
-		public string IndexFileName => $"{this.DefaultFileName}{this.PageFileExtension.AssureStartsWith('.')}";
+		public string IndexFileName => $"{this.DefaultFileName}{this.PageFileExtension.EnsureStartsWith('.')}";
 
 		public List<string> DefaultFileExclusions { get; } = new(new[] { "index", "default" });
 

@@ -52,7 +52,7 @@ namespace AspNetStatic
 			options ??= new StaticPageFallbackMiddlewareOptions();
 
 			this._haveStaticPages = this._pageInfoProvider.Pages.Any();
-			this._pageFileExtension = this._pageInfoProvider.PageFileExtension.AssureStartsWith(".");
+			this._pageFileExtension = this._pageInfoProvider.PageFileExtension.EnsureStartsWith(".");
 			this._defaultFileName = $"{this._pageInfoProvider.DefaultFileName}{this._pageFileExtension}";
 			this._exclusions = this._pageInfoProvider.DefaultFileExclusions;
 
@@ -76,7 +76,7 @@ namespace AspNetStatic
 		{
 			if (this._haveStaticPages)
 			{
-				var path = ctx.Request.Path.Value.AssureStartsWith(RouteConsts.FwdSlash);
+				var path = ctx.Request.Path.Value.EnsureStartsWith(RouteConsts.FwdSlash);
 				var page = this._pageInfoProvider.Pages.GetForRoute(path);
 
 				if (page is not null)
@@ -86,14 +86,14 @@ namespace AspNetStatic
 					{
 						var physicalPath =
 							Path.Combine(this._webRoot,
-							page.OutFilePathname.AssureNotStartsWith(
+							page.OutFilePathname.EnsureNotStartsWith(
 								Path.DirectorySeparatorChar));
 
 						if (File.Exists(physicalPath))
 						{
 							var newPath = page.OutFilePathname.Replace(
 								Path.DirectorySeparatorChar, RouteConsts.FwdSlash)
-								.AssureStartsWith(RouteConsts.FwdSlash);
+								.EnsureStartsWith(RouteConsts.FwdSlash);
 
 							this._logger?.ProcessedRoute(path, newPath);
 
@@ -129,7 +129,7 @@ namespace AspNetStatic
 								Path.Combine(this._webRoot, newPath
 								.Replace(RouteConsts.BakSlash, Path.DirectorySeparatorChar)
 								.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar)
-								.AssureNotStartsWith(Path.DirectorySeparatorChar));
+								.EnsureNotStartsWith(Path.DirectorySeparatorChar));
 
 							if (File.Exists(physicalPath))
 							{

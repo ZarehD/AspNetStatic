@@ -39,8 +39,8 @@ namespace AspNetStatic
 			var pattern = string.Format(_regex, string.Join('|',
 				pages.Select(
 					p => p.Route.Equals(RouteConsts.FwdSlash.ToString()) ? p.Route :
-					p.Route.AssureNotStartsWith(RouteConsts.FwdSlash)
-					.AssureNotEndsWith(RouteConsts.FwdSlash))));
+					p.Route.EnsureNotStartsWith(RouteConsts.FwdSlash)
+					.EnsureNotEndsWith(RouteConsts.FwdSlash))));
 
 			htmlContent = Regex.Replace(
 				htmlContent, pattern, m =>
@@ -50,10 +50,10 @@ namespace AspNetStatic
 					var page =
 						pages.FirstOrDefault(
 							p => href == _fSlash ? p.Route.Equals(_fSlash) :
-							p.Route.AssureNotStartsWith(RouteConsts.FwdSlash)
-							.AssureNotEndsWith(RouteConsts.FwdSlash)
-							.Equals(href.AssureNotStartsWith(RouteConsts.FwdSlash)
-							.AssureNotEndsWith(RouteConsts.FwdSlash),
+							p.Route.EnsureNotStartsWith(RouteConsts.FwdSlash)
+							.EnsureNotEndsWith(RouteConsts.FwdSlash)
+							.Equals(href.EnsureNotStartsWith(RouteConsts.FwdSlash)
+							.EnsureNotEndsWith(RouteConsts.FwdSlash),
 							routesAreCaseSensitive
 							? StringComparison.InvariantCulture
 							: StringComparison.InvariantCultureIgnoreCase));
@@ -64,13 +64,13 @@ namespace AspNetStatic
 						!string.IsNullOrWhiteSpace(page.OutFilePathname)
 						? page.OutFilePathname
 						.Replace(RouteConsts.BakSlash, RouteConsts.FwdSlash)
-						.AssureStartsWith(_fSlash)
+						.EnsureStartsWith(_fSlash)
 						: (page.Route.EndsWith(RouteConsts.FwdSlash) || alwaysDefaultFile)
-						? $"{href.AssureEndsWith(_fSlash)}{defaultFileName}"
-						: $"{href.AssureNotEndsWith(_fSlash)}{pageFileExtension}"
+						? $"{href.EnsureEndsWith(_fSlash)}{defaultFileName}"
+						: $"{href.EnsureNotEndsWith(_fSlash)}{pageFileExtension}"
 						;
 
-					newHref = href.StartsWith(_fSlash) ? newHref.AssureStartsWith(_fSlash) : newHref;
+					newHref = href.StartsWith(_fSlash) ? newHref.EnsureStartsWith(_fSlash) : newHref;
 
 					return m.Value.Replace(href, newHref);
 				},
