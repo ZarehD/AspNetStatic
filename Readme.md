@@ -175,7 +175,7 @@ Sample Configuration 2:
       dontUpdateLinks: true);
     ```
 
-If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a StaticOnly profile in _launchSettings.json_ (as shown earlier) and surround the `app.GenerateStaticPages()` call with an IF gate in order to switch between static-page-generation and normal page-serving modes.
+If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a StaticOnly profile in _launchSettings.json_ (as shown earlier) and surround the `app.GenerateStaticPages()` call with an IF gate.
 ```c#
 if (args.HasExitAfterStaticGenerationParameter())
 {
