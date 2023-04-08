@@ -36,10 +36,10 @@ It's a peace of cake!
    dotnet add package AspNetStatic
    ```
 1. Create and register a class that implements `IStaticPagesInfoProvider`
-	- Derrive from `StaticPagesInfoProviderBase` or implement the interface directly
-	- Populate the `Pages` collection to specify the routes for which to generate static pages
-	- Set other properties as appropriate
-	- Register the class in the DI container
+  - Derrive from `StaticPagesInfoProviderBase` or implement the interface directly
+  - Populate the `Pages` collection to specify the routes for which to generate static pages
+  - Set other properties as appropriate
+  - Register the class in the DI container
       ```c#
       builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>();
       ```
@@ -116,13 +116,13 @@ Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always
 > #### The same rules apply when links in static files are updated to refer to other generated static files.
 
 
-__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link urls based on the routing configuration of your app, so be sure to specify an appropriate value for `alwaysDefaultFile`, as below.
+__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link URLs based on the routing configuration of your app, so if you're using them, be sure to specify an appropriate value for `alwaysDefaultFile`, as shown below.
 ```c#
 builder.Services.AddRouting(
-	options =>
-	{ // default configuration in ASP.NET Core
-		options.AppendTrailingSlash = false;   // generated links: / and /page
-	});
+  options =>
+  { // default configuration in ASP.NET Core
+    options.AppendTrailingSlash = false;   // generated links: / and /page
+  });
 ...
 app.GenerateStaticPages(
   alwaysDefaultFile: false);   // generated pages: /index.html and /page.index.html
@@ -130,10 +130,10 @@ app.GenerateStaticPages(
 --OR--
 
 builder.Services.AddRouting(
-	options =>
-	{
-		options.AppendTrailingSlash = true;   // generated links: / and /page/
-	});
+  options =>
+  {
+    options.AppendTrailingSlash = true;   // generated links: / and /page/
+  });
 ...
 app.GenerateStaticPages(
   alwaysDefaultFile: true);   // generated pages: /index.html and /page/index.html
@@ -156,8 +156,8 @@ Sample Configuration 1:
   - Update href attribute value for \<a\> and \<area\> tags that refer to static pages (e.g. _/page_ to _/page.html_).
     ```c#
     app.GenerateStaticPages(
-      args,
       app.Environment.WebRoot,
+      exitWhenDone: true,
       alwaysDefautFile: false,
       dontUpdateLinks: false);
     ```
@@ -169,11 +169,22 @@ Sample Configuration 2:
   - Use your web server's redirect or url-rewrite module to re-route requests (e.g. _/page/_ or _/page/index_ to _/page/index.html_).
     ```c#
     app.GenerateStaticPages(
-      args,
       "C:\path\to\destination\root\folder",
+      commandLineArgs: args, // exit when done if contains 'static-only' parameter
       alwaysDefautFile: true,
       dontUpdateLinks: true);
     ```
+
+If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a StaticOnly profile in _launchSettings.json_ (as shown earlier) and surround the `app.GenerateStaticPages()` call with an IF gate in order to switch between static-page-generation and normal page-serving modes.
+```c#
+if (args.HasExitAfterStaticGenerationParameter())
+{
+  app.GenerateStaticPages(
+    "path\to\destination\root\folder",
+    exitWhenDone: true,
+  );
+}
+```
 
 
 ### Partial Static Site
@@ -187,7 +198,7 @@ The configuration options are the same as for a standalone static site, except t
  - You must do one of the following (can do both):
    - Use the AspNetStatic fallback middleware.
    - Allow links in generaed static files to be updated.
- - Do not specify the static-only command-line parameter when running the app (obviously, right?)
+ - Do not exit the app after static files are generated (obviously, right?)
  
 Like this:
 ```c#
@@ -200,8 +211,8 @@ app.UseRouting();
 app.Map...();
 ...
 app.GenerateStaticPages(
-  args,                          // no static-only parameter
   app.Environment.WebRoot,       // must specify wwwroot
+  exitWhenDone: false,           // don't exit after generating static files
   alwaysDefautFile: true/false,
   dontUpdateLinks: false);       // update links so they refer to the static file
 ...
