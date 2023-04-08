@@ -12,7 +12,7 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	internal static class AspNetStaticExtensions
+	internal static class StringExtensions
 	{
 		public  static string EnsureStartsWith(this string? src, char pfx) =>
 			(src is null) ? pfx.ToString()
