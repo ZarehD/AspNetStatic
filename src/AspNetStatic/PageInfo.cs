@@ -33,10 +33,17 @@ namespace AspNetStatic
 		/// </summary>
 		/// <remarks>
 		///		The specified value is appended to the value specified in 
-		///		<see cref="Route"/> without modification to either value.
+		///		<see cref="Route"/> without modification to either value 
+		///		(see <see cref="Url"/> proprty).
 		/// </remarks>
 		[JsonPropertyName("Query")]
 		public string? QueryString { get; init; }
+
+		/// <summary>
+		///		Gets the combined <see cref="Route"/> and 
+		///		<see cref="QueryString"/> value.
+		/// </summary>
+		public string Url => $"{this.Route.EnsureEndsWith(RouteConsts.FwdSlash)}{this.QueryString}";
 
 		/// <summary>
 		///		Gets or sets the pathname (path and filename) of the file 

@@ -66,7 +66,7 @@ namespace AspNetStatic
 					continue;
 				}
 
-				var requestUri = pageRoute + page.QueryString;
+				var requestUri = page.Url;
 
 				logger?.FetchingPageContent(requestUri);
 
