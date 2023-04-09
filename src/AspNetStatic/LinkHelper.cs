@@ -47,16 +47,7 @@ namespace AspNetStatic
 				{
 					var href = m.Groups[1].Value;
 
-					var page =
-						pages.FirstOrDefault(
-							p => href == _fSlash ? p.Route.Equals(_fSlash) :
-							p.Route.EnsureNotStartsWith(RouteConsts.FwdSlash)
-							.EnsureNotEndsWith(RouteConsts.FwdSlash)
-							.Equals(href.EnsureNotStartsWith(RouteConsts.FwdSlash)
-							.EnsureNotEndsWith(RouteConsts.FwdSlash),
-							routesAreCaseSensitive
-							? StringComparison.InvariantCulture
-							: StringComparison.InvariantCultureIgnoreCase));
+					var page = pages.FindPage(href, routesAreCaseSensitive);
 
 					if (page is null) return m.Value;
 
@@ -82,6 +73,25 @@ namespace AspNetStatic
 
 
 			return htmlContent;
+		}
+
+		public static PageInfo? FindPage(
+			this IEnumerable<PageInfo> pages,
+			string href,
+			bool routesAreCaseSensitive = default)
+		{
+			if ((pages is null) || !pages.Any()) return default;
+
+			return
+				pages.FirstOrDefault(
+					p => href == _fSlash ? p.Url.Equals(_fSlash) :
+					p.Url.EnsureNotStartsWith(RouteConsts.FwdSlash)
+					.EnsureNotEndsWith(RouteConsts.FwdSlash)
+					.Equals(href.EnsureNotStartsWith(RouteConsts.FwdSlash)
+					.EnsureNotEndsWith(RouteConsts.FwdSlash),
+					routesAreCaseSensitive
+					? StringComparison.InvariantCulture
+					: StringComparison.InvariantCultureIgnoreCase));
 		}
 
 		private static readonly string _regex = @"(?:<a|<area) (?:\s|\w|-|_|=|""|')* (?:\n|\r|\f|\r\n|\n\r|\n\f|\f\n)* (?:\s|\w|-|_|=|""|')* href=[""|']([/]?(?:{0})[/]?)[""|']";

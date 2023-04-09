@@ -22,6 +22,9 @@
 				new("docs/page1"),
 				new("docs/page2/"),
 				new("/home/p1"){ OutFilePathname = @"home\page1.htm" },
+				new("/pages/page") { QueryString = "?p1=q1" },
+				new("/pages/page") { QueryString = "/rp1" },
+				new("/pages/page/") { QueryString = "?p1=q1" },
 			});
 
 
@@ -104,6 +107,28 @@
 				alwaysDefaultFile: true);
 
 			Assert.AreEqual(expected, actual, ignoreCase: true);
+		}
+
+		#endregion
+
+		#region Find Page...
+
+		[DataTestMethod]
+		[DataRow(@"/pages/page", null)]
+		[DataRow(@"/pages/page/", null)]
+		[DataRow(@"/pages/page", "p1=q1")]
+		[DataRow(@"/pages/page/", "?q1=p1")]
+		[DataRow(@"/pages/page", "/route-parm")]
+		[DataRow(@"/pages/page/", "/route-parm")]
+		public void Test_FindPage(string route, string? query)
+		{
+			var page = new PageInfo(route) { QueryString = query };
+			var pages = new List<PageInfo>(new[] { page });
+
+			var expected = page;
+			var actual = pages.FindPage(page.Url);
+
+			Assert.AreEqual(expected, actual);
 		}
 
 		#endregion
