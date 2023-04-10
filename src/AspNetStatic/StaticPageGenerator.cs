@@ -120,7 +120,7 @@ namespace AspNetStatic
 
 					logger?.WritingPageFile(requestUri, pagePathShortName, pageContent.Length);
 
-					await File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct);
+					await File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct); //
 				}
 				else
 				{

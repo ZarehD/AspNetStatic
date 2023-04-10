@@ -37,7 +37,6 @@ app.UseStaticPageFallback(
 	cfg =>
 	{
 		cfg.AlwaysDefaultFile = false;
-		cfg.IgnoreOutFilePathname = false;
 	});
 
 #endif
@@ -53,8 +52,9 @@ app.MapRazorPages();
 
 app.GenerateStaticPages(
 	app.Environment.WebRootPath,
-	exitWhenDone: false,
+	exitWhenDone: exitWhenDone,
 	alwaysDefautFile: false,
-	dontUpdateLinks: false);
+	dontUpdateLinks: false,
+	regenerationInterval: TimeSpan.FromMinutes(5));
 
 app.Run();

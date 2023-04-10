@@ -100,7 +100,8 @@ namespace AspNetStatic
 			bool exitWhenDone = default,
 			bool alwaysDefautFile = default,
 			bool dontUpdateLinks = default,
-			bool dontOptimizeContent = default)
+			bool dontOptimizeContent = default,
+			TimeSpan? regenerationInterval = default)
 		{
 			if (host is null)
 			{
@@ -132,9 +133,7 @@ namespace AspNetStatic
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
-			using var ctsAppShutdown = new CancellationTokenSource();
-
-			lifetime.ApplicationStopping.Register(() => ctsAppShutdown.Cancel());
+			lifetime.ApplicationStopping.Register(() => _appShutdown.Cancel());
 
 			lifetime.ApplicationStarted.Register(
 				async () =>
@@ -151,37 +150,60 @@ namespace AspNetStatic
 							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp)) ??
 							throw new InvalidOperationException(Properties.Resources.Err_HostNotHttpService);
 
-						using var httpClient =
-							new HttpClient()
-							{
-								BaseAddress = new Uri(baseUri),
-								Timeout = TimeSpan.FromSeconds(90)
-							};
+						_httpClient.BaseAddress = new Uri(baseUri);
+						_httpClient.Timeout = TimeSpan.FromSeconds(90);
+						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(AspNetStatic));
 
-						httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(AspNetStatic));
+						var generatorConfig =
+							new StaticPageGeneratorConfig(
+								_httpClient,
+								pageUrlProvider.Pages,
+								destinationRoot,
+								alwaysDefautFile,
+								!dontUpdateLinks,
+								pageUrlProvider.DefaultFileName,
+								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
+								pageUrlProvider.DefaultFileExclusions,
+								dontOptimizeContent,
+								htmlMinifierSettings,
+								cssMinifier,
+								jsMinifier);
 
-						await StaticPageGenerator.Execute(new(
-							httpClient,
-							pageUrlProvider.Pages,
-							destinationRoot,
-							alwaysDefautFile,
-							!dontUpdateLinks,
-							pageUrlProvider.DefaultFileName,
-							pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
-							pageUrlProvider.DefaultFileExclusions,
-							dontOptimizeContent,
-							htmlMinifierSettings,
-							cssMinifier,
-							jsMinifier),
+						await StaticPageGenerator.Execute(
+							generatorConfig,
 							loggerFactory,
-							ctsAppShutdown.Token);
+							_appShutdown.Token);
+
+						if ((regenerationInterval is not null) && !_appShutdown.IsCancellationRequested)
+						{
+							_timer.Interval = regenerationInterval.Value.TotalMilliseconds;
+							_timer.Elapsed +=
+								async (s, e) =>
+								{
+									await StaticPageGenerator.Execute(
+										generatorConfig,
+										loggerFactory,
+										_appShutdown.Token);
+
+									if (_appShutdown.IsCancellationRequested)
+									{
+										_timer.Stop();
+									}
+								};
+							_timer.Start();
+						}
 					}
+					catch (TaskCanceledException) { }
 					catch (Exception ex)
 					{
 						logger.Exception(ex);
 					}
 
-					if (exitWhenDone)
+					if (_appShutdown.IsCancellationRequested)
+					{
+						_timer.Stop();
+					}
+					else if (exitWhenDone)
 					{
 						logger.Exiting();
 						await Task.Delay(500);
@@ -190,11 +212,15 @@ namespace AspNetStatic
 				});
 		}
 
-		private const string STATIC_ONLY = "static-only";
-
 		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>
 			(args is not null) && args.Any(a => a.Equals(
 				STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase));
+
+		private static readonly CancellationTokenSource _appShutdown = new();
+		private static readonly HttpClient _httpClient = new();
+		private static readonly System.Timers.Timer _timer = new();
+
+		private const string STATIC_ONLY = "static-only";
 	}
 
 
