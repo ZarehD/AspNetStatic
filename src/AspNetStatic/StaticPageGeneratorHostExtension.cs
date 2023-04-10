@@ -132,6 +132,10 @@ namespace AspNetStatic
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
+			using var ctsAppShutdown = new CancellationTokenSource();
+
+			lifetime.ApplicationStopping.Register(() => ctsAppShutdown.Cancel());
+
 			lifetime.ApplicationStarted.Register(
 				async () =>
 				{
@@ -169,7 +173,8 @@ namespace AspNetStatic
 							htmlMinifierSettings,
 							cssMinifier,
 							jsMinifier),
-							loggerFactory);
+							loggerFactory,
+							ctsAppShutdown.Token);
 					}
 					catch (Exception ex)
 					{
@@ -187,7 +192,7 @@ namespace AspNetStatic
 
 		private const string STATIC_ONLY = "static-only";
 
-		public static bool HasExitAfterStaticGenerationParameter(this string[] args) => 
+		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>
 			(args is not null) && args.Any(a => a.Equals(
 				STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase));
 	}

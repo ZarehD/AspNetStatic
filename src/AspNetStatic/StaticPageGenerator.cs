@@ -20,8 +20,11 @@ namespace AspNetStatic
 	{
 		public static async Task Execute(
 			StaticPageGeneratorConfig config,
-			ILoggerFactory? loggerFactory = default)
+			ILoggerFactory? loggerFactory = default,
+			CancellationToken ct = default)
 		{
+			if (ct.IsCancellationRequested) return;
+
 			if (config is null) throw new ArgumentNullException(nameof(config));
 
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
@@ -36,13 +39,14 @@ namespace AspNetStatic
 						config.JsMinifier);
 			}
 
-
 			logger?.Configuration(config);
 
 			logger?.GeneratingStaticPages();
 
 			foreach (var page in config.Pages)
 			{
+				if (ct.IsCancellationRequested) break;
+
 				var pageRoute = page.Route;
 
 				logger?.ProcessingPage(pageRoute);
@@ -74,7 +78,7 @@ namespace AspNetStatic
 
 				try
 				{
-					pageContent = await config.HttpClient.GetStringAsync(requestUri);
+					pageContent = await config.HttpClient.GetStringAsync(requestUri, ct);
 				}
 				catch (Exception ex)
 				{
@@ -116,7 +120,7 @@ namespace AspNetStatic
 
 					logger?.WritingPageFile(requestUri, pagePathShortName, pageContent.Length);
 
-					await File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8);
+					await File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct);
 				}
 				else
 				{
