@@ -4,7 +4,7 @@
 ![License: Apache 2](https://img.shields.io/badge/license-Apache%202.0-blue?style=for-the-badge)
 
 
-## Transforms ASP.NET Core into a Static Site Generator
+## Transform ASP.NET Core into a Static Site Generator
 
 
 Okay, so you want to create a static website. After doing some research, you learn that all the cool kids are using tools like __Jekyll__, __Hugo__, __Gatsby__, __Statiq__, and others. 
