@@ -222,11 +222,22 @@ app.Run();
 > #### The fallback middleware only re-routes requests for routes that are specified in the `Pages` collection, and only if the static file exists.
 
 
+#### Regenerate Static Files Periodically
+
+If the data used in the content of static files changes while the app is running, you can configure periodic regeneration by specifying a value for the `regenerationInterval` parameter in the `GenerateStaticPages()` call. This will result in static files being generated when the app starts, and then periodically based on the specified interval.
+```c#
+app.GenerateStaticPages(
+  ...
+  regenerationInterval: TimeSpan.FromHours(2) // re-generate static files every 2 hours
+);
+```
+
+
 <br/>
 
 ## Content Optimization
 
-AspNetStatic automatically minifies HTML content (and any embedded CSS or Javascript) in generated static files.
+AspNetStatic automatically minifies HTML content (and any embedded CSS or Javascript) in generated static files; configuration is not required.
 To disable this feature, specify `true` for the `dontOptimizeContent` parameter:
 ```c#
 app.GenerateStaticPages(
@@ -236,7 +247,7 @@ app.GenerateStaticPages(
 
 ### Configuration
 
-To customize the minification settings used by AspNetStatic, register the appropriate objects in the DI container, as shown below.
+To override the default minification settings used by AspNetStatic, register the appropriate objects in the DI container, as shown below.
 
 > AspNetStatic uses the excellent WebMarkupMin package to implement the minification feature. For details about the configuration settings, please consult the WebMarkupMin [documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
 
