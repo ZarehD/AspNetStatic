@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace AspNetStatic
 {
@@ -76,69 +77,76 @@ namespace AspNetStatic
 		{
 			if (this._haveStaticPages)
 			{
-				var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
-				var page = this._pageInfoProvider.Pages.GetForRoute(path);
+				var isAspNetStatic =
+					ctx.Request.Headers.TryGetValue(HeaderNames.UserAgent, out var ua) &&
+					ua.Contains(Consts.AspNetStatic);
 
-				if (page is not null)
+				if (!isAspNetStatic)
 				{
-					if (!this._ignoreOutFilePathname &&
-						!string.IsNullOrWhiteSpace(page.OutFilePathname))
+					var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
+					var page = this._pageInfoProvider.Pages.GetForRoute(path);
+
+					if (page is not null)
 					{
-						var physicalPath =
-							Path.Combine(this._webRoot,
-							page.OutFilePathname.EnsureNotStartsWith(
-								Path.DirectorySeparatorChar));
-
-						if (File.Exists(physicalPath))
-						{
-							var newPath = page.OutFilePathname.Replace(
-								Path.DirectorySeparatorChar, Consts.FwdSlash)
-								.EnsureStartsWith(Consts.FwdSlash);
-
-							this._logger?.ProcessedRoute(path, newPath);
-
-							ctx.Request.Path = newPath;
-						}
-						else
-						{
-							this._logger?.NoFileAtProposedRoute(path, "N/A", physicalPath);
-						}
-					}
-					else
-					{
-						var hasExtension = Path.HasExtension(path);
-						var endsWithSlash = path.EndsWith(Consts.FwdSlash);
-						var alwaysDefault = this._alwaysDefaultFile;
-
-						this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
-
-						var newPath =
-							(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
-							? path.ToDefaultFileFallback(
-								this._exclusions,
-								this._defaultFileName,
-								this._pageFileExtension)
-							: (!endsWithSlash && !hasExtension && !alwaysDefault)
-							? path + this._pageFileExtension
-							: string.Empty
-							;
-
-						if (!string.IsNullOrEmpty(newPath))
+						if (!this._ignoreOutFilePathname &&
+							!string.IsNullOrWhiteSpace(page.OutFilePathname))
 						{
 							var physicalPath =
-								Path.Combine(this._webRoot, newPath
-								.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
-								.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-								.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+								Path.Combine(this._webRoot,
+								page.OutFilePathname.EnsureNotStartsWith(
+									Path.DirectorySeparatorChar));
 
 							if (File.Exists(physicalPath))
 							{
+								var newPath = page.OutFilePathname.Replace(
+									Path.DirectorySeparatorChar, Consts.FwdSlash)
+									.EnsureStartsWith(Consts.FwdSlash);
+
 								this._logger?.ProcessedRoute(path, newPath);
+
 								ctx.Request.Path = newPath;
 							}
 							else
 							{
-								this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+								this._logger?.NoFileAtProposedRoute(path, "N/A", physicalPath);
+							}
+						}
+						else
+						{
+							var hasExtension = Path.HasExtension(path);
+							var endsWithSlash = path.EndsWith(Consts.FwdSlash);
+							var alwaysDefault = this._alwaysDefaultFile;
+
+							this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
+
+							var newPath =
+								(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
+								? path.ToDefaultFileFallback(
+									this._exclusions,
+									this._defaultFileName,
+									this._pageFileExtension)
+								: (!endsWithSlash && !hasExtension && !alwaysDefault)
+								? path + this._pageFileExtension
+								: string.Empty
+								;
+
+							if (!string.IsNullOrEmpty(newPath))
+							{
+								var physicalPath =
+									Path.Combine(this._webRoot, newPath
+									.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+									.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+									.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+
+								if (File.Exists(physicalPath))
+								{
+									this._logger?.ProcessedRoute(path, newPath);
+									ctx.Request.Path = newPath;
+								}
+								else
+								{
+									this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+								}
 							}
 						}
 					}
@@ -196,6 +204,8 @@ namespace AspNetStatic
 		}
 	}
 
+
+	#region Logger Messages...
 
 	public static partial class StaticPageFallbackMiddlewareLoggerExtensions
 	{
@@ -303,4 +313,6 @@ namespace AspNetStatic
 
 		#endregion
 	}
+
+	#endregion
 }

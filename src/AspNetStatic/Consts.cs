@@ -16,5 +16,7 @@ namespace AspNetStatic
 	{
 		public static readonly char BakSlash = '\\';
 		public static readonly char FwdSlash = '/';
+
+		public static readonly string AspNetStatic = nameof(AspNetStatic);
 	}
 }

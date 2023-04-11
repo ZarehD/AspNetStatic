@@ -159,7 +159,7 @@ namespace AspNetStatic
 
 						_httpClient.BaseAddress = new Uri(baseUri);
 						_httpClient.Timeout = TimeSpan.FromSeconds(90);
-						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, nameof(AspNetStatic));
+						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
 
 						var generatorConfig =
 							new StaticPageGeneratorConfig(
