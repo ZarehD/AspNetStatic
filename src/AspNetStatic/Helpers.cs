@@ -39,10 +39,10 @@ namespace AspNetStatic
 
 			return
 				((exclusions is null) || !exclusions.Any(
-					x => route.EnsureNotEndsWith(RouteConsts.FwdSlash)?
+					x => route.EnsureNotEndsWith(Consts.FwdSlash)?
 					.EndsWith(x, StringComparison.InvariantCultureIgnoreCase) ?? false))
-				? route.EnsureEndsWith(RouteConsts.FwdSlash) + defaultFileName
-				: route.EnsureNotEndsWith(RouteConsts.FwdSlash) + pageFileExtension
+				? route.EnsureEndsWith(Consts.FwdSlash) + defaultFileName
+				: route.EnsureNotEndsWith(Consts.FwdSlash) + pageFileExtension
 				;
 		}
 	}

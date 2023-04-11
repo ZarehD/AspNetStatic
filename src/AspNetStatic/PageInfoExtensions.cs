@@ -26,8 +26,8 @@ namespace AspNetStatic
 			bool routesAreCaseSensitive = default) =>
 			(pages is null) || !pages.Any() ? default :
 			pages.FirstOrDefault(
-				p => p.Route.EnsureStartsWith(RouteConsts.FwdSlash).EnsureEndsWith(RouteConsts.FwdSlash)
-				.Equals(route.EnsureStartsWith(RouteConsts.FwdSlash).EnsureEndsWith(RouteConsts.FwdSlash),
+				p => p.Route.EnsureStartsWith(Consts.FwdSlash).EnsureEndsWith(Consts.FwdSlash)
+				.Equals(route.EnsureStartsWith(Consts.FwdSlash).EnsureEndsWith(Consts.FwdSlash),
 					routesAreCaseSensitive
 					? StringComparison.InvariantCulture
 					: StringComparison.InvariantCultureIgnoreCase));

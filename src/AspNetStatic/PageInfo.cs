@@ -43,7 +43,7 @@ namespace AspNetStatic
 		///		Gets the combined <see cref="Route"/> and 
 		///		<see cref="QueryString"/> value.
 		/// </summary>
-		public string Url => $"{this.Route.EnsureEndsWith(RouteConsts.FwdSlash)}{this.QueryString}";
+		public string Url => $"{this.Route.EnsureEndsWith(Consts.FwdSlash)}{this.QueryString}";
 
 		/// <summary>
 		///		Gets or sets the pathname (path and filename) of the file 

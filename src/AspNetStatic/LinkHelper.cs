@@ -38,9 +38,9 @@ namespace AspNetStatic
 
 			var pattern = string.Format(_regex, string.Join('|',
 				pages.Select(
-					p => p.Route.Equals(RouteConsts.FwdSlash.ToString()) ? p.Route :
-					p.Route.EnsureNotStartsWith(RouteConsts.FwdSlash)
-					.EnsureNotEndsWith(RouteConsts.FwdSlash))));
+					p => p.Route.Equals(Consts.FwdSlash.ToString()) ? p.Route :
+					p.Route.EnsureNotStartsWith(Consts.FwdSlash)
+					.EnsureNotEndsWith(Consts.FwdSlash))));
 
 			htmlContent = Regex.Replace(
 				htmlContent, pattern, m =>
@@ -54,9 +54,9 @@ namespace AspNetStatic
 					var newHref =
 						!string.IsNullOrWhiteSpace(page.OutFilePathname)
 						? page.OutFilePathname
-						.Replace(RouteConsts.BakSlash, RouteConsts.FwdSlash)
+						.Replace(Consts.BakSlash, Consts.FwdSlash)
 						.EnsureStartsWith(_fSlash)
-						: (page.Route.EndsWith(RouteConsts.FwdSlash) || alwaysDefaultFile)
+						: (page.Route.EndsWith(Consts.FwdSlash) || alwaysDefaultFile)
 						? $"{href.EnsureEndsWith(_fSlash)}{defaultFileName}"
 						: $"{href.EnsureNotEndsWith(_fSlash)}{pageFileExtension}"
 						;
@@ -85,10 +85,10 @@ namespace AspNetStatic
 			return
 				pages.FirstOrDefault(
 					p => href == _fSlash ? p.Url.Equals(_fSlash) :
-					p.Url.EnsureNotStartsWith(RouteConsts.FwdSlash)
-					.EnsureNotEndsWith(RouteConsts.FwdSlash)
-					.Equals(href.EnsureNotStartsWith(RouteConsts.FwdSlash)
-					.EnsureNotEndsWith(RouteConsts.FwdSlash),
+					p.Url.EnsureNotStartsWith(Consts.FwdSlash)
+					.EnsureNotEndsWith(Consts.FwdSlash)
+					.Equals(href.EnsureNotStartsWith(Consts.FwdSlash)
+					.EnsureNotEndsWith(Consts.FwdSlash),
 					routesAreCaseSensitive
 					? StringComparison.InvariantCulture
 					: StringComparison.InvariantCultureIgnoreCase));
@@ -96,6 +96,6 @@ namespace AspNetStatic
 
 		private static readonly string _regex = @"(?:<a|<area) (?:\s|\w|-|_|=|""|')* (?:\n|\r|\f|\r\n|\n\r|\n\f|\f\n)* (?:\s|\w|-|_|=|""|')* href=[""|']([/]?(?:{0})[/]?)[""|']";
 
-		private static readonly string _fSlash = RouteConsts.FwdSlash.ToString();
+		private static readonly string _fSlash = Consts.FwdSlash.ToString();
 	}
 }

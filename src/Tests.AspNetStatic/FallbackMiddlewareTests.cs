@@ -46,7 +46,7 @@ namespace Tests.AspNetStatic
 			var webRoot = GetWebHostEnvironment().WebRootPath;
 			var fullPathname = Path.Combine(
 				webRoot, filePathname.EnsureNotStartsWith(
-					RouteConsts.BakSlash));
+					Consts.BakSlash));
 			if (!Directory.Exists(Path.GetDirectoryName(fullPathname)))
 			{
 				Directory.CreateDirectory(Path.GetDirectoryName(fullPathname)!);
@@ -61,7 +61,7 @@ namespace Tests.AspNetStatic
 			var webRoot = GetWebHostEnvironment().WebRootPath;
 			var fullPathname = Path.Combine(
 				webRoot, filePathname.EnsureNotStartsWith(
-					RouteConsts.BakSlash));
+					Consts.BakSlash));
 
 			if (File.Exists(fullPathname))
 			{
@@ -105,14 +105,14 @@ namespace Tests.AspNetStatic
 
 			var pathname = string.Empty;
 			var createFile =
-				!expectedPath.EndsWith(RouteConsts.FwdSlash) &&
+				!expectedPath.EndsWith(Consts.FwdSlash) &&
 				Path.HasExtension(expectedPath) &&
 				pageInfoProvider.Pages.Any(p => p.Route.Equals(requestPath))
 				;
 
 			if (createFile)
 			{
-				pathname = expectedPath.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar);
+				pathname = expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar);
 				CreateFileInWebRoot(pathname);
 			}
 			try
@@ -167,14 +167,14 @@ namespace Tests.AspNetStatic
 
 			var pathname = string.Empty;
 			var createFile =
-				!expectedPath.EndsWith(RouteConsts.FwdSlash) &&
+				!expectedPath.EndsWith(Consts.FwdSlash) &&
 				Path.HasExtension(expectedPath) &&
 				pageInfoProvider.Pages.Any(p => p.Route.Equals(requestPath))
 				;
 
 			if (createFile)
 			{
-				pathname = expectedPath.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar);
+				pathname = expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar);
 				CreateFileInWebRoot(pathname);
 			}
 			try

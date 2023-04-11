@@ -66,7 +66,7 @@ namespace AspNetStatic
 						Properties.Resources.Err_RouteForPageNotWellFormed,
 						uriKind.ToString()));
 
-				if (pagePath.EndsWith(RouteConsts.FwdSlash) || pagePath.EndsWith(RouteConsts.BakSlash))
+				if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
 				{
 					pagePath += indexFileName;
 				}
@@ -79,14 +79,14 @@ namespace AspNetStatic
 
 					pagePath +=
 						generateDefaultFile
-						? $"{RouteConsts.FwdSlash}{indexFileName}"
+						? $"{Consts.FwdSlash}{indexFileName}"
 						: pageFileExtension;
 				}
 			}
 
 			pagePath = pagePath
-				.Replace(RouteConsts.BakSlash, Path.DirectorySeparatorChar)
-				.Replace(RouteConsts.FwdSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 				;
 
 			return
