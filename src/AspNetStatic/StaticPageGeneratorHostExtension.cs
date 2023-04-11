@@ -34,17 +34,20 @@ namespace AspNetStatic
 		/// <param name="alwaysDefautFile"></param>
 		/// <param name="dontUpdateLinks"></param>
 		/// <param name="dontOptimizeContent"></param>
+		/// <param name="regenerationInterval"></param>
 		public static void GenerateStaticPages(
 			this IHost host,
 			string destinationRoot,
 			string[] commandLineArgs,
 			bool alwaysDefautFile = default,
 			bool dontUpdateLinks = default,
-			bool dontOptimizeContent = default) =>
+			bool dontOptimizeContent = default,
+			TimeSpan? regenerationInterval = default) =>
 			host.GenerateStaticPages(
 				destinationRoot,
 				commandLineArgs.HasExitAfterStaticGenerationParameter(),
-				alwaysDefautFile, dontUpdateLinks, dontOptimizeContent);
+				alwaysDefautFile, dontUpdateLinks, dontOptimizeContent,
+				regenerationInterval);
 
 		/// <summary>
 		///		Generates static pages for the configured pages.
@@ -93,6 +96,10 @@ namespace AspNetStatic
 		///			By default, when this parameter is <c>false</c>, content of the generated 
 		///			static file will be minified. Specify <c>true</c> to omit the optimizations.
 		///		</para>
+		/// </param>
+		/// <param name="regenerationInterval">
+		///		Specifies whther the periodic regeneration is enabled (non-null value),
+		///		and the interval between regeneration events.
 		/// </param>
 		public static void GenerateStaticPages(
 			this IHost host,
