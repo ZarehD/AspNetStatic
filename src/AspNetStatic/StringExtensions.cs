@@ -19,12 +19,12 @@ namespace AspNetStatic
 			((src is null) && (other is null)) || (src?.Equals(other, comparisonMode) ?? false);
 
 
-		public static string EnsureStartsWith(this string? src, char pfx) =>
-			(src is null) ? pfx.ToString()
+		public static string EnsureStartsWith(this string? src, char pfx, bool onlyIfHasValue = default) =>
+			string.IsNullOrEmpty(src) ? onlyIfHasValue ? string.Empty : pfx.ToString()
 			: src.StartsWith(pfx)
 			? src : $"{pfx}{src}";
-		public static string EnsureStartsWith(this string? src, string pfx) =>
-			(src is null) ? pfx
+		public static string EnsureStartsWith(this string? src, string pfx, bool onlyIfHasValue = default) =>
+			string.IsNullOrEmpty(src) ? onlyIfHasValue ? string.Empty : pfx
 			: src.StartsWith(pfx, StringComparison.OrdinalIgnoreCase)
 			? src : $"{pfx}{src}";
 
@@ -38,12 +38,12 @@ namespace AspNetStatic
 			? src[pfx.Length..] : src;
 
 
-		public static string EnsureEndsWith(this string? src, char sfx) =>
-			(src is null) ? sfx.ToString() :
+		public static string EnsureEndsWith(this string? src, char sfx, bool onlyIfHasValue = default) =>
+			string.IsNullOrEmpty(src) ? onlyIfHasValue ? string.Empty : sfx.ToString() :
 			src.EndsWith(sfx)
 			? src : $"{src}{sfx}";
-		public static string EnsureEndsWith(this string? src, string sfx) =>
-			(src is null) ? sfx :
+		public static string EnsureEndsWith(this string? src, string sfx, bool onlyIfHasValue = default) =>
+			string.IsNullOrEmpty(src) ? onlyIfHasValue ? string.Empty : sfx :
 			src.EndsWith(sfx, StringComparison.OrdinalIgnoreCase)
 			? src : $"{src}{sfx}";
 

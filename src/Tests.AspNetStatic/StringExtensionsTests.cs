@@ -24,24 +24,30 @@
 		#region Starts...
 
 		[DataTestMethod]
-		[DataRow("doc", '/', "/doc")]
-		[DataRow("/doc", '/', "/doc")]
-		[DataRow("", '/', "/")]
-		[DataRow("z", 'a', "az")]
-		public void Test_EnsureStartsWith_Char(string src, char pfx, string expected)
+		[DataRow("doc", '/', false, "/doc")]
+		[DataRow("/doc", '/', false, "/doc")]
+		[DataRow("", '/', false, "/")]
+		[DataRow("z", 'a', false, "az")]
+		[DataRow(null, 'a', true, "")]
+		[DataRow("", 'a', true, "")]
+		[DataRow(" ", 'a', true, "a ")]
+		public void Test_EnsureStartsWith_Char(string? src, char pfx, bool onlyIfHasValue, string expected)
 		{
-			var actual = src.EnsureStartsWith(pfx);
+			var actual = src.EnsureStartsWith(pfx, onlyIfHasValue);
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
 
 		[DataTestMethod]
-		[DataRow("doc", "/", "/doc")]
-		[DataRow("/doc", "/", "/doc")]
-		[DataRow("", "/", "/")]
-		[DataRow("xyz", "abc", "abcxyz")]
-		public void Test_EnsureStartsWith_Str(string src, string pfx, string expected)
+		[DataRow("doc", "/", false, "/doc")]
+		[DataRow("/doc", "/", false, "/doc")]
+		[DataRow("", "/", false, "/")]
+		[DataRow("xyz", "abc", false, "abcxyz")]
+		[DataRow(null, "abc", true, "")]
+		[DataRow("", "abc", true, "")]
+		[DataRow(" ", "abc", true, "abc ")]
+		public void Test_EnsureStartsWith_Str(string? src, string pfx, bool onlyIfHasValue, string expected)
 		{
-			var actual = src.EnsureStartsWith(pfx);
+			var actual = src.EnsureStartsWith(pfx, onlyIfHasValue);
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
 
@@ -76,24 +82,30 @@
 		#region Ends...
 
 		[DataTestMethod]
-		[DataRow("doc", '/', "doc/")]
-		[DataRow("/doc/", '/', "/doc/")]
-		[DataRow("", '/', "/")]
-		[DataRow("a", 'z', "az")]
-		public void Test_EnsureEndsWith_Char(string src, char sfx, string expected)
+		[DataRow("doc", '/', false, "doc/")]
+		[DataRow("/doc/", '/', false, "/doc/")]
+		[DataRow("", '/', false, "/")]
+		[DataRow("a", 'z', false, "az")]
+		[DataRow(null, 'x', true, "")]
+		[DataRow("", 'x', true, "")]
+		[DataRow(" ", 'x', true, " x")]
+		public void Test_EnsureEndsWith_Char(string? src, char sfx, bool onlyIfHasValue, string expected)
 		{
-			var actual = src.EnsureEndsWith(sfx);
+			var actual = src.EnsureEndsWith(sfx, onlyIfHasValue);
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
 
 		[DataTestMethod]
-		[DataRow("doc", "/", "doc/")]
-		[DataRow("/doc/", "/", "/doc/")]
-		[DataRow("", "/", "/")]
-		[DataRow("abc", "xyz", "abcxyz")]
-		public void Test_EnsureEndsWith_Str(string src, string sfx, string expected)
+		[DataRow("doc", "/", false, "doc/")]
+		[DataRow("/doc/", "/", false, "/doc/")]
+		[DataRow("", "/", false, "/")]
+		[DataRow("abc", "xyz", false, "abcxyz")]
+		[DataRow(null, "xyz", true, "")]
+		[DataRow("", "xyz", true, "")]
+		[DataRow(" ", "xyz", true, " xyz")]
+		public void Test_EnsureEndsWith_Str(string src, string sfx, bool onlyIfHasValue, string expected)
 		{
-			var actual = src.EnsureEndsWith(sfx);
+			var actual = src.EnsureEndsWith(sfx, onlyIfHasValue);
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
 
