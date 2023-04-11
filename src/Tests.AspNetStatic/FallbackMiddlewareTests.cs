@@ -82,12 +82,10 @@ namespace Tests.AspNetStatic
 			bool alwaysDefaultfile)
 		{
 			var httpContextMoq = new Mock<HttpContext>();
-			httpContextMoq
-				.Setup(x => x.Request.Path)
-				.Returns(new PathString(requestPath));
-			httpContextMoq
-				.SetupSet(x => x.Request.Path = new PathString(expectedPath))
-				.Verifiable();
+
+			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
+			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(requestPath));
+			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
 
 			var httpContext = httpContextMoq.Object;
 
@@ -144,12 +142,10 @@ namespace Tests.AspNetStatic
 			bool ignoreOutFilePathname)
 		{
 			var httpContextMoq = new Mock<HttpContext>();
-			httpContextMoq
-				.Setup(x => x.Request.Path)
-				.Returns(new PathString(requestPath));
-			httpContextMoq
-				.SetupSet(x => x.Request.Path = new PathString(expectedPath))
-				.Verifiable();
+
+			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
+			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(requestPath));
+			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
 
 			var httpContext = httpContextMoq.Object;
 
