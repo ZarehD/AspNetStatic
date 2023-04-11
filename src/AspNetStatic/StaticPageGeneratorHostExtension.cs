@@ -116,7 +116,9 @@ namespace AspNetStatic
 			}
 			if (string.IsNullOrWhiteSpace(destinationRoot))
 			{
-				throw new ArgumentNullException(nameof(destinationRoot));
+				throw new ArgumentException(
+					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
+					nameof(destinationRoot));
 			}
 			if (!Directory.Exists(destinationRoot))
 			{

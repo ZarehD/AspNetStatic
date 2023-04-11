@@ -106,14 +106,14 @@ namespace AspNetStatic
 			this.DefaultFileName =
 				!string.IsNullOrWhiteSpace(defaultFileName)
 				? defaultFileName
-				: throw new ArgumentNullException(
+				: throw new ArgumentException(
 					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
 					nameof(defaultFileName));
 
 			this.PageFileExtension =
 				!string.IsNullOrWhiteSpace(fileExtension)
 				? fileExtension
-				: throw new ArgumentNullException(
+				: throw new ArgumentException(
 					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
 					nameof(fileExtension));
 

@@ -78,7 +78,9 @@ namespace AspNetStatic
 		{
 			this.Route =
 				string.IsNullOrWhiteSpace(route)
-				? throw new ArgumentNullException(nameof(route))
+				? throw new ArgumentException(
+					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
+					nameof(route))
 				: route
 				;
 		}
