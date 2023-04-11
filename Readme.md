@@ -38,7 +38,9 @@ It's a peace of cake!
 1. Create and register a class that implements `IStaticPagesInfoProvider`
   - Derrive from `StaticPagesInfoProviderBase` or implement the interface directly
   - Populate the `Pages` collection to specify the routes for which to generate static pages
-  - Set other properties as appropriate
+    - Set required `Route` property of each `PageInfo`
+    - Set other `PageInfo` properties as appropriate
+  - Set other `StaticPagesInfoProviderBase` properties as appropriate (via protected backing fields)
   - Register the class in the DI container
       ```c#
       builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>();
