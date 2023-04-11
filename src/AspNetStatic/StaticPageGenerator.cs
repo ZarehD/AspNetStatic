@@ -47,9 +47,7 @@ namespace AspNetStatic
 			{
 				if (ct.IsCancellationRequested) break;
 
-				var pageRoute = page.Route;
-
-				logger?.ProcessingPage(pageRoute);
+				logger?.ProcessingPage(page);
 
 				var pagePath =
 					RouteToPathname.GetPathname(
@@ -282,15 +280,17 @@ namespace AspNetStatic
 
 		public static void ProcessingPage(
 			this ILogger<StaticPageGenerator> logger,
-			string pageRoute) =>
+			PageInfo page) =>
 			logger.Imp_ProcessingPage(
-				pageRoute);
+				page.Route,
+				page.QueryString);
 
 		[LoggerMessage(EventId = 1030, EventName = "ProcessingPage", Level = LogLevel.Information,
-			Message = "StaticPageGenerator: Processing page > PageRoute = {PageRoute}")]
+			Message = "StaticPageGenerator: Processing page > Route = {Route}, Query = {Query}")]
 		private static partial void Imp_ProcessingPage(
 			this ILogger<StaticPageGenerator> logger,
-			string pageRoute);
+			string route,
+			string? query);
 
 		#endregion
 
