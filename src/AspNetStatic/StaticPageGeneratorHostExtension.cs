@@ -220,8 +220,7 @@ namespace AspNetStatic
 		}
 
 		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>
-			(args is not null) && args.Any(a => a.Equals(
-				STATIC_ONLY, StringComparison.InvariantCultureIgnoreCase));
+			(args is not null) && args.Any(a => a.AreSameText(STATIC_ONLY));
 
 		private static readonly CancellationTokenSource _appShutdown = new();
 		private static readonly HttpClient _httpClient = new();

@@ -14,41 +14,46 @@ namespace AspNetStatic
 {
 	internal static class StringExtensions
 	{
-		public  static string EnsureStartsWith(this string? src, char pfx) =>
+		public static bool AreSameText(this string? src, string? other,
+			StringComparison comparisonMode = StringComparison.OrdinalIgnoreCase) =>
+			((src is null) && (other is null)) || (src?.Equals(other, comparisonMode) ?? false);
+
+
+		public static string EnsureStartsWith(this string? src, char pfx) =>
 			(src is null) ? pfx.ToString()
 			: src.StartsWith(pfx)
 			? src : $"{pfx}{src}";
-		public  static string EnsureStartsWith(this string? src, string pfx) =>
+		public static string EnsureStartsWith(this string? src, string pfx) =>
 			(src is null) ? pfx
-			: src.StartsWith(pfx, StringComparison.InvariantCultureIgnoreCase)
+			: src.StartsWith(pfx, StringComparison.OrdinalIgnoreCase)
 			? src : $"{pfx}{src}";
 
-		public  static string EnsureNotStartsWith(this string? src, char pfx) =>
+		public static string EnsureNotStartsWith(this string? src, char pfx) =>
 			(src is null) ? string.Empty
 			: src.StartsWith(pfx)
 			? src[1..] : src;
-		public  static string EnsureNotStartsWith(this string? src, string pfx) =>
+		public static string EnsureNotStartsWith(this string? src, string pfx) =>
 			(src is null) ? string.Empty
-			: src.StartsWith(pfx, StringComparison.InvariantCultureIgnoreCase)
+			: src.StartsWith(pfx, StringComparison.OrdinalIgnoreCase)
 			? src[pfx.Length..] : src;
 
 
-		public  static string EnsureEndsWith(this string? src, char sfx) =>
+		public static string EnsureEndsWith(this string? src, char sfx) =>
 			(src is null) ? sfx.ToString() :
 			src.EndsWith(sfx)
 			? src : $"{src}{sfx}";
-		public  static string EnsureEndsWith(this string? src, string sfx) =>
+		public static string EnsureEndsWith(this string? src, string sfx) =>
 			(src is null) ? sfx :
-			src.EndsWith(sfx, StringComparison.InvariantCultureIgnoreCase)
+			src.EndsWith(sfx, StringComparison.OrdinalIgnoreCase)
 			? src : $"{src}{sfx}";
 
-		public  static string EnsureNotEndsWith(this string? src, char sfx) =>
+		public static string EnsureNotEndsWith(this string? src, char sfx) =>
 			(src is null) ? string.Empty :
 			src.EndsWith(sfx)
 			? src[0..^1] : src;
-		public  static string EnsureNotEndsWith(this string? src, string sfx) =>
+		public static string EnsureNotEndsWith(this string? src, string sfx) =>
 			(src is null) ? string.Empty :
-			src.EndsWith(sfx, StringComparison.InvariantCultureIgnoreCase)
+			src.EndsWith(sfx, StringComparison.OrdinalIgnoreCase)
 			? src[0..^sfx.Length] : src;
 	}
 }

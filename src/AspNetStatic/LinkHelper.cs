@@ -90,8 +90,8 @@ namespace AspNetStatic
 					.Equals(href.EnsureNotStartsWith(Consts.FwdSlash)
 					.EnsureNotEndsWith(Consts.FwdSlash),
 					routesAreCaseSensitive
-					? StringComparison.InvariantCulture
-					: StringComparison.InvariantCultureIgnoreCase));
+					? StringComparison.Ordinal
+					: StringComparison.OrdinalIgnoreCase));
 		}
 
 		private static readonly string _regex = @"(?:<a|<area) (?:\s|\w|-|_|=|""|')* (?:\n|\r|\f|\r\n|\n\r|\n\f|\f\n)* (?:\s|\w|-|_|=|""|')* href=[""|']([/]?(?:{0})[/]?)[""|']";

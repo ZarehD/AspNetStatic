@@ -40,7 +40,7 @@ namespace AspNetStatic
 			return
 				((exclusions is null) || !exclusions.Any(
 					x => route.EnsureNotEndsWith(Consts.FwdSlash)?
-					.EndsWith(x, StringComparison.InvariantCultureIgnoreCase) ?? false))
+					.EndsWith(x, StringComparison.OrdinalIgnoreCase) ?? false))
 				? route.EnsureEndsWith(Consts.FwdSlash) + defaultFileName
 				: route.EnsureNotEndsWith(Consts.FwdSlash) + pageFileExtension
 				;

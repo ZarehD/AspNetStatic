@@ -75,7 +75,7 @@ namespace AspNetStatic
 					var generateDefaultFile =
 						alwaysCreateDefaultFile &&
 						!exclusions.Any(x => pagePath.EndsWith(
-							x, StringComparison.InvariantCultureIgnoreCase));
+							x, StringComparison.OrdinalIgnoreCase));
 
 					pagePath +=
 						generateDefaultFile

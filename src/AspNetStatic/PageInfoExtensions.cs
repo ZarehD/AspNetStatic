@@ -29,7 +29,7 @@ namespace AspNetStatic
 				p => p.Route.EnsureStartsWith(Consts.FwdSlash).EnsureEndsWith(Consts.FwdSlash)
 				.Equals(route.EnsureStartsWith(Consts.FwdSlash).EnsureEndsWith(Consts.FwdSlash),
 					routesAreCaseSensitive
-					? StringComparison.InvariantCulture
-					: StringComparison.InvariantCultureIgnoreCase));
+					? StringComparison.Ordinal
+					: StringComparison.OrdinalIgnoreCase));
 	}
 }
