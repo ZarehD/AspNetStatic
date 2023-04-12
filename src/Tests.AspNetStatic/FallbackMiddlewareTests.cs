@@ -22,12 +22,9 @@ namespace Tests.AspNetStatic
 				new("/doc/p4/789/") { QueryString = "?p1=v1", OutFilePathname = "doc\\page4-789-p1v1.htm" },
 			});
 
-		private class PageInfoProvider : StaticPagesInfoProviderBase
+		private class PageInfoProvider : StaticPagesInfoProvider
 		{
-			public PageInfoProvider()
-			{
-				this.pages.AddRange(_pages);
-			}
+			public PageInfoProvider():base(_pages) { }
 		}
 
 		private static ILogger<StaticPageFallbackMiddleware> GetMiddlewareLogger() =>

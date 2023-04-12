@@ -10,17 +10,14 @@ namespace Tests.AspNetStatic
         private readonly static string Test_DefaultFileExtension = ".test-extension";
 
 
-        public class TestStaticPagesInfoProvider : StaticPagesInfoProviderBase
+        public class TestStaticPagesInfoProvider : StaticPagesInfoProvider
         {
             public TestStaticPagesInfoProvider()
+                : base(Test_Pages, 
+                      Test_DefaultFileName,
+					  Test_DefaultFileExtension,
+					  Test_Exclusions)
             {
-                pages.AddRange(Test_Pages);
-
-                exclusions.Clear();
-                exclusions.AddRange(Test_Exclusions);
-
-                defaultFileName = Test_DefaultFileName;
-                defaultFileExtension = Test_DefaultFileExtension;
             }
 
             public new void SetDefaultFileName(string name) => base.SetDefaultFileName(name);

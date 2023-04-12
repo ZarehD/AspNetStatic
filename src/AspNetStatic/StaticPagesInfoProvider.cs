@@ -12,7 +12,7 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public abstract class StaticPagesInfoProviderBase : IStaticPagesInfoProvider
+	public class StaticPagesInfoProvider : IStaticPagesInfoProvider
 	{
 		public IEnumerable<PageInfo> Pages => this.pages.ToArray();
 		protected readonly List<PageInfo> pages = new();
@@ -39,6 +39,19 @@ namespace AspNetStatic
 		protected readonly List<string> exclusions = new(new[] { "index", "default" });
 
 
+		public StaticPagesInfoProvider(
+			IEnumerable<PageInfo> pages,
+			string? defaultFileName = default,
+			string? defaultFileExtension = default,
+			IEnumerable<string>? dffExclusions = default)
+		{
+			this.pages.AddRange(pages ?? throw new ArgumentNullException(nameof(pages)));
+
+			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);
+			if (defaultFileExtension is not null) SetDefaultFileExtension(defaultFileExtension);
+			if (dffExclusions is not null) SetDefaultFileExclusions(dffExclusions.ToArray());
+		}
+
 
 		protected virtual void SetDefaultFileName(string name)
 		{
@@ -47,7 +60,6 @@ namespace AspNetStatic
 				? throw new ArgumentException(Properties.Resources.Err_MissingDefaultFileName, nameof(name))
 				: name;
 		}
-
 		protected virtual void SetDefaultFileExtension(string extension)
 		{
 			this.defaultFileExtension =
@@ -55,7 +67,6 @@ namespace AspNetStatic
 				? throw new ArgumentException(Properties.Resources.Err_MissingDefaultFileExtension, nameof(extension))
 				: extension;
 		}
-
 		protected virtual void SetDefaultFileExclusions(string[] newExclusions)
 		{
 			if (newExclusions.Any(s => string.IsNullOrWhiteSpace(s)))
