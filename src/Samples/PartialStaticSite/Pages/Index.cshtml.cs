@@ -12,9 +12,21 @@ namespace PartialStaticSite.Pages
 			_logger = logger;
 		}
 
-		public void OnGet()
-		{
 
+		public class Data
+		{
+			public string? RouteId { get; set; }
+
+			public string? Parm1 { get; set; }
+		}
+
+		public Data VmData { get; } = new();
+
+
+		public void OnGet(string? id, [FromQuery] string? p1)
+		{
+			this.VmData.RouteId = id;
+			this.VmData.Parm1 = p1;
 		}
 	}
 }

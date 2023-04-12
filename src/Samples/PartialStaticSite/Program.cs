@@ -55,6 +55,7 @@ app.GenerateStaticPages(
 	exitWhenDone: exitWhenDone,
 	alwaysDefautFile: false,
 	dontUpdateLinks: false,
+	dontOptimizeContent: true,
 	regenerationInterval: TimeSpan.FromMinutes(5));
 
 app.Run();

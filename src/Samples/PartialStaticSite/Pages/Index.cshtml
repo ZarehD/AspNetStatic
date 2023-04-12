@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{id?}"
 @model IndexModel
 @{
 	ViewData["Title"] = "Home page";
@@ -7,4 +7,13 @@
 <div class="text-center">
 	<h1 class="display-4">Welcome</h1>
 	<p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+	<br/>
+	@if (!string.IsNullOrWhiteSpace(Model.VmData.RouteId))
+	{
+		<p>Route ID: @Model.VmData.RouteId</p>
+	}
+	@if (!string.IsNullOrWhiteSpace(Model.VmData.Parm1))
+	{
+		<p>Parm One: @Model.VmData.Parm1</p>
+	}
 </div>
