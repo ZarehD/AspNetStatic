@@ -38,30 +38,31 @@ namespace AspNetStatic
 
 			var pattern = string.Format(_regex, string.Join('|',
 				pages.Select(
-					p => p.Route.Equals(Consts.FwdSlash.ToString()) ? p.Route :
-					p.Route.EnsureNotStartsWith(Consts.FwdSlash)
-					.EnsureNotEndsWith(Consts.FwdSlash))));
+					p => p.Url.Equals(Consts.FSlash) ? p.Url :
+					p.Url.EnsureNotStartsWith(Consts.FwdSlash)
+					.EnsureNotEndsWith(Consts.FwdSlash)
+					.Replace("?", "\\?"))));
 
 			htmlContent = Regex.Replace(
 				htmlContent, pattern, m =>
 				{
 					var href = m.Groups[1].Value;
 
-					var page = pages.FindPage(href, routesAreCaseSensitive);
+					var page = pages.GetPageForUrl(href, routesAreCaseSensitive);
 
 					if (page is null) return m.Value;
 
 					var newHref =
 						!string.IsNullOrWhiteSpace(page.OutFilePathname)
-						? page.OutFilePathname
-						.Replace(Consts.BakSlash, Consts.FwdSlash)
-						.EnsureStartsWith(_fSlash)
+						? page.OutFilePathname.Replace(Consts.BakSlash, Consts.FwdSlash).EnsureStartsWith(Consts.FSlash)
 						: (page.Route.EndsWith(Consts.FwdSlash) || alwaysDefaultFile)
-						? $"{href.EnsureEndsWith(_fSlash)}{defaultFileName}"
-						: $"{href.EnsureNotEndsWith(_fSlash)}{pageFileExtension}"
+						? $"{page.Route.EnsureEndsWith(Consts.FSlash)}{defaultFileName}"
+						: $"{page.Route.EnsureNotEndsWith(Consts.FSlash)}{pageFileExtension}"
 						;
 
-					newHref = href.StartsWith(_fSlash) ? newHref.EnsureStartsWith(_fSlash) : newHref;
+					newHref = href.StartsWith(Consts.FwdSlash)
+						? newHref.EnsureStartsWith(Consts.FSlash)
+						: newHref.EnsureNotStartsWith(Consts.FSlash);
 
 					return m.Value.Replace(href, newHref);
 				},
@@ -75,27 +76,6 @@ namespace AspNetStatic
 			return htmlContent;
 		}
 
-		public static PageInfo? FindPage(
-			this IEnumerable<PageInfo> pages,
-			string href,
-			bool routesAreCaseSensitive = default)
-		{
-			if ((pages is null) || !pages.Any()) return default;
-
-			return
-				pages.FirstOrDefault(
-					p => href == _fSlash ? p.Url.Equals(_fSlash) :
-					p.Url.EnsureNotStartsWith(Consts.FwdSlash)
-					.EnsureNotEndsWith(Consts.FwdSlash)
-					.Equals(href.EnsureNotStartsWith(Consts.FwdSlash)
-					.EnsureNotEndsWith(Consts.FwdSlash),
-					routesAreCaseSensitive
-					? StringComparison.Ordinal
-					: StringComparison.OrdinalIgnoreCase));
-		}
-
 		private static readonly string _regex = @"(?:<a|<area) (?:\s|\w|-|_|=|""|')* (?:\n|\r|\f|\r\n|\n\r|\n\f|\f\n)* (?:\s|\w|-|_|=|""|')* href=[""|']([/]?(?:{0})[/]?)[""|']";
-
-		private static readonly string _fSlash = Consts.FwdSlash.ToString();
 	}
 }

@@ -15,7 +15,11 @@ namespace Tests.AspNetStatic
 				new("/"),
 				new("/blog/"),
 				new("/blog/article1"),
-				new("/doc/p1") { OutFilePathname = "docs\\page1.htm" },
+				new("/doc/p1") { OutFilePathname = "doc\\page1.htm" },
+				new("/doc/p2/123") { OutFilePathname = "doc\\page2-123.htm" },
+				new("/doc/p3") { QueryString = "?p1=v1&p2=v2", OutFilePathname = "doc\\page3-p1v1-p2v2.htm" },
+				new("/doc/p4/567") { QueryString = "?p1=v1", OutFilePathname = "doc\\page4-567-p1v1.htm" },
+				new("/doc/p4/789/") { QueryString = "?p1=v1", OutFilePathname = "doc\\page4-789-p1v1.htm" },
 			});
 
 		private class PageInfoProvider : StaticPagesInfoProviderBase
@@ -81,10 +85,15 @@ namespace Tests.AspNetStatic
 			string requestPath, string expectedPath,
 			bool alwaysDefaultfile)
 		{
+			var parts = requestPath.Split('?');
+			var path = parts[0];
+			var query = parts.Length > 1 ? parts[1] : null;
+
 			var httpContextMoq = new Mock<HttpContext>();
 
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
-			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(requestPath));
+			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
+			httpContextMoq.Setup(x => x.Request.QueryString).Returns(new QueryString(query.EnsureStartsWith('?', true)));
 			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
 
 			var httpContext = httpContextMoq.Object;
@@ -105,7 +114,7 @@ namespace Tests.AspNetStatic
 			var createFile =
 				!expectedPath.EndsWith(Consts.FwdSlash) &&
 				Path.HasExtension(expectedPath) &&
-				pageInfoProvider.Pages.Any(p => p.Route.Equals(requestPath))
+				pageInfoProvider.Pages.ContainsPageForUrl(requestPath)
 				;
 
 			if (createFile)
@@ -134,17 +143,28 @@ namespace Tests.AspNetStatic
 
 
 		[DataTestMethod]
-		[DataRow("/doc/p1", "/docs/page1.htm", false)]
+		[DataRow("/doc/p1", "/doc/page1.htm", false)]
 		[DataRow("/doc/", "/doc/index.html", true)]
 		[DataRow("/doc/p1", "/doc/p1.html", true)]
+		[DataRow("/doc/p2/123", "/doc/page2-123.htm", false)]
+		[DataRow("/doc/p3?p1=v1&p2=v2", "/doc/page3-p1v1-p2v2.htm", false)]
+		[DataRow("/doc/p4/567/?p1=v1", "/doc/page4-567-p1v1.htm", false)]
+		[DataRow("/doc/p4/567?p1=v1", "/doc/p4/567.html", true)]
+		[DataRow("/doc/p4/789/?p1=v1", "/doc/page4-789-p1v1.htm", false)]
+		[DataRow("/doc/p4/789/?p1=v1", "/doc/p4/789/index.html", true)]
 		public async Task Test_Fallback_OutFilePathname(
 			string requestPath, string expectedPath,
 			bool ignoreOutFilePathname)
 		{
+			var parts = requestPath.Split('?');
+			var path = parts[0];
+			var query = parts.Length > 1 ? parts[1] : null;
+
 			var httpContextMoq = new Mock<HttpContext>();
 
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
-			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(requestPath));
+			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
+			httpContextMoq.Setup(x => x.Request.QueryString).Returns(new QueryString(query.EnsureStartsWith('?', true)));
 			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
 
 			var httpContext = httpContextMoq.Object;
@@ -165,7 +185,7 @@ namespace Tests.AspNetStatic
 			var createFile =
 				!expectedPath.EndsWith(Consts.FwdSlash) &&
 				Path.HasExtension(expectedPath) &&
-				pageInfoProvider.Pages.Any(p => p.Route.Equals(requestPath))
+				pageInfoProvider.Pages.ContainsPageForUrl(requestPath)
 				;
 
 			if (createFile)

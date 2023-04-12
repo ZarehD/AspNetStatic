@@ -23,6 +23,9 @@
                             <a class="nav-link text-dark" href="/">Home</a>
                         </li>
                         <li b-j6gudk29q9 class="nav-item">
+                            <a class="nav-link text-dark" href="/?p1=v1">Home P1V1</a>
+                        </li>
+                        <li b-j6gudk29q9 class="nav-item">
                             <a class="nav-link text-dark" href="/Privacy">Privacy</a>
                         </li>
                     </ul>

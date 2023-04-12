@@ -18,32 +18,31 @@ namespace AspNetStatic
 	public class PageInfo
 	{
 		/// <summary>
-		///		Gets or sets the route to the page (e.g. /blog/article1).
+		///		Gets or sets the route to the page (e.g. /blog/article1), 
+		///		including any relevant route parameter values.
 		/// </summary>
 		/// <remarks>
 		///		The specified route must be relative to the base URI 
 		///		of the site (e.g. www.mysite.com), and must not include 
-		///		a query string or route parameters.
+		///		a query string.
 		/// </remarks>
 		public string Route { get; init; }
 
 		/// <summary>
-		///		Gets or sets the query string or route paramters for 
-		///		the route specified in <see cref="Route"/>.
+		///		Gets or sets the query string for the route specified in <see cref="Route"/>.
 		/// </summary>
 		/// <remarks>
 		///		The specified value is appended to the value specified in 
-		///		<see cref="Route"/> without modification to either value 
+		///		<see cref="Route"/> and should start with a '?' character.
 		///		(see <see cref="Url"/> proprty).
 		/// </remarks>
 		[JsonPropertyName("Query")]
 		public string? QueryString { get; init; }
 
 		/// <summary>
-		///		Gets the combined <see cref="Route"/> and 
-		///		<see cref="QueryString"/> value.
+		///		Gets the combined <see cref="Route"/> and <see cref="QueryString"/> value.
 		/// </summary>
-		public string Url => $"{this.Route.EnsureEndsWith(Consts.FwdSlash)}{this.QueryString}";
+		public string Url => $"{this.Route}{this.QueryString.EnsureStartsWith('?', true)}";
 
 		/// <summary>
 		///		Gets or sets the pathname (path and filename) of the file 

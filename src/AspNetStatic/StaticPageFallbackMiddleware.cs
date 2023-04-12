@@ -78,7 +78,8 @@ namespace AspNetStatic
 				if (!isAspNetStatic)
 				{
 					var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
-					var page = this._pageInfoProvider.Pages.GetForRoute(path);
+					var query = ctx.Request.QueryString.Value.EnsureStartsWith('?', true);
+					var page = this._pageInfoProvider.Pages.GetPageForUrl($"{path}{query}");
 
 					if (page is not null)
 					{

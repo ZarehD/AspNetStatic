@@ -19,6 +19,8 @@
 				new("docs/"),
 				new("docs/page1"),
 				new("docs/page2/"),
+				new("/segment/page/1") { QueryString="?p1=v1" },
+				new("/segment/page/2/") { QueryString="p1=v1" },
 			});
 
 
@@ -35,10 +37,34 @@
 		[DataRow("docs/", false, true)]
 		[DataRow("docs/page1", false, true)]
 		[DataRow("docs/page2/", false, true)]
-		public void Test_Pages_ContainsRoute(
+		public void Test_Pages_ContainsPageForRoute(
 			string route, bool isCaseSensitive, bool expected)
 		{
 			var actual = _pages.ContainsPageForRoute(route, isCaseSensitive);
+			Assert.AreEqual(expected, actual);
+		}
+
+		[DataTestMethod]
+		[DataRow("abc/", false, false)]
+		[DataRow("/abc", false, false)]
+		[DataRow("/abc/", false, false)]
+		[DataRow("/abc/xyz", false, false)]
+		[DataRow("/", false, true)]
+		[DataRow("/Policies/", true, true)]
+		[DataRow("/blog/", false, true)]
+		[DataRow("/blog/article1", false, true)]
+		[DataRow("/blog/categories/", false, true)]
+		[DataRow("docs/", false, true)]
+		[DataRow("docs/page1", false, true)]
+		[DataRow("docs/page2/", false, true)]
+		[DataRow("/segment/page/1", false, false)]
+		[DataRow("/segment/page/1?p1=v1", false, true)]
+		[DataRow("/segment/page/2/", false, false)]
+		[DataRow("/segment/page/2/?p1=v1", false, true)]
+		public void Test_Pages_ContainsPageForUrl(
+			string url, bool isCaseSensitive, bool expected)
+		{
+			var actual = _pages.ContainsPageForUrl(url, isCaseSensitive);
 			Assert.AreEqual(expected, actual);
 		}
 
@@ -56,10 +82,35 @@
 		[DataRow("docs/", false, true)]
 		[DataRow("docs/page1", false, true)]
 		[DataRow("docs/page2/", false, true)]
-		public void Test_Pages_GetForRoute(
+		public void Test_Pages_GetPageForRoute(
 			string route, bool isCaseSensitive, bool expected)
 		{
-			var page = _pages.GetForRoute(route, isCaseSensitive);
+			var page = _pages.GetPageForRoute(route, isCaseSensitive);
+			var actual = page is not null;
+			Assert.AreEqual(expected, actual);
+		}
+
+		[DataTestMethod]
+		[DataRow("abc/", false, false)]
+		[DataRow("/abc", false, false)]
+		[DataRow("/abc/", false, false)]
+		[DataRow("/abc/xyz", false, false)]
+		[DataRow("/", false, true)]
+		[DataRow("/Policies/", true, true)]
+		[DataRow("/blog/", false, true)]
+		[DataRow("/blog/article1", false, true)]
+		[DataRow("/blog/categories/", false, true)]
+		[DataRow("docs/", false, true)]
+		[DataRow("docs/page1", false, true)]
+		[DataRow("docs/page2/", false, true)]
+		[DataRow("/segment/page/1", false, false)]
+		[DataRow("/segment/page/1?p1=v1", false, true)]
+		[DataRow("/segment/page/2/", false, false)]
+		[DataRow("/segment/page/2/?p1=v1", false, true)]
+		public void Test_Pages_GetPageForUrl(
+			string url, bool isCaseSensitive, bool expected)
+		{
+			var page = _pages.GetPageForUrl(url, isCaseSensitive);
 			var actual = page is not null;
 			Assert.AreEqual(expected, actual);
 		}
