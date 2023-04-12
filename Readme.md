@@ -88,7 +88,9 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 
 ### Routes vs. Generated Static Files
 
-> Assume destination root folder is "__C:\MySite__".
+> Assumes the following:
+>  - Destination root: "__C:\MySite__"
+>  - OutFilePathname: __null / empty / whitespace__
 
 <br/>Route | Always Default<br/>false | Always Default<br/>true
 ---|---|---
@@ -97,12 +99,18 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 /index/                 | C:\MySite\index\index.html            | C:\MySite\index\index.html
 /page                   | C:\MySite\page.html                   | C:\MySite\page\index.html
 /page/                  | C:\MySite\page\index.html             | C:\MySite\page\index.html
+/page/123               | C:\MySite\page\123.html               | C:\MySite\page\123\index.html
+/page/123/              | C:\MySite\page\123\index.html         | C:\MySite\page\123\index.html
+/page/123?p1=v1         | C:\MySite\page\123.html               | C:\MySite\page\123\index.html
+/page/123/?p1=v1        | C:\MySite\page\123\index.html         | C:\MySite\page\123\index.html
 /blog/articles/         | C:\MySite\blog\articles/index.html    | C:\MySite\blog\articles\index.html
 /blog/articles/article1 | C:\MySite\blog\articles/article1.html | C:\MySite\blog\articles\article1/index.html
 
 
-
 ### Routes vs. Served Content (using fallback middleware)
+
+> Assumes the following:
+>  - OutFilePathname: __null / empty / whitespace__
 
 Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always Default: false | Is Static Route: true<br/>Always Default: true
 ---|---|---|---
@@ -111,6 +119,10 @@ Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always
 /index/                 | /index/index.cshtml            | /index.html                  | /index/index.html
 /page                   | /page.cshtml                   | /page.html                   | /page/index.html
 /page/                  | /page/index.cshtml             | /page/index.html             | /page/index.html
+/page/123               | /page.cshtml                   | /page/123.html               | /page/123/index.html
+/page/123/              | /page.cshtml                   | /page/123/index.html         | /page/123/index.html
+/page/123?p1=v1         | /page.cshtml                   | /page/123.html               | /page/123/index.html
+/page/123/?p1=v1        | /page.cshtml                   | /page/123/index.html         | /page/123/index.html
 /blog/articles/         | /blog/articles/index.cshtml    | /blog/articles/index.html    | /blog/articles/index.html
 /blog/articles/article1 | /blog/articles/article1.cshtml | /blog/articles/article1.html | /blog/articles/article1/index..html
 
