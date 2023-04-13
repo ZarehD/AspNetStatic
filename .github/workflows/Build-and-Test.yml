@@ -22,8 +22,8 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./src/AspNetStatic.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build ./src/AspNetStatic.sln -c Release --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ./src/AspNetStatic.sln -c Release --no-build --verbosity normal
