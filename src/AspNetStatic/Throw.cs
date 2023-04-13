@@ -41,7 +41,7 @@ namespace AspNetStatic
 		[DoesNotReturn]
 		public static void BadArg(string? argName = default, string? message = default, params string[] args) =>
 			throw new ArgumentException(
-				string.Format(CultureInfo.InvariantCulture, message, args),
+				string.Format(CultureInfo.InvariantCulture, message ?? string.Empty, args),
 				argName);
 
 		[DoesNotReturn]
