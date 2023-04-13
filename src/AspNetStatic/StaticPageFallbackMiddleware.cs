@@ -41,9 +41,9 @@ namespace AspNetStatic
 		{
 			this._logger = logger;
 
-			this._next = next ?? throw new ArgumentNullException(nameof(next));
-			this._pageInfoProvider = pageInfoProvider ?? throw new ArgumentNullException(nameof(pageInfoProvider));
-			if (environment is null) throw new ArgumentNullException(nameof(environment));
+			this._next = Throw.IfNull(next, nameof(next));
+			this._pageInfoProvider = Throw.IfNull(pageInfoProvider, nameof(pageInfoProvider));
+			Throw.IfNull(environment, nameof(environment));
 			options ??= new StaticPageFallbackMiddlewareOptions();
 
 			this._haveStaticPages = this._pageInfoProvider.Pages.Any();

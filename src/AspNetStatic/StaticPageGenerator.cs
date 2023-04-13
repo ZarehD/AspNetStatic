@@ -25,7 +25,7 @@ namespace AspNetStatic
 		{
 			if (ct.IsCancellationRequested) return;
 
-			if (config is null) throw new ArgumentNullException(nameof(config));
+			Throw.IfNull(config, nameof(config));
 
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
 
@@ -130,10 +130,9 @@ namespace AspNetStatic
 
 		private static void RemoveIfExists(string pageDiskPath)
 		{
-			if (string.IsNullOrWhiteSpace(pageDiskPath))
-			{
-				throw new ArgumentNullException(nameof(pageDiskPath));
-			}
+			Throw.IfNullOrWhiteSpace(
+				pageDiskPath, nameof(pageDiskPath),
+				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			if (File.Exists(pageDiskPath))
 			{
@@ -143,10 +142,9 @@ namespace AspNetStatic
 
 		private static bool EnsureFolderExists(string pageDiskPath)
 		{
-			if (string.IsNullOrWhiteSpace(pageDiskPath))
-			{
-				throw new ArgumentNullException(nameof(pageDiskPath));
-			}
+			Throw.IfNullOrWhiteSpace(
+				pageDiskPath, nameof(pageDiskPath),
+				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			var folder = Directory.GetParent(pageDiskPath);
 

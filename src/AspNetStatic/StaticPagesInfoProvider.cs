@@ -45,7 +45,7 @@ namespace AspNetStatic
 			string? defaultFileExtension = default,
 			IEnumerable<string>? dffExclusions = default)
 		{
-			this.pages.AddRange(pages ?? throw new ArgumentNullException(nameof(pages)));
+			this.pages.AddRange(Throw.IfNull(pages, nameof(pages)));
 
 			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);
 			if (defaultFileExtension is not null) SetDefaultFileExtension(defaultFileExtension);
@@ -53,27 +53,15 @@ namespace AspNetStatic
 		}
 
 
-		protected virtual void SetDefaultFileName(string name)
-		{
-			this.defaultFileName =
-				string.IsNullOrWhiteSpace(name)
-				? throw new ArgumentException(Properties.Resources.Err_MissingDefaultFileName, nameof(name))
-				: name;
-		}
-		protected virtual void SetDefaultFileExtension(string extension)
-		{
-			this.defaultFileExtension =
-				string.IsNullOrWhiteSpace(extension)
-				? throw new ArgumentException(Properties.Resources.Err_MissingDefaultFileExtension, nameof(extension))
-				: extension;
-		}
+		protected virtual void SetDefaultFileName(string name) => this.defaultFileName = Throw.IfNullOrWhiteSpace(name, nameof(name), Properties.Resources.Err_MissingDefaultFileName);
+		protected virtual void SetDefaultFileExtension(string extension) => this.defaultFileExtension = Throw.IfNullOrWhiteSpace(extension, nameof(extension), Properties.Resources.Err_MissingDefaultFileExtension);
 		protected virtual void SetDefaultFileExclusions(string[] newExclusions)
 		{
 			if (newExclusions.Any(s => string.IsNullOrWhiteSpace(s)))
 			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ArrayElementNullOrWhitespace,
-					nameof(newExclusions));
+				Throw.BadArg(
+					nameof(newExclusions),
+					Properties.Resources.Err_ArrayElementNullOrWhitespace);
 			}
 
 			this.exclusions.Clear();

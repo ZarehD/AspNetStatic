@@ -18,24 +18,9 @@ namespace AspNetStatic
 			this string route, string[] exclusions,
 			string defaultFileName, string pageFileExtension)
 		{
-			if (string.IsNullOrWhiteSpace(route))
-			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(route));
-			}
-			if (string.IsNullOrWhiteSpace(defaultFileName))
-			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(defaultFileName));
-			}
-			if (string.IsNullOrWhiteSpace(pageFileExtension))
-			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(pageFileExtension));
-			}
+			Throw.IfNullOrWhiteSpace(route, nameof(route), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhiteSpace(pageFileExtension, nameof(pageFileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			return
 				((exclusions is null) || !exclusions.Any(

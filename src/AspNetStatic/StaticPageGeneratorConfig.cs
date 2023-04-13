@@ -51,13 +51,8 @@ namespace AspNetStatic
 			bool createDefaultFile,
 			bool fixupHrefValues)
 		{
-			this.HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-
-			this.DestinationRoot =
-				string.IsNullOrWhiteSpace(destinationRoot)
-				? throw new ArgumentException(Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace, nameof(destinationRoot))
-				: destinationRoot;
-
+			this.HttpClient = Throw.IfNull(httpClient, nameof(httpClient));
+			this.DestinationRoot = Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.AlwaysCreateDefaultFile = createDefaultFile;
 			this.UpdateLinks = fixupHrefValues;
 
@@ -103,19 +98,8 @@ namespace AspNetStatic
 			: this(httpClient, pages, destinationRoot, createDefaultFile, fixupHrefValues,
 				  disableOptimizations, htmlMinifierSettings, cssMinifier, jsMinifier)
 		{
-			this.DefaultFileName =
-				!string.IsNullOrWhiteSpace(defaultFileName)
-				? defaultFileName
-				: throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(defaultFileName));
-
-			this.PageFileExtension =
-				!string.IsNullOrWhiteSpace(fileExtension)
-				? fileExtension
-				: throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(fileExtension));
+			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			this.PageFileExtension = Throw.IfNullOrWhiteSpace(fileExtension, nameof(fileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			if ((defaultFileExclusions is not null) && defaultFileExclusions.Any())
 			{

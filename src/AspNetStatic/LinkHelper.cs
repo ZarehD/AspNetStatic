@@ -24,14 +24,8 @@ namespace AspNetStatic
 			bool alwaysDefaultFile = default,
 			bool routesAreCaseSensitive = default)
 		{
-			if (htmlContent is null)
-			{
-				throw new ArgumentNullException(nameof(htmlContent));
-			}
-			if (pages is null)
-			{
-				throw new ArgumentNullException(nameof(pages));
-			}
+			Throw.IfNull(htmlContent, nameof(htmlContent));
+			Throw.IfNull(pages, nameof(pages));
 
 			if (string.IsNullOrWhiteSpace(htmlContent)) return htmlContent;
 			if (!pages.Any()) return htmlContent;

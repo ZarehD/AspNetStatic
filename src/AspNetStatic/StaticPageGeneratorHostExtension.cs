@@ -110,20 +110,12 @@ namespace AspNetStatic
 			bool dontOptimizeContent = default,
 			TimeSpan? regenerationInterval = default)
 		{
-			if (host is null)
-			{
-				throw new ArgumentNullException(nameof(host));
-			}
-			if (string.IsNullOrWhiteSpace(destinationRoot))
-			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(destinationRoot));
-			}
+			Throw.IfNull(host, nameof(host));
+			Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+
 			if (!Directory.Exists(destinationRoot))
 			{
-				throw new InvalidOperationException(
-					Properties.Resources.Err_InvalidDestinationRoot);
+				Throw.InvalidOp(Properties.Resources.Err_InvalidDestinationRoot);
 			}
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
@@ -150,14 +142,14 @@ namespace AspNetStatic
 					try
 					{
 						var hostFeatures = host.Services.GetRequiredService<IServer>().Features;
-						var serverAddresses = hostFeatures.Get<IServerAddressesFeature>() ??
-							throw new InvalidOperationException($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
+						var serverAddresses = hostFeatures.Get<IServerAddressesFeature>();
+						if (serverAddresses is null) Throw.InvalidOp($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
 						var hostUrls = serverAddresses.Addresses;
 
 						var baseUri =
 							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttps)) ??
-							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp)) ??
-							throw new InvalidOperationException(Properties.Resources.Err_HostNotHttpService);
+							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp));
+						if (baseUri is null) Throw.InvalidOp(Properties.Resources.Err_HostNotHttpService);
 
 						_httpClient.BaseAddress = new Uri(baseUri);
 						_httpClient.Timeout = TimeSpan.FromSeconds(90);

@@ -15,23 +15,17 @@ namespace AspNetStatic
 	internal class RouteToPathname
 	{
 		public static string GetPathname(
-			PageInfo page, 
+			PageInfo page,
 			string rootFolder,
 			bool alwaysCreateDefaultFile,
 			string indexFileName,
 			string pageFileExtension,
 			string[] exclusions)
 		{
-			if (page is null)
-			{
-				throw new ArgumentNullException(nameof(page));
-			}
-			if (string.IsNullOrWhiteSpace(rootFolder))
-			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(rootFolder));
-			}
+			Throw.IfNull(page, nameof(page));
+			Throw.IfNullOrWhiteSpace(
+				rootFolder, nameof(rootFolder),
+				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			var pagePath = string.Empty;
 
@@ -41,30 +35,24 @@ namespace AspNetStatic
 			}
 			else
 			{
-				if (string.IsNullOrWhiteSpace(indexFileName))
-				{
-					throw new ArgumentException(
-						Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-						nameof(indexFileName));
-				}
-				if (string.IsNullOrWhiteSpace(pageFileExtension))
-				{
-					throw new ArgumentException(
-						Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-						nameof(pageFileExtension));
-				}
+				Throw.IfNullOrWhiteSpace(
+					indexFileName, nameof(indexFileName),
+					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+
+				Throw.IfNullOrWhiteSpace(
+					pageFileExtension, nameof(pageFileExtension),
+					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 				exclusions ??= Array.Empty<string>();
 
 				var pageUrl = GetUrlWithoutQueryString(page.Route);
 				var uriKind = UriKind.Relative;
 
-				pagePath =
-					Uri.IsWellFormedUriString(pageUrl, uriKind)
-					? pageUrl : throw new InvalidOperationException(string.Format(
-						CultureInfo.InvariantCulture,
-						Properties.Resources.Err_RouteForPageNotWellFormed,
-						uriKind.ToString()));
+				if (!Uri.IsWellFormedUriString(pageUrl, uriKind))
+				{
+					Throw.InvalidOp(Properties.Resources.Err_RouteForPageNotWellFormed, uriKind.ToString());
+				}
+				pagePath = pageUrl;
 
 				if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
 				{
@@ -97,12 +85,9 @@ namespace AspNetStatic
 
 		public static string GetUrlWithoutQueryString(string url)
 		{
-			if (string.IsNullOrWhiteSpace(url))
-			{
-				throw new ArgumentException(
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace,
-					nameof(url));
-			}
+			Throw.IfNullOrWhiteSpace(
+				url, nameof(url),
+				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			var idx = url.IndexOf('?');
 			return idx > -1 ? url[0..idx] : url;
