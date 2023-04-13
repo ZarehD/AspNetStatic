@@ -18,7 +18,8 @@ builder.Services.AddRouting(
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton<IStaticPagesInfoProvider, SampleStaticPagesInfoProvider>();
+builder.Services.AddSingleton<IStaticPagesInfoProvider>(
+	new StaticPagesInfoProvider(SampleStaticPages.GetCollection()));
 
 
 var app = builder.Build();
