@@ -187,13 +187,13 @@ namespace AspNetStatic
 									_appShutdown.Token);
 							}
 							while (doPeriodicRefresh && await _timer.WaitForNextTickAsync(_appShutdown.Token));
+						}
 
-							if (exitWhenDone && !doPeriodicRefresh)
-							{
-								logger.Exiting();
-								await Task.Delay(500);
-								await host.StopAsync();
-							}
+						if (exitWhenDone && !doPeriodicRefresh && !_appShutdown.IsCancellationRequested)
+						{
+							logger.Exiting();
+							await Task.Delay(500);
+							await host.StopAsync();
 						}
 #else
 						await StaticPageGenerator.Execute(
