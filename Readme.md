@@ -35,16 +35,22 @@ It's a peace of cake!
    ```
    dotnet add package AspNetStatic
    ```
-1. Create and register a class that implements `IStaticPagesInfoProvider`
-  - Derrive from `StaticPagesInfoProviderBase` or implement the interface directly
-  - Populate the `Pages` collection to specify the routes for which to generate static pages
-    - Set required `Route` property of each `PageInfo`
-    - Set other `PageInfo` properties as appropriate
-  - Set other `StaticPagesInfoProviderBase` properties as appropriate (via protected backing fields)
-  - Register the class in the DI container
-      ```c#
-      builder.Services.AddSingleton<IStaticPagesInfoProvider, MyStaticPagesInfoProvider>();
-      ```
+1. Create and register an object that implements `IStaticPagesInfoProvider`
+   - Create an instance of `StaticPagesInfoProvider`, or an object that derrives from it, or one that implements the interface directly
+   - Populate the `Pages` collection to specify the routes for which to generate static pages
+     - Set required `Route` property of each `PageInfo`
+     - Set other `PageInfo` properties as appropriate
+   - Set other `IStaticPagesInfoProvider` attributes as appropriate
+   - Register the implementation class in the DI container
+   ```c#
+   builder.Services.AddSingleton<IStaticPagesInfoProvider>(
+     new StaticPagesInfoProvider(
+       new PageInfo[]
+       {
+         new("/") { ... },
+         new("/privacy") { ... }
+       }));
+   ```
 1. Add the AspNetStatic module
    ```c#
    ...
