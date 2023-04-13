@@ -10,6 +10,8 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+#define USE_PERIODIC_TIMER
+
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -170,14 +172,38 @@ namespace AspNetStatic
 								cssMinifier,
 								jsMinifier);
 
+						logger.RegenerationConfig(regenerationInterval);
+						var doPeriodicRefresh = regenerationInterval is not null;
+
+#if USE_PERIODIC_TIMER
+						if (!_appShutdown.IsCancellationRequested)
+						{
+							if (doPeriodicRefresh) _timer = new(regenerationInterval!.Value);
+							do
+							{
+								await StaticPageGenerator.Execute(
+									generatorConfig,
+									loggerFactory,
+									_appShutdown.Token);
+							}
+							while (doPeriodicRefresh && await _timer.WaitForNextTickAsync(_appShutdown.Token));
+
+							if (exitWhenDone && !doPeriodicRefresh)
+							{
+								logger.Exiting();
+								await Task.Delay(500);
+								await host.StopAsync();
+							}
+						}
+#else
 						await StaticPageGenerator.Execute(
 							generatorConfig,
 							loggerFactory,
 							_appShutdown.Token);
 
-						if ((regenerationInterval is not null) && !_appShutdown.IsCancellationRequested)
+						if (doPeriodicRefresh && !_appShutdown.IsCancellationRequested)
 						{
-							_timer.Interval = regenerationInterval.Value.TotalMilliseconds;
+							_timer.Interval = regenerationInterval!.Value.TotalMilliseconds;
 							_timer.Elapsed +=
 								async (s, e) =>
 								{
@@ -193,22 +219,23 @@ namespace AspNetStatic
 								};
 							_timer.Start();
 						}
+
+						if (_appShutdown.IsCancellationRequested)
+						{
+							_timer.Stop();
+						}
+						else if (exitWhenDone && !doPeriodicRefresh)
+						{
+							logger.Exiting();
+							await Task.Delay(500);
+							await host.StopAsync();
+						}
+#endif
 					}
-					catch (TaskCanceledException) { }
+					catch (OperationCanceledException) { }
 					catch (Exception ex)
 					{
 						logger.Exception(ex);
-					}
-
-					if (_appShutdown.IsCancellationRequested)
-					{
-						_timer.Stop();
-					}
-					else if (exitWhenDone)
-					{
-						logger.Exiting();
-						await Task.Delay(500);
-						await host.StopAsync();
 					}
 				});
 		}
@@ -218,7 +245,11 @@ namespace AspNetStatic
 
 		private static readonly CancellationTokenSource _appShutdown = new();
 		private static readonly HttpClient _httpClient = new();
+#if USE_PERIODIC_TIMER
+		private static PeriodicTimer _timer = null!;
+#else
 		private static readonly System.Timers.Timer _timer = new();
+#endif
 
 		private const string STATIC_ONLY = "static-only";
 	}
@@ -305,6 +336,22 @@ namespace AspNetStatic
 			Message = "StaticPageGeneratorHost: Completed generating static pages. Exiting...")]
 		private static partial void Imp_Exiting(
 			this ILogger logger);
+
+		#endregion
+
+		#region 1030 - RegenerationConfig
+
+		public static void RegenerationConfig(
+			this ILogger logger,
+			TimeSpan? interval) =>
+			logger.Imp_RegenerationConfig(
+				interval);
+
+		[LoggerMessage(EventId = 1030, EventName = "RegenerationConfig", Level = LogLevel.Information,
+			Message = "StaticPageGeneratorHost: Periodic Regeneration > Interval = {Interval}")]
+		private static partial void Imp_RegenerationConfig(
+			this ILogger logger,
+			TimeSpan? interval);
 
 		#endregion
 	}

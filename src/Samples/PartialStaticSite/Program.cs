@@ -23,6 +23,10 @@ builder.Services.AddSingleton<IStaticPagesInfoProvider, SampleStaticPagesInfoPro
 
 var app = builder.Build();
 
+var intervalStr = app.Configuration["AspNetStatic:RegenTimer"];
+TimeSpan? regenInterval = TimeSpan.TryParse(intervalStr, out var ts) ? ts : null;
+
+
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Error");
@@ -55,7 +59,12 @@ app.GenerateStaticPages(
 	exitWhenDone: exitWhenDone,
 	alwaysDefautFile: false,
 	dontUpdateLinks: false,
-	dontOptimizeContent: true,
-	regenerationInterval: TimeSpan.FromMinutes(5));
+	dontOptimizeContent: false,
+	regenerationInterval: regenInterval);
 
 app.Run();
+
+#if DEBUG
+Console.WriteLine("Press any Key to exit...");
+Console.ReadKey();
+#endif
