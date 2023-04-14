@@ -20,7 +20,7 @@
 			new(new PageInfo[]
 			{
 				new("/"),
-				new("/") { QueryString = "?p1=v1", OutFilePathname = File_Index_p1v1 },
+				new("/") { Query = "?p1=v1", OutFile = File_Index_p1v1 },
 				new("/privacy"),
 				new("/blog/"),
 				new("/blog/article1"),
@@ -32,12 +32,12 @@
 				new("docs/"),
 				new("docs/page1"),
 				new("docs/page2/"),
-				new("/home/p1"){ OutFilePathname = File_Home_P1 },
-				new("/pages/page") { QueryString = "?p1=v1" },
-				new("/pages/page/") { QueryString = "?p1=v1" },
+				new("/home/p1"){ OutFile = File_Home_P1 },
+				new("/pages/page") { Query = "?p1=v1" },
+				new("/pages/page/") { Query = "?p1=v1" },
 				new("/pages/page/rp1"),
-				new("/pages/page/rp2") { OutFilePathname = File_Pages_Page_Rp2 },
-				new("/pages/page/rp2") { QueryString = "?p1=v1", OutFilePathname = File_Pages_Page_Rp2_P1V1 },
+				new("/pages/page/rp2") { OutFile = File_Pages_Page_Rp2 },
+				new("/pages/page/rp2") { Query = "?p1=v1", OutFile = File_Pages_Page_Rp2_P1V1 },
 			});
 
 

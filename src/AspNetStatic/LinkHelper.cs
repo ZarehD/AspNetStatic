@@ -47,8 +47,8 @@ namespace AspNetStatic
 					if (page is null) return m.Value;
 
 					var newHref =
-						!string.IsNullOrWhiteSpace(page.OutFilePathname)
-						? page.OutFilePathname.Replace(Consts.BakSlash, Consts.FwdSlash).EnsureStartsWith(Consts.FSlash)
+						!string.IsNullOrWhiteSpace(page.OutFile)
+						? page.OutFile.Replace(Consts.BakSlash, Consts.FwdSlash).EnsureStartsWith(Consts.FSlash)
 						: (page.Route.EndsWith(Consts.FwdSlash) || alwaysDefaultFile)
 						? $"{page.Route.EnsureEndsWith(Consts.FSlash)}{defaultFileName}"
 						: $"{page.Route.EnsureNotEndsWith(Consts.FSlash)}{pageFileExtension}"

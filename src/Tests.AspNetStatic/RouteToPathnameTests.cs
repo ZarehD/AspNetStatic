@@ -80,7 +80,7 @@
 		{
 			var page = new PageInfo(route)
 			{
-				OutFilePathname = overridePathname
+				OutFile = overridePathname
 			};
 
 			var actual = RouteToPathname.GetPathname(

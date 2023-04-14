@@ -29,9 +29,9 @@ namespace AspNetStatic
 
 			var pagePath = string.Empty;
 
-			if (!string.IsNullOrWhiteSpace(page.OutFilePathname))
+			if (!string.IsNullOrWhiteSpace(page.OutFile))
 			{
-				pagePath = page.OutFilePathname;
+				pagePath = page.OutFile;
 			}
 			else
 			{

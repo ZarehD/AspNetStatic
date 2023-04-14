@@ -19,8 +19,8 @@
 				new("docs/"),
 				new("docs/page1"),
 				new("docs/page2/"),
-				new("/segment/page/1") { QueryString="?p1=v1" },
-				new("/segment/page/2/") { QueryString="p1=v1" },
+				new("/segment/page/1") { Query="?p1=v1" },
+				new("/segment/page/2/") { Query="p1=v1" },
 			});
 
 

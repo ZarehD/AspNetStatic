@@ -84,16 +84,16 @@ namespace AspNetStatic
 					if (page is not null)
 					{
 						if (!this._ignoreOutFilePathname &&
-							!string.IsNullOrWhiteSpace(page.OutFilePathname))
+							!string.IsNullOrWhiteSpace(page.OutFile))
 						{
 							var physicalPath =
 								Path.Combine(this._webRoot,
-								page.OutFilePathname.EnsureNotStartsWith(
+								page.OutFile.EnsureNotStartsWith(
 									Path.DirectorySeparatorChar));
 
 							if (File.Exists(physicalPath))
 							{
-								var newPath = page.OutFilePathname.Replace(
+								var newPath = page.OutFile.Replace(
 									Path.DirectorySeparatorChar, Consts.FwdSlash)
 									.EnsureStartsWith(Consts.FwdSlash);
 
@@ -172,9 +172,9 @@ namespace AspNetStatic
 		/// <summary>
 		///		Gets or sets a value that, when true, indicates that 
 		///		the fallback route should ignore the value specified 
-		///		in <see cref="PageInfo.OutFilePathname"/>, and instead 
+		///		in <see cref="PageInfo.OutFile"/>, and instead 
 		///		use apply the usual rules to determine the fallback route; 
-		///		otherwise, if <see cref="PageInfo.OutFilePathname"/> 
+		///		otherwise, if <see cref="PageInfo.OutFile"/> 
 		///		specifies a file pathname, it should be used as 
 		///		the fallback route.
 		/// </summary>

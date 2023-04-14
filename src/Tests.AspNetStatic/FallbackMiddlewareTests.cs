@@ -15,11 +15,11 @@ namespace Tests.AspNetStatic
 				new("/"),
 				new("/blog/"),
 				new("/blog/article1"),
-				new("/doc/p1") { OutFilePathname = "doc\\page1.htm" },
-				new("/doc/p2/123") { OutFilePathname = "doc\\page2-123.htm" },
-				new("/doc/p3") { QueryString = "?p1=v1&p2=v2", OutFilePathname = "doc\\page3-p1v1-p2v2.htm" },
-				new("/doc/p4/567") { QueryString = "?p1=v1", OutFilePathname = "doc\\page4-567-p1v1.htm" },
-				new("/doc/p4/789/") { QueryString = "?p1=v1", OutFilePathname = "doc\\page4-789-p1v1.htm" },
+				new("/doc/p1") { OutFile = "doc\\page1.htm" },
+				new("/doc/p2/123") { OutFile = "doc\\page2-123.htm" },
+				new("/doc/p3") { Query = "?p1=v1&p2=v2", OutFile = "doc\\page3-p1v1-p2v2.htm" },
+				new("/doc/p4/567") { Query = "?p1=v1", OutFile = "doc\\page4-567-p1v1.htm" },
+				new("/doc/p4/789/") { Query = "?p1=v1", OutFile = "doc\\page4-789-p1v1.htm" },
 			});
 
 		private class PageInfoProvider : StaticPagesInfoProvider

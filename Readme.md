@@ -49,8 +49,8 @@ It's a peace of cake!
        {
          new("/") { ... },
          new("/privacy") { ... }
-         new("/blog/posts/1") { OutFilePathname = @"blog\post-1.html" }
-         new("/blog/posts/2") { OutFilePathname = @"blog\post-2-dark.html", QueryString = "?theme=dark" }
+         new("/blog/posts/1") { OutFile = @"blog\post-1.html" }
+         new("/blog/posts/2") { OutFile = @"blog\post-2-dark.html", Query = "?theme=dark" }
        }));
    ```
 1. Add the AspNetStatic module
@@ -90,15 +90,15 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 
 - Routes must exclude the site's base URI (e.g. __http:<span>://</span>localhost:5000__, __https<span>://www</span>.mysite.com__)
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
-- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFilePathname` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFilePathname`, the pathname for the generated file will be determined as demonstrated below.
-- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `QueryString` property). You can specify the same `Route` with different `QueryString` values, but be sure to specify a unique `OutFilePathname` value for each instance of that route.
+- You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
+- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but be sure to specify a unique `OutFile` value for each instance of that route.
 
 
 ### Routes vs. Generated Static Files
 
 > Assumes the following:
 >  - Destination root: "__C:\MySite__"
->  - OutFilePathname: __null / empty / whitespace__
+>  - OutFile: __null / empty / whitespace__
 
 <br/>Route | Always Default<br/>false | Always Default<br/>true
 ---|---|---
@@ -118,7 +118,7 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 ### Routes vs. Served Content (using fallback middleware)
 
 > Assumes the following:
->  - OutFilePathname: __null / empty / whitespace__
+>  - OutFile: __null / empty / whitespace__
 
 Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always Default: false | Is Static Route: true<br/>Always Default: true
 ---|---|---|---

@@ -16,8 +16,8 @@
 			var page =
 				new PageInfo(route)
 				{
-					QueryString = queryString,
-					OutFilePathname = outFilePathname,
+					Query = queryString,
+					OutFile = outFilePathname,
 					ChangeFrequency = changeFrequency,
 					IndexPriority = indexPriority,
 					LastModified = lastModified
@@ -25,8 +25,8 @@
 
 			Assert.IsNotNull(page);
 			Assert.AreEqual(page.Route, route, ignoreCase: true);
-			Assert.AreEqual(page.QueryString, queryString, ignoreCase: true);
-			Assert.AreEqual(page.OutFilePathname, outFilePathname, ignoreCase: true);
+			Assert.AreEqual(page.Query, queryString, ignoreCase: true);
+			Assert.AreEqual(page.OutFile, outFilePathname, ignoreCase: true);
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
@@ -45,14 +45,14 @@
 			var page =
 				new PageInfo(route)
 				{
-					QueryString = queryString,
-					OutFilePathname = pageFilePathname,
+					Query = queryString,
+					OutFile = pageFilePathname,
 				};
 
 			Assert.IsNotNull(page);
 			Assert.AreEqual(page.Route, route, ignoreCase: true);
-			Assert.AreEqual(page.QueryString, queryString, ignoreCase: true);
-			Assert.AreEqual(page.OutFilePathname, pageFilePathname, ignoreCase: true);
+			Assert.AreEqual(page.Query, queryString, ignoreCase: true);
+			Assert.AreEqual(page.OutFile, pageFilePathname, ignoreCase: true);
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
@@ -65,8 +65,8 @@
 			var expected =
 				new PageInfo("/route/")
 				{
-					QueryString = "?parm=value",
-					OutFilePathname = "\\route\\index.html",
+					Query = "?parm=value",
+					OutFile = "\\route\\index.html",
 					ChangeFrequency = ChangeFrequency.Daily,
 					IndexPriority = 1.0,
 					LastModified = DateTime.UtcNow
@@ -76,8 +76,8 @@
 			var actual = System.Text.Json.JsonSerializer.Deserialize<PageInfo>(json);
 
 			Assert.AreEqual(expected.Route, actual?.Route, ignoreCase: true);
-			Assert.AreEqual(expected.QueryString, actual?.QueryString, ignoreCase: true);
-			Assert.AreEqual(expected.OutFilePathname, actual?.OutFilePathname, ignoreCase: true);
+			Assert.AreEqual(expected.Query, actual?.Query, ignoreCase: true);
+			Assert.AreEqual(expected.OutFile, actual?.OutFile, ignoreCase: true);
 			Assert.AreEqual(expected.ChangeFrequency, actual?.ChangeFrequency);
 			Assert.AreEqual(expected.IndexPriority, actual?.IndexPriority);
 			Assert.AreEqual(expected.LastModified, actual?.LastModified);

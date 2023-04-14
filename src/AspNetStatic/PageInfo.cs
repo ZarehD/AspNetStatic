@@ -36,13 +36,12 @@ namespace AspNetStatic
 		///		<see cref="Route"/> and should start with a '?' character.
 		///		(see <see cref="Url"/> proprty).
 		/// </remarks>
-		[JsonPropertyName("Query")]
-		public string? QueryString { get; init; }
+		public string? Query { get; init; }
 
 		/// <summary>
-		///		Gets the combined <see cref="Route"/> and <see cref="QueryString"/> value.
+		///		Gets the combined <see cref="Route"/> and <see cref="Query"/> value.
 		/// </summary>
-		public string Url => $"{this.Route}{this.QueryString.EnsureStartsWith('?', true)}";
+		public string Url => $"{this.Route}{this.Query.EnsureStartsWith('?', true)}";
 
 		/// <summary>
 		///		Gets or sets the pathname (path and filename) of the file 
@@ -62,8 +61,7 @@ namespace AspNetStatic
 		///			this page, including any file extension for the file.
 		///		</para>
 		/// </remarks>
-		[JsonPropertyName("File")]
-		public string? OutFilePathname { get; init; }
+		public string? OutFile { get; init; }
 
 		public ChangeFrequency ChangeFrequency { get; init; } = ChangeFrequency.Never;
 

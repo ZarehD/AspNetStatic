@@ -281,7 +281,7 @@ namespace AspNetStatic
 			PageInfo page) =>
 			logger.Imp_ProcessingPage(
 				page.Route,
-				page.QueryString);
+				page.Query);
 
 		[LoggerMessage(EventId = 1030, EventName = "ProcessingPage", Level = LogLevel.Information,
 			Message = "StaticPageGenerator: Processing page > Route = {Route}, Query = {Query}")]
