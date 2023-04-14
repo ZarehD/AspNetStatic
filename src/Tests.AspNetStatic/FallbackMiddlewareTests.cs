@@ -24,7 +24,7 @@ namespace Tests.AspNetStatic
 
 		private class PageInfoProvider : StaticPagesInfoProvider
 		{
-			public PageInfoProvider():base(_pages) { }
+			public PageInfoProvider() : base(_pages) { }
 		}
 
 		private static ILogger<StaticPageFallbackMiddleware> GetMiddlewareLogger() =>

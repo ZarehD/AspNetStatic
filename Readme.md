@@ -36,7 +36,7 @@ It's a peace of cake!
    dotnet add package AspNetStatic
    ```
 1. Create and register an object that implements `IStaticPagesInfoProvider`
-   - Create an instance of `StaticPagesInfoProvider`, or an object that derrives from it, or one that implements the interface directly
+   - Create an instance of `StaticPagesInfoProvider`, or an object that derrives from `StaticPagesInfoProviderBase`, or one that implements the interface directly
    - Populate the `Pages` collection to specify the routes for which to generate static pages
      - Set required `Route` property of each `PageInfo`
      - Set other `PageInfo` properties as appropriate
