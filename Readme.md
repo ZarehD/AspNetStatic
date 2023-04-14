@@ -100,19 +100,19 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 >  - Destination root: "__C:\MySite__"
 >  - OutFile: __null / empty / whitespace__
 
-<br/>Route | Always Default<br/>false | Always Default<br/>true
+Url<br/>(route + query) | Always Default<br/>false | Always Default<br/>true
 ---|---|---
-/                       | C:\MySite\index.html                  | C:\MySite\index.html
-/index                  | C:\MySite\index.html                  | C:\MySite\index.html
-/index/                 | C:\MySite\index\index.html            | C:\MySite\index\index.html
-/page                   | C:\MySite\page.html                   | C:\MySite\page\index.html
-/page/                  | C:\MySite\page\index.html             | C:\MySite\page\index.html
-/page/123               | C:\MySite\page\123.html               | C:\MySite\page\123\index.html
-/page/123/              | C:\MySite\page\123\index.html         | C:\MySite\page\123\index.html
-/page/123?p1=v1         | C:\MySite\page\123.html               | C:\MySite\page\123\index.html
-/page/123/?p1=v1        | C:\MySite\page\123\index.html         | C:\MySite\page\123\index.html
-/blog/articles/         | C:\MySite\blog\articles/index.html    | C:\MySite\blog\articles\index.html
-/blog/articles/article1 | C:\MySite\blog\articles/article1.html | C:\MySite\blog\articles\article1/index.html
+/                    | C:\MySite\index.html                  | C:\MySite\index.html
+/index               | C:\MySite\index.html                  | C:\MySite\index.html
+/index/              | C:\MySite\index\index.html            | C:\MySite\index\index.html
+/page                | C:\MySite\page.html                   | C:\MySite\page\index.html
+/page/               | C:\MySite\page\index.html             | C:\MySite\page\index.html
+/page/123            | C:\MySite\page\123.html               | C:\MySite\page\123\index.html
+/page/123/           | C:\MySite\page\123\index.html         | C:\MySite\page\123\index.html
+/page/123?p1=v1      | C:\MySite\page\123.html               | C:\MySite\page\123\index.html
+/page/123/?p1=v1     | C:\MySite\page\123\index.html         | C:\MySite\page\123\index.html
+/blog/articles/      | C:\MySite\blog\articles/index.html    | C:\MySite\blog\articles\index.html
+/blog/articles/post1 | C:\MySite\blog\articles\post1.html | C:\MySite\blog\articles\post1\index.html
 
 
 ### Routes vs. Served Content (using fallback middleware)
@@ -120,19 +120,19 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 > Assumes the following:
 >  - OutFile: __null / empty / whitespace__
 
-Route<br/> | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always Default: false | Is Static Route: true<br/>Always Default: true
+Url<br/>(route + query) | Is Static Route: false<br/><br/> | Is Static Route: true<br/>Always Default: false | Is Static Route: true<br/>Always Default: true
 ---|---|---|---
-/                       | /index.cshtml                  | /index.html                  | /index.html
-/index                  | /index.cshtml                  | /index.html                  | /index.html
-/index/                 | /index/index.cshtml            | /index.html                  | /index/index.html
-/page                   | /page.cshtml                   | /page.html                   | /page/index.html
-/page/                  | /page/index.cshtml             | /page/index.html             | /page/index.html
-/page/123               | /page.cshtml                   | /page/123.html               | /page/123/index.html
-/page/123/              | /page.cshtml                   | /page/123/index.html         | /page/123/index.html
-/page/123?p1=v1         | /page.cshtml                   | /page/123.html               | /page/123/index.html
-/page/123/?p1=v1        | /page.cshtml                   | /page/123/index.html         | /page/123/index.html
-/blog/articles/         | /blog/articles/index.cshtml    | /blog/articles/index.html    | /blog/articles/index.html
-/blog/articles/article1 | /blog/articles/article1.cshtml | /blog/articles/article1.html | /blog/articles/article1/index..html
+/                    | /index.cshtml                  | /index.html                  | /index.html
+/index               | /index.cshtml                  | /index.html                  | /index.html
+/index/              | /index/index.cshtml            | /index.html                  | /index/index.html
+/page                | /page.cshtml                   | /page.html                   | /page/index.html
+/page/               | /page/index.cshtml             | /page/index.html             | /page/index.html
+/page/123            | /page.cshtml                   | /page/123.html               | /page/123/index.html
+/page/123/           | /page.cshtml                   | /page/123/index.html         | /page/123/index.html
+/page/123?p1=v1      | /page.cshtml                   | /page/123.html               | /page/123/index.html
+/page/123/?p1=v1     | /page.cshtml                   | /page/123/index.html         | /page/123/index.html
+/blog/articles/      | /blog/articles/index.cshtml    | /blog/articles/index.html    | /blog/articles/index.html
+/blog/articles/post1 | /blog/articles/post1.cshtml | /blog/articles/post1.html | /blog/articles/post1/index..html
 
 
 > #### The same rules apply when links in static files are updated to refer to other generated static files.
