@@ -6,12 +6,13 @@
 
 ## Transform ASP.NET Core into a Static Site Generator
 
-
 Okay, so you want to create a static website. After doing some research, you learn that all the cool kids are using tools like __Jekyll__, __Hugo__, __Gatsby__, __Statiq__, and others. 
 But what you also learn is that all of these tools require you to learn an entirely new way of constructing sites and pages. 
 And then it occurs to you, hey wait a minute, I already know how to use ASP.NET Core to create websites, so why oh why do I have to learn a whole new stack just for this? Isn't there a better way that lets me use the tools and skills I already know?
 
 Well, now there is!
+
+### Create a static site from your ASP.NET Core generated content
 
 AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator!
 
