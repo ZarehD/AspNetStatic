@@ -49,6 +49,8 @@ It's a peace of cake!
        {
          new("/") { ... },
          new("/privacy") { ... }
+         new("/blog/posts/1") { OutFilePathname = @"blog\post-1.html" }
+         new("/blog/posts/2") { OutFilePathname = @"blog\post-2-dark.html", QueryString = "?theme=dark" }
        }));
    ```
 1. Add the AspNetStatic module
