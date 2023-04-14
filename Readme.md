@@ -165,7 +165,7 @@ app.GenerateStaticPages(
 
 <br/>
 
-## Senarios
+## Scenarios
 
 > #### In all senarios, ensure that routes for static pages are unincumbered by authentication or authorization requirements.
 
