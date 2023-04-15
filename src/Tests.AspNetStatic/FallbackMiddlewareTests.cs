@@ -10,17 +10,23 @@ namespace Tests.AspNetStatic
 	[TestClass]
 	public class FallbackMiddlewareTests
 	{
+		private static readonly string File_Doc_P1 = "doc/page1.htm".ToFileSysPath();
+		private static readonly string File_Doc_P2_123 = @"doc\page2-123.htm".ToFileSysPath();
+		private static readonly string File_Doc_P3 = "doc/page3-p1v1-p2v2.htm".ToFileSysPath();
+		private static readonly string File_Doc_P4_567_P1V1 = "doc/page4-567-p1v1.htm".ToFileSysPath();
+		private static readonly string File_Doc_P4_789_P1V1 = "doc/page4-789-p1v1.htm".ToFileSysPath();
+
 		private static readonly List<PageInfo> _pages =
 			new(new PageInfo[]
 			{
 				new("/"),
 				new("/blog/"),
 				new("/blog/article1"),
-				new("/doc/p1") { OutFile = "doc\\page1.htm" },
-				new("/doc/p2/123") { OutFile = "doc\\page2-123.htm" },
-				new("/doc/p3") { Query = "?p1=v1&p2=v2", OutFile = "doc\\page3-p1v1-p2v2.htm" },
-				new("/doc/p4/567") { Query = "?p1=v1", OutFile = "doc\\page4-567-p1v1.htm" },
-				new("/doc/p4/789/") { Query = "?p1=v1", OutFile = "doc\\page4-789-p1v1.htm" },
+				new("/doc/p1") { OutFile = File_Doc_P1 },
+				new("/doc/p2/123") { OutFile = File_Doc_P2_123 },
+				new("/doc/p3") { Query = "?p1=v1&p2=v2", OutFile = File_Doc_P3 },
+				new("/doc/p4/567") { Query = "?p1=v1", OutFile = File_Doc_P4_567_P1V1 },
+				new("/doc/p4/789/") { Query = "?p1=v1", OutFile = File_Doc_P4_789_P1V1 },
 			});
 
 		private class PageInfoProvider : StaticPagesInfoProvider
