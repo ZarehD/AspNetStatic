@@ -1,11 +1,11 @@
 name: Build-And-Test
 
 on:
-#   push:
-#     branches: [ "master" ]
-#   pull_request:
-#     branches: [ "master" ]
-    workflow_dispatch:
+   push:
+     branches: [ "master" ]
+   pull_request:
+     branches: [ "master" ]
+   workflow_dispatch:
 
 jobs:
   build:
