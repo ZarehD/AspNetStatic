@@ -25,5 +25,5 @@ jobs:
       run: dotnet restore ./src/AspNetStatic.sln
     - name: Build
       run: dotnet build ./src/AspNetStatic.sln -c Release --no-restore
-    - name: Test (--no-build)
-      run: dotnet test ./src/AspNetStatic.sln -c Release --verbosity normal
+    - name: Test
+      run: dotnet test ./src/AspNetStatic.sln -c Release --no-build --verbosity normal
