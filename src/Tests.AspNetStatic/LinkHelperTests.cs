@@ -92,12 +92,12 @@
 		[TestMethod]
 		public void Test_FixupHrefValues_FileInput_Html()
 		{
-			var inputFilePath = @".\data\input.txt"
+			var inputFilePath = @".\Data\input.txt"
 				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
 				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 				;
 
-			var outputFileName = @".\data\output_html.txt"
+			var outputFileName = @".\Data\output_html.txt"
 				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
 				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 				;
@@ -122,12 +122,12 @@
 		[TestMethod]
 		public void Test_FixupHrefValues_FileInput_DefaultFile()
 		{
-			var inputFilePath = @".\data\input.txt"
+			var inputFilePath = @".\Data\input.txt"
 				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
 				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 				;
 
-			var outputFileName = @".\data\output_default.txt"
+			var outputFileName = @".\Data\output_default.txt"
 				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
 				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 				;
