@@ -1,7 +1,8 @@
-﻿using System.Text;
+﻿using System.IO.Abstractions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Tests.AspNetStatic
@@ -42,33 +43,12 @@ namespace Tests.AspNetStatic
 			return moqEnv.Object;
 		}
 
-		private static void CreateFileInWebRoot(string filePathname)
-		{
-			var webRoot = GetWebHostEnvironment().WebRootPath;
-			var fullPathname = Path.Combine(
-				webRoot, filePathname.EnsureNotStartsWith(
-					Consts.BakSlash));
-			if (!Directory.Exists(Path.GetDirectoryName(fullPathname)))
-			{
-				Directory.CreateDirectory(Path.GetDirectoryName(fullPathname)!);
-			}
-			File.WriteAllText(fullPathname, "AspNetStatic fallback middleware test content.", Encoding.UTF8);
-		}
-
-		private static void DeleteFile(string filePathname)
-		{
-			if (string.IsNullOrWhiteSpace(filePathname)) return;
-
-			var webRoot = GetWebHostEnvironment().WebRootPath;
-			var fullPathname = Path.Combine(
-				webRoot, filePathname.EnsureNotStartsWith(
-					Consts.BakSlash));
-
-			if (File.Exists(fullPathname))
-			{
-				File.Delete(fullPathname);
-			}
-		}
+		private static string GetOutFileFullPath(string filePathname) =>
+			Path.Combine(
+				GetWebHostEnvironment().WebRootPath, filePathname
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.EnsureNotStartsWith(Path.DirectorySeparatorChar));
 
 
 
@@ -82,52 +62,58 @@ namespace Tests.AspNetStatic
 			string requestPath, string expectedPath,
 			bool alwaysDefaultfile)
 		{
+			// Setup...
+			//
 			var parts = requestPath.Split('?');
 			var path = parts[0];
 			var query = parts.Length > 1 ? parts[1] : null;
 
-			var httpContextMoq = new Mock<HttpContext>();
+			var pageInfoProvider = GetPagenfoProvider();
 
+			var createFile =
+				!expectedPath.EndsWith(Consts.FwdSlash) &&
+				Path.HasExtension(expectedPath) &&
+				pageInfoProvider.Pages.ContainsPageForUrl(requestPath);
+
+			var diskFilePathname = createFile
+				? GetOutFileFullPath(expectedPath)
+				: string.Empty;
+
+			var pathname = createFile
+				? expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				: string.Empty;
+
+			var fileSystemMoq = new Mock<IFileSystem>();
+			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(true);
+			var fileSystem = fileSystemMoq.Object;
+
+			var httpContextMoq = new Mock<HttpContext>();
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
 			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
 			httpContextMoq.Setup(x => x.Request.QueryString).Returns(new QueryString(query.EnsureStartsWith('?', true)));
 			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
-
 			var httpContext = httpContextMoq.Object;
-
-			var pageInfoProvider = GetPagenfoProvider();
 
 			var sut = new StaticPageFallbackMiddleware(
 				GetMiddlewareLogger(),
+				fileSystem,
 				GetNextMiddleware(),
 				pageInfoProvider,
 				GetWebHostEnvironment(),
-				new()
-				{
-					AlwaysDefaultFile = alwaysDefaultfile
-				});
+				Options.Create<StaticPageFallbackMiddlewareOptions>(
+					new()
+					{
+						AlwaysDefaultFile = alwaysDefaultfile
+					}));
 
-			var pathname = string.Empty;
-			var createFile =
-				!expectedPath.EndsWith(Consts.FwdSlash) &&
-				Path.HasExtension(expectedPath) &&
-				pageInfoProvider.Pages.ContainsPageForUrl(requestPath)
-				;
 
-			if (createFile)
-			{
-				pathname = expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar);
-				CreateFileInWebRoot(pathname);
-			}
-			try
-			{
-				await sut.InvokeAsync(httpContext);
-			}
-			finally
-			{
-				if (createFile) DeleteFile(pathname);
-			}
+			// Act...
+			//
+			await sut.InvokeAsync(httpContext);
 
+
+			// Assess...
+			//
 			if (createFile)
 			{
 				httpContextMoq.VerifySet(x => x.Request.Path = new PathString(expectedPath)); //new PathString(expectedPath)
@@ -153,52 +139,58 @@ namespace Tests.AspNetStatic
 			string requestPath, string expectedPath,
 			bool ignoreOutFilePathname)
 		{
+			// Setup...
+			//
 			var parts = requestPath.Split('?');
 			var path = parts[0];
 			var query = parts.Length > 1 ? parts[1] : null;
 
-			var httpContextMoq = new Mock<HttpContext>();
+			var pageInfoProvider = GetPagenfoProvider();
 
+			var createFile =
+				!expectedPath.EndsWith(Consts.FwdSlash) &&
+				Path.HasExtension(expectedPath) &&
+				pageInfoProvider.Pages.ContainsPageForUrl(requestPath);
+
+			var diskFilePathname = createFile
+				? GetOutFileFullPath(expectedPath)
+				: string.Empty;
+
+			var pathname = createFile
+				? expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				: string.Empty;
+
+			var fileSystemMoq = new Mock<IFileSystem>();
+			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(true);
+			var fileSystem = fileSystemMoq.Object;
+
+			var httpContextMoq = new Mock<HttpContext>();
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
 			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
 			httpContextMoq.Setup(x => x.Request.QueryString).Returns(new QueryString(query.EnsureStartsWith('?', true)));
 			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
-
 			var httpContext = httpContextMoq.Object;
-
-			var pageInfoProvider = GetPagenfoProvider();
 
 			var sut = new StaticPageFallbackMiddleware(
 				GetMiddlewareLogger(),
+				fileSystem,
 				GetNextMiddleware(),
 				pageInfoProvider,
 				GetWebHostEnvironment(),
-				new()
-				{
-					IgnoreOutFilePathname = ignoreOutFilePathname
-				});
+				Options.Create<StaticPageFallbackMiddlewareOptions>(
+					new()
+					{
+						IgnoreOutFilePathname = ignoreOutFilePathname
+					}));
 
-			var pathname = string.Empty;
-			var createFile =
-				!expectedPath.EndsWith(Consts.FwdSlash) &&
-				Path.HasExtension(expectedPath) &&
-				pageInfoProvider.Pages.ContainsPageForUrl(requestPath)
-				;
 
-			if (createFile)
-			{
-				pathname = expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar);
-				CreateFileInWebRoot(pathname);
-			}
-			try
-			{
-				await sut.InvokeAsync(httpContext);
-			}
-			finally
-			{
-				if (createFile) DeleteFile(pathname);
-			}
+			// Act...
+			//
+			await sut.InvokeAsync(httpContext);
 
+
+			// Assess...
+			//
 			if (createFile)
 			{
 				httpContextMoq.VerifySet(x => x.Request.Path = new PathString(expectedPath)); //new PathString(expectedPath)

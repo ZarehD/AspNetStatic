@@ -4,7 +4,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -17,6 +16,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="TestableIO.System.IO.Abstractions" Version="19.2.11" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="19.2.11" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\AspNetStatic\AspNetStatic.csproj" />
   </ItemGroup>
 

@@ -10,10 +10,13 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+using System.IO.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
 namespace AspNetStatic
@@ -21,6 +24,7 @@ namespace AspNetStatic
 	public class StaticPageFallbackMiddleware
 	{
 		private readonly ILogger<StaticPageFallbackMiddleware>? _logger;
+		private readonly IFileSystem _fileSystem;
 		private readonly RequestDelegate _next;
 		private readonly IStaticPagesInfoProvider _pageInfoProvider;
 		private readonly bool _haveStaticPages;
@@ -31,20 +35,21 @@ namespace AspNetStatic
 		private readonly string _defaultFileName;
 		private readonly string _pageFileExtension;
 
-
 		public StaticPageFallbackMiddleware(
 			ILogger<StaticPageFallbackMiddleware>? logger,
+			IFileSystem fileSystem,
 			RequestDelegate next,
 			IStaticPagesInfoProvider pageInfoProvider,
 			IWebHostEnvironment environment,
-			StaticPageFallbackMiddlewareOptions? options)
+			IOptions<StaticPageFallbackMiddlewareOptions>? optionsAccessor)
 		{
 			this._logger = logger;
 
+			this._fileSystem = Throw.IfNull(fileSystem, nameof(fileSystem));
 			this._next = Throw.IfNull(next, nameof(next));
 			this._pageInfoProvider = Throw.IfNull(pageInfoProvider, nameof(pageInfoProvider));
 			Throw.IfNull(environment, nameof(environment));
-			options ??= new StaticPageFallbackMiddlewareOptions();
+			var options = optionsAccessor?.Value ?? new StaticPageFallbackMiddlewareOptions();
 
 			this._haveStaticPages = this._pageInfoProvider.Pages.Any();
 			this._pageFileExtension = this._pageInfoProvider.PageFileExtension.EnsureStartsWith(".");
@@ -65,7 +70,6 @@ namespace AspNetStatic
 				this._pageFileExtension,
 				this._exclusions);
 		}
-
 
 		public async Task InvokeAsync(HttpContext ctx)
 		{
@@ -91,7 +95,7 @@ namespace AspNetStatic
 								page.OutFile.EnsureNotStartsWith(
 									Path.DirectorySeparatorChar));
 
-							if (File.Exists(physicalPath))
+							if (this._fileSystem.File.Exists(physicalPath))
 							{
 								var newPath = page.OutFile.Replace(
 									Path.DirectorySeparatorChar, Consts.FwdSlash)
@@ -133,7 +137,7 @@ namespace AspNetStatic
 									.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 									.EnsureNotStartsWith(Path.DirectorySeparatorChar));
 
-								if (File.Exists(physicalPath))
+								if (this._fileSystem.File.Exists(physicalPath))
 								{
 									this._logger?.ProcessedRoute(path, newPath);
 									ctx.Request.Path = newPath;
@@ -151,7 +155,6 @@ namespace AspNetStatic
 			await this._next(ctx).ConfigureAwait(false);
 		}
 	}
-
 
 	public class StaticPageFallbackMiddlewareOptions
 	{
@@ -184,19 +187,29 @@ namespace AspNetStatic
 		public bool IgnoreOutFilePathname { get; set; }
 	}
 
-
 	public static class StaticPageFallbackMiddlewareExtensions
 	{
-		public static IApplicationBuilder UseStaticPageFallback(
-			this IApplicationBuilder builder,
+		public static IServiceCollection AddStaticPageFallback(
+			this IServiceCollection services,
 			Action<StaticPageFallbackMiddlewareOptions>? configAction = default)
 		{
+			services.AddTransient<IFileSystem, FileSystem>();
+
 			var options = new StaticPageFallbackMiddlewareOptions();
-
 			configAction?.Invoke(options);
+			services.Configure<StaticPageFallbackMiddlewareOptions>(
+				cfg =>
+				{
+					cfg.AlwaysDefaultFile = options.AlwaysDefaultFile;
+					cfg.IgnoreOutFilePathname = options.IgnoreOutFilePathname;
+				});
 
-			return builder.UseMiddleware<StaticPageFallbackMiddleware>(options);
+			return services;
 		}
+
+		public static IApplicationBuilder UseStaticPageFallback(
+			this IApplicationBuilder builder) =>
+			builder.UseMiddleware<StaticPageFallbackMiddleware>();
 	}
 
 

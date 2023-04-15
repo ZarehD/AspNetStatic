@@ -139,7 +139,7 @@ Url<br/>(route + query) | Is Static Route: false<br/><br/> | Is Static Route: tr
 > #### The same rules apply when links in static files are updated to refer to other generated static files.
 
 
-__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link URLs based on the routing configuration of your app, so if you're using them, be sure to specify an appropriate value for `alwaysDefaultFile`, as shown below.
+__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link URLs based on the routing configuration of your app, so if you're using them, be sure to specify an appropriate value for `alwaysDefaultFile`, as shown below. (NOTE: Specify the same value if/when configuring the fallback middleware).
 ```c#
 builder.Services.AddRouting(
   options =>
@@ -225,6 +225,8 @@ The configuration options are the same as for a standalone static site, except t
  
 Like this:
 ```c#
+...
+builder.Services.AddStaticPageFallback();
 ...
 app.UseStaticPageFallback();     // re-route to the static file
 app.UseStaticFiles();

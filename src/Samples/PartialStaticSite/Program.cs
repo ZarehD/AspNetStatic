@@ -21,6 +21,18 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<IStaticPagesInfoProvider>(
 	new StaticPagesInfoProvider(SampleStaticPages.GetCollection()));
 
+#region app.UseStaticPageFallback()
+#if ENABLE_STATIC_PAGE_FALLBACK
+
+builder.Services.AddStaticPageFallback(
+	cfg =>
+	{
+		cfg.AlwaysDefaultFile = false;
+	});
+
+#endif
+#endregion
+
 
 var app = builder.Build();
 
@@ -38,11 +50,7 @@ app.UseHttpsRedirection();
 #region app.UseStaticPageFallback()
 #if ENABLE_STATIC_PAGE_FALLBACK
 
-app.UseStaticPageFallback(
-	cfg =>
-	{
-		cfg.AlwaysDefaultFile = false;
-	});
+app.UseStaticPageFallback();
 
 #endif
 #endregion
