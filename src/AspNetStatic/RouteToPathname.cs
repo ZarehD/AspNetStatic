@@ -12,7 +12,7 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	internal class RouteToPathname
+	internal static class RouteToPathname
 	{
 		public static string GetPathname(
 			PageInfo page,
@@ -45,20 +45,20 @@ namespace AspNetStatic
 
 				exclusions ??= Array.Empty<string>();
 
-				var pageUrl = GetUrlWithoutQueryString(page.Route);
+				var pageRoute = page.Route.StripQueryString();
 				var uriKind = UriKind.Relative;
 
-				if (!Uri.IsWellFormedUriString(pageUrl, uriKind))
+				if (!Uri.IsWellFormedUriString(pageRoute, uriKind))
 				{
 					Throw.InvalidOp(Properties.Resources.Err_RouteForPageNotWellFormed, uriKind.ToString());
 				}
-				pagePath = pageUrl;
+				pagePath = pageRoute;
 
 				if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
 				{
 					pagePath += indexFileName;
 				}
-				else if (string.IsNullOrEmpty(Path.GetExtension(pagePath)))
+				else if (!Path.HasExtension(pagePath)) //(string.IsNullOrEmpty(Path.GetExtension(pagePath)))
 				{
 					var generateDefaultFile =
 						alwaysCreateDefaultFile &&
@@ -67,7 +67,7 @@ namespace AspNetStatic
 
 					pagePath +=
 						generateDefaultFile
-						? $"{Consts.FwdSlash}{indexFileName}"
+						? $"{Path.DirectorySeparatorChar}{indexFileName}"
 						: pageFileExtension;
 				}
 			}
@@ -75,19 +75,20 @@ namespace AspNetStatic
 			pagePath = pagePath
 				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
 				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				.EnsureNotStartsWith(Path.DirectorySeparatorChar)
 				;
 
-			return
-				Path.Combine(rootFolder,
-				pagePath.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+			return Path.Combine(rootFolder, pagePath);
 		}
 
 
-		public static string GetUrlWithoutQueryString(string url)
+		public static string StripQueryString(this string url)
 		{
-			Throw.IfNullOrWhiteSpace(
-				url, nameof(url),
-				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			//Throw.IfNullOrWhiteSpace(
+			//	url, nameof(url),
+			//	Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+
+			if (string.IsNullOrWhiteSpace(url)) return url;
 
 			var idx = url.IndexOf('?');
 			return idx > -1 ? url[0..idx] : url;
