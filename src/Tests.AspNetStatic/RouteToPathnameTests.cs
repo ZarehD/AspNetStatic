@@ -26,7 +26,7 @@
 		[DataRow("/segment/page/?q1=v1", "/segment/page/")]
 		public void Test_GetUrlWithoutQueryString(string url, string expected)
 		{
-			var actual = RouteToPathname.GetUrlWithoutQueryString(url);
+			var actual = RouteToPathname.StripQueryString(url);
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
 
@@ -36,7 +36,8 @@
 		[DataRow(" ")]
 		public void Test_GetUrlWithoutQueryString_BadInput(string url)
 		{
-			Assert.ThrowsException<ArgumentException>(() => RouteToPathname.GetUrlWithoutQueryString(url));
+			//Assert.ThrowsException<ArgumentException>(() => RouteToPathname.StripQueryString(url));
+			Assert.AreEqual(url, RouteToPathname.StripQueryString(url), ignoreCase: true);
 		}
 
 		#endregion
@@ -55,7 +56,7 @@
 		[DataRow("/page", false, @"\root\page.html")]
 		[DataRow("/page", true, @"\root\page\index.html")]
 		[DataRow("/segment/page", false, @"\root\segment\page.html")]
-		[DataRow("/segment/page", true, @"\root\segment\page\index.html")]
+		[DataRow("/segment/page", true, @"/root/segment\page\index.html")]
 		public void Test_GetPathname(string route, bool createDefaultFile, string expected)
 		{
 			var page = new PageInfo(route);
@@ -64,6 +65,10 @@
 				page, _webroot, createDefaultFile,
 				_indexFileName, _pageFileExtension,
 				_exclusions);
+
+			expected = expected
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar);
 
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
@@ -75,7 +80,7 @@
 		[DataRow("/", " ", @"\root\index.html")]
 		[DataRow("/", "page.htm", @"\root\page.htm")]
 		[DataRow("/page", "my-page.htm", @"\root\my-page.htm")]
-		[DataRow("/page/", @"\page\default.htm", @"\root\page\default.htm")]
+		[DataRow("/page/", @"\page/default.htm", @"/root/page\default.htm")]
 		public void Test_GetPathname_Override(string route, string? overridePathname, string expected)
 		{
 			var page = new PageInfo(route)
@@ -86,6 +91,10 @@
 			var actual = RouteToPathname.GetPathname(
 				page, _webroot, false,
 				_indexFileName, _pageFileExtension, _exclusions);
+
+			expected = expected
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar);
 
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}

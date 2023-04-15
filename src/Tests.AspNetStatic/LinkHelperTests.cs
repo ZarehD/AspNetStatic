@@ -92,8 +92,18 @@
 		[TestMethod]
 		public void Test_FixupHrefValues_FileInput_Html()
 		{
-			var source = File.ReadAllText(".\\data\\input.txt");
-			var expected = File.ReadAllText(".\\data\\output_html.txt");
+			var inputFilePath = @".\data\input.txt"
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				;
+
+			var outputFileName = @".\data\output_html.txt"
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				;
+
+			var source = File.ReadAllText(inputFilePath);
+			var expected = File.ReadAllText(outputFileName);
 
 			Assert.IsNotNull(source);
 			Assert.IsTrue(source.Length > 0);
@@ -112,8 +122,18 @@
 		[TestMethod]
 		public void Test_FixupHrefValues_FileInput_DefaultFile()
 		{
-			var source = File.ReadAllText(".\\data\\input.txt");
-			var expected = File.ReadAllText(".\\data\\output_default.txt");
+			var inputFilePath = @".\data\input.txt"
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				;
+
+			var outputFileName = @".\data\output_default.txt"
+				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+				;
+
+			var source = File.ReadAllText(inputFilePath);
+			var expected = File.ReadAllText(outputFileName);
 
 			Assert.IsNotNull(source);
 			Assert.IsTrue(source.Length > 0);

@@ -43,9 +43,9 @@ namespace Tests.AspNetStatic
 			return moqEnv.Object;
 		}
 
-		private static string GetOutFileFullPath(string filePathname) =>
+		private static string GetOutFileFullPath(string pageRoute) =>
 			Path.Combine(
-				GetWebHostEnvironment().WebRootPath, filePathname
+				GetWebHostEnvironment().WebRootPath, pageRoute
 				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
 				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
 				.EnsureNotStartsWith(Path.DirectorySeparatorChar));
@@ -75,13 +75,7 @@ namespace Tests.AspNetStatic
 				Path.HasExtension(expectedPath) &&
 				pageInfoProvider.Pages.ContainsPageForUrl(requestPath);
 
-			var diskFilePathname = createFile
-				? GetOutFileFullPath(expectedPath)
-				: string.Empty;
-
-			var pathname = createFile
-				? expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-				: string.Empty;
+			var diskFilePathname = GetOutFileFullPath(expectedPath);
 
 			var fileSystemMoq = new Mock<IFileSystem>();
 			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(true);
@@ -152,13 +146,7 @@ namespace Tests.AspNetStatic
 				Path.HasExtension(expectedPath) &&
 				pageInfoProvider.Pages.ContainsPageForUrl(requestPath);
 
-			var diskFilePathname = createFile
-				? GetOutFileFullPath(expectedPath)
-				: string.Empty;
-
-			var pathname = createFile
-				? expectedPath.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-				: string.Empty;
+			var diskFilePathname = GetOutFileFullPath(expectedPath);
 
 			var fileSystemMoq = new Mock<IFileSystem>();
 			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(true);

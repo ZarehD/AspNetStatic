@@ -90,10 +90,13 @@ namespace AspNetStatic
 						if (!this._ignoreOutFilePathname &&
 							!string.IsNullOrWhiteSpace(page.OutFile))
 						{
-							var physicalPath =
-								Path.Combine(this._webRoot,
-								page.OutFile.EnsureNotStartsWith(
-									Path.DirectorySeparatorChar));
+							var outFile = page.OutFile
+								.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+								.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+								.EnsureNotStartsWith(Path.DirectorySeparatorChar)
+								;
+
+							var physicalPath = Path.Combine(this._webRoot, outFile);
 
 							if (this._fileSystem.File.Exists(physicalPath))
 							{
