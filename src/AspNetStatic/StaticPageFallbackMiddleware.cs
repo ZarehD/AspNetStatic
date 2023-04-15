@@ -95,7 +95,7 @@ namespace AspNetStatic
 
 							if (this._fileSystem.File.Exists(physicalPath))
 							{
-								var newPath = page.OutFile
+								var newPath = outFile
 									.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
 									.EnsureStartsWith(Consts.FwdSlash);
 
@@ -118,10 +118,7 @@ namespace AspNetStatic
 
 							var newPath =
 								(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
-								? path.ToDefaultFileFallback(
-									this._exclusions,
-									this._defaultFileName,
-									this._pageFileExtension)
+								? path.ToDefaultFileFallback(this._exclusions, this._defaultFileName, this._pageFileExtension)
 								: (!endsWithSlash && !hasExtension && !alwaysDefault)
 								? path + this._pageFileExtension
 								: string.Empty

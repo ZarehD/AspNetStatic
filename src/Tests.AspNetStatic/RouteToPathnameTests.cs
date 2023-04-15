@@ -26,7 +26,7 @@
 		[DataRow("/segment/page/?q1=v1", "/segment/page/")]
 		public void Test_GetUrlWithoutQueryString(string url, string expected)
 		{
-			var actual = RouteToPathname.StripQueryString(url);
+			var actual = url.StripQueryString();
 			Assert.AreEqual(expected, actual, ignoreCase: true);
 		}
 
@@ -37,7 +37,7 @@
 		public void Test_GetUrlWithoutQueryString_BadInput(string url)
 		{
 			//Assert.ThrowsException<ArgumentException>(() => RouteToPathname.StripQueryString(url));
-			Assert.AreEqual(url, RouteToPathname.StripQueryString(url), ignoreCase: true);
+			Assert.AreEqual(url, url.StripQueryString(), ignoreCase: true);
 		}
 
 		#endregion
@@ -61,8 +61,8 @@
 		{
 			var page = new PageInfo(route);
 
-			var actual = RouteToPathname.GetPathname(
-				page, _webroot.ToFileSysPath(), createDefaultFile,
+			var actual = page.GetOutFilePathname(
+				_webroot.ToFileSysPath(), createDefaultFile,
 				_indexFileName, _pageFileExtension,
 				_exclusions);
 
@@ -88,8 +88,8 @@
 				OutFile = overridePathname
 			};
 
-			var actual = RouteToPathname.GetPathname(
-				page, _webroot.ToFileSysPath(), false,
+			var actual = page.GetOutFilePathname(
+				_webroot.ToFileSysPath(), false,
 				_indexFileName, _pageFileExtension, _exclusions);
 
 			expected = expected
@@ -106,8 +106,8 @@
 			var page = default(PageInfo);
 
 			Assert.ThrowsException<ArgumentNullException>(
-				() => RouteToPathname.GetPathname(
-					page!, _webroot, false,
+				() => page!.GetOutFilePathname(
+					_webroot, false,
 					_indexFileName, _pageFileExtension,
 					_exclusions));
 		}
@@ -118,20 +118,20 @@
 			var page = new PageInfo("/");
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _nullString, false,
+				() => page.GetOutFilePathname(
+					_nullString, false,
 					_indexFileName, _pageFileExtension,
 					_exclusions));
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _emptyString, false,
+				() => page.GetOutFilePathname(
+					_emptyString, false,
 					_indexFileName, _pageFileExtension,
 					_exclusions));
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _whitespace, false,
+				() => page.GetOutFilePathname(
+					_whitespace, false,
 					_indexFileName, _pageFileExtension,
 					_exclusions));
 		}
@@ -142,20 +142,20 @@
 			var page = new PageInfo("/");
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _webroot, false,
+				() => page.GetOutFilePathname(
+					_webroot, false,
 					_nullString, _pageFileExtension,
 					_exclusions));
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _webroot, false,
+				() => page.GetOutFilePathname(
+					_webroot, false,
 					_emptyString, _pageFileExtension,
 					_exclusions));
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _webroot, false,
+				() => page.GetOutFilePathname(
+					_webroot, false,
 					_whitespace, _pageFileExtension,
 					_exclusions));
 		}
@@ -166,20 +166,20 @@
 			var page = new PageInfo("/");
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _webroot, false,
+				() => page.GetOutFilePathname(
+					_webroot, false,
 					_indexFileName, _nullString,
 					_exclusions));
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _webroot, false,
+				() => page.GetOutFilePathname(
+					_webroot, false,
 					_indexFileName, _emptyString,
 					_exclusions));
 
 			Assert.ThrowsException<ArgumentException>(
-				() => RouteToPathname.GetPathname(
-					page, _webroot, false,
+				() => page.GetOutFilePathname(
+					_webroot, false,
 					_indexFileName, _whitespace,
 					_exclusions));
 		}

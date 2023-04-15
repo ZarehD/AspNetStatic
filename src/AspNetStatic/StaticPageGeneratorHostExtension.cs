@@ -12,6 +12,7 @@ the specific language governing permissions and limitations under the License.
 
 #define USE_PERIODIC_TIMER
 
+using System.IO.Abstractions;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,7 +116,9 @@ namespace AspNetStatic
 			Throw.IfNull(host, nameof(host));
 			Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
-			if (!Directory.Exists(destinationRoot))
+			var fileSystem = host.Services.GetService<IFileSystem>() ?? new FileSystem();
+
+			if (!fileSystem.Directory.Exists(destinationRoot))
 			{
 				Throw.InvalidOp(Properties.Resources.Err_InvalidDestinationRoot);
 			}
@@ -159,7 +162,6 @@ namespace AspNetStatic
 
 						var generatorConfig =
 							new StaticPageGeneratorConfig(
-								_httpClient,
 								pageUrlProvider.Pages,
 								destinationRoot,
 								alwaysDefautFile,
@@ -183,8 +185,8 @@ namespace AspNetStatic
 							{
 								await StaticPageGenerator.Execute(
 									generatorConfig,
-									loggerFactory,
-									_appShutdown.Token);
+									_httpClient, fileSystem,
+									loggerFactory, _appShutdown.Token);
 							}
 							while (doPeriodicRefresh && await _timer.WaitForNextTickAsync(_appShutdown.Token));
 						}
@@ -198,8 +200,8 @@ namespace AspNetStatic
 #else
 						await StaticPageGenerator.Execute(
 							generatorConfig,
-							loggerFactory,
-							_appShutdown.Token);
+							_httpClient, fileSystem,
+							loggerFactory, _appShutdown.Token);
 
 						if (doPeriodicRefresh && !_appShutdown.IsCancellationRequested)
 						{
@@ -209,8 +211,8 @@ namespace AspNetStatic
 								{
 									await StaticPageGenerator.Execute(
 										generatorConfig,
-										loggerFactory,
-										_appShutdown.Token);
+										_httpClient, fileSystem,
+										loggerFactory, _appShutdown.Token);
 
 									if (_appShutdown.IsCancellationRequested)
 									{
@@ -241,7 +243,7 @@ namespace AspNetStatic
 		}
 
 		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>
-			(args is not null) && args.Any(a => a.AreSameText(STATIC_ONLY));
+			(args is not null) && args.Any(a => a.HasSameText(STATIC_ONLY));
 
 		private static readonly CancellationTokenSource _appShutdown = new();
 		private static readonly HttpClient _httpClient = new();

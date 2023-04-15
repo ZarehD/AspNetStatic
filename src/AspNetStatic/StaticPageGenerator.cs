@@ -10,6 +10,7 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+using System.IO.Abstractions;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using WebMarkupMin.Core;
@@ -20,12 +21,16 @@ namespace AspNetStatic
 	{
 		public static async Task Execute(
 			StaticPageGeneratorConfig config,
+			HttpClient httpClient,
+			IFileSystem fileSystem,
 			ILoggerFactory? loggerFactory = default,
 			CancellationToken ct = default)
 		{
 			if (ct.IsCancellationRequested) return;
 
 			Throw.IfNull(config, nameof(config));
+			Throw.IfNull(httpClient, nameof(httpClient));
+			Throw.IfNull(fileSystem, nameof(fileSystem));
 
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
 
@@ -39,9 +44,14 @@ namespace AspNetStatic
 						config.JsMinifier);
 			}
 
-			logger?.Configuration(config);
-
 			logger?.GeneratingStaticPages();
+			logger?.Configuration(config, httpClient);
+
+			var destRoot = config.DestinationRoot;
+			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
+			var indexFile = config.IndexFileName;
+			var fileExtension = config.PageFileExtension;
+			var exclusionsArray = config.DefaultFileExclusions.ToArray();
 
 			foreach (var page in config.Pages)
 			{
@@ -49,20 +59,18 @@ namespace AspNetStatic
 
 				logger?.ProcessingPage(page);
 
-				var pagePath =
-					RouteToPathname.GetPathname(
-						page, config.DestinationRoot,
-						config.AlwaysCreateDefaultFile,
-						config.IndexFileName, config.PageFileExtension,
-						config.DefaultFileExclusions.ToArray());
+				var pagePath = page.GetOutFilePathname(
+					destRoot, alwaysDefaultFile,
+					indexFile, fileExtension,
+					exclusionsArray);
 
 				var pagePathShortName = pagePath.Replace(config.DestinationRoot, string.Empty);
 
 				logger?.Debug("PagePath = {0}", pagePathShortName);
 
-				RemoveIfExists(pagePath);
+				RemoveIfExists(fileSystem, pagePath);
 
-				if (!EnsureFolderExists(pagePath))
+				if (!EnsureFolderExists(fileSystem, pagePath))
 				{
 					logger?.FailedToEnsureFolder(pagePath);
 					continue;
@@ -76,77 +84,78 @@ namespace AspNetStatic
 
 				try
 				{
-					pageContent = await config.HttpClient.GetStringAsync(requestUri, ct);
+					pageContent = await httpClient.GetStringAsync(requestUri, ct);
 				}
 				catch (Exception ex)
 				{
 					logger?.Exception(ex);
 				}
 
-				if (!string.IsNullOrWhiteSpace(pageContent))
-				{
-					if (config.UpdateLinks)
-					{
-						logger?.UpdatingHrefValues(pagePathShortName);
-
-						pageContent =
-							pageContent.FixupHrefValues(
-								config.Pages,
-								config.IndexFileName, config.PageFileExtension,
-								config.AlwaysCreateDefaultFile);
-					}
-
-					if (config.OptimizePageContent)
-					{
-						logger?.OptimizingHtmlContent(requestUri, pagePathShortName);
-
-						var result = htmlMinifier.Minify(pageContent, Encoding.UTF8);
-
-						if (!result.Errors.Any())
-						{
-							pageContent = result.MinifiedContent;
-						}
-						else
-						{
-							logger?.OptimizationErrors(requestUri, pagePathShortName, result.Errors);
-						}
-						if (result.Warnings.Any())
-						{
-							logger?.OptimizationErrors(requestUri, pagePathShortName, result.Warnings);
-						}
-					}
-
-					logger?.WritingPageFile(requestUri, pagePathShortName, pageContent.Length);
-
-					await File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct); //
-				}
-				else
+				if (string.IsNullOrWhiteSpace(pageContent))
 				{
 					logger?.NoContentForPage(requestUri);
+					return;
 				}
+
+				if (config.UpdateLinks)
+				{
+					logger?.UpdatingHrefValues(pagePathShortName);
+
+					pageContent =
+						pageContent.FixupHrefValues(
+							config.Pages,
+							config.IndexFileName, config.PageFileExtension,
+							config.AlwaysCreateDefaultFile);
+				}
+
+				if (config.OptimizePageContent)
+				{
+					logger?.OptimizingHtmlContent(requestUri, pagePathShortName);
+
+					var result = htmlMinifier.Minify(pageContent, Encoding.UTF8);
+
+					if (!result.Errors.Any())
+					{
+						pageContent = result.MinifiedContent;
+					}
+					else
+					{
+						logger?.OptimizationErrors(requestUri, pagePathShortName, result.Errors);
+					}
+					if (result.Warnings.Any())
+					{
+						logger?.OptimizationErrors(requestUri, pagePathShortName, result.Warnings);
+					}
+				}
+
+				logger?.WritingPageFile(requestUri, pagePathShortName, pageContent.Length);
+
+				await fileSystem.File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct); //
+
 			}
 		}
 
-
-		private static void RemoveIfExists(string pageDiskPath)
+		private static void RemoveIfExists(IFileSystem fs, string pageDiskPath)
 		{
+			Throw.IfNull(fs, nameof(fs));
 			Throw.IfNullOrWhiteSpace(
 				pageDiskPath, nameof(pageDiskPath),
 				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
-			if (File.Exists(pageDiskPath))
+			if (fs.File.Exists(pageDiskPath))
 			{
-				File.Delete(pageDiskPath);
+				fs.File.Delete(pageDiskPath);
 			}
 		}
 
-		private static bool EnsureFolderExists(string pageDiskPath)
+		private static bool EnsureFolderExists(IFileSystem fs, string pageDiskPath)
 		{
+			Throw.IfNull(fs, nameof(fs));
 			Throw.IfNullOrWhiteSpace(
 				pageDiskPath, nameof(pageDiskPath),
 				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
-			var folder = Directory.GetParent(pageDiskPath);
+			var folder = fs.Directory.GetParent(pageDiskPath);
 
 			if (folder is null) return false;
 
@@ -168,10 +177,11 @@ namespace AspNetStatic
 
 		public static void Configuration(
 			this ILogger<StaticPageGenerator> logger,
-			StaticPageGeneratorConfig config) =>
+			StaticPageGeneratorConfig config,
+			HttpClient httpClient) =>
 			logger.Imp_Configuration(
 				config.Pages.Count,
-				config.HttpClient.BaseAddress?.ToString() ?? "Unknown Base Address",
+				httpClient.BaseAddress?.ToString() ?? "Unknown Base Address",
 				config.DestinationRoot,
 				config.AlwaysCreateDefaultFile,
 				config.UpdateLinks,

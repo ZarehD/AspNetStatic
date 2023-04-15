@@ -10,8 +10,6 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
-using System.Text.Json.Serialization;
-
 namespace AspNetStatic
 {
 	[Serializable]
@@ -70,11 +68,10 @@ namespace AspNetStatic
 		public double IndexPriority { get; init; }
 
 
-
 		public PageInfo(string route)
 		{
 			Throw.IfNullOrWhiteSpace(
-				route, nameof(route), 
+				route, nameof(route),
 				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 
 			this.Route = route;

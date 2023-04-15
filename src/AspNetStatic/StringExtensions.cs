@@ -14,7 +14,7 @@ namespace AspNetStatic
 {
 	internal static class StringExtensions
 	{
-		public static bool AreSameText(this string? src, string? other,
+		public static bool HasSameText(this string? src, string? other,
 			StringComparison comparisonMode = StringComparison.OrdinalIgnoreCase) =>
 			((src is null) && (other is null)) || (src?.Equals(other, comparisonMode) ?? false);
 

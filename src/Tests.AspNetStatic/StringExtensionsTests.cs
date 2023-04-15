@@ -3,7 +3,7 @@
 	[TestClass]
 	public class StringExtensionsTests
 	{
-		#region AreSameText...
+		#region HasSameText...
 
 		[DataTestMethod]
 		[DataRow("abc", "abc", true)]
@@ -13,15 +13,15 @@
 		[DataRow("abc", null, false)]
 		[DataRow(null, "xyz", false)]
 		[DataRow(null, null, true)]
-		public void Test_AreSameText(string? src, string? other, bool expected)
+		public void Test_HasSameText(string? src, string? other, bool expected)
 		{
-			var actual = src.AreSameText(other);
+			var actual = src.HasSameText(other);
 			Assert.AreEqual(expected, actual);
 		}
 
 		#endregion
 
-		#region Starts...
+		#region StartsWith...
 
 		[DataTestMethod]
 		[DataRow("doc", '/', false, "/doc")]
@@ -79,7 +79,7 @@
 
 		#endregion
 
-		#region Ends...
+		#region EndsWith...
 
 		[DataTestMethod]
 		[DataRow("doc", '/', false, "doc/")]

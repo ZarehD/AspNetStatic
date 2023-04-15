@@ -32,8 +32,6 @@ namespace AspNetStatic
 
 		public List<string> DefaultFileExclusions { get; } = new(new[] { "index", "default" });
 
-		public HttpClient HttpClient { get; }
-
 		public bool OptimizePageContent { get; init; } = true;
 
 		public ICssMinifier? CssMinifier { get; init; }
@@ -43,15 +41,12 @@ namespace AspNetStatic
 		public HtmlMinificationSettings? HtmlMinifierSettings { get; init; }
 
 
-
 		public StaticPageGeneratorConfig(
-			HttpClient httpClient,
 			IEnumerable<PageInfo> pages,
 			string destinationRoot,
 			bool createDefaultFile,
 			bool fixupHrefValues)
 		{
-			this.HttpClient = Throw.IfNull(httpClient, nameof(httpClient));
 			this.DestinationRoot = Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.AlwaysCreateDefaultFile = createDefaultFile;
 			this.UpdateLinks = fixupHrefValues;
@@ -62,9 +57,7 @@ namespace AspNetStatic
 			}
 		}
 
-
 		public StaticPageGeneratorConfig(
-			HttpClient httpClient,
 			IEnumerable<PageInfo> pages,
 			string destinationRoot,
 			bool createDefaultFile,
@@ -73,7 +66,7 @@ namespace AspNetStatic
 			HtmlMinificationSettings? htmlMinifierSettings = default,
 			ICssMinifier? cssMinifier = default,
 			IJsMinifier? jsMinifier = default)
-			: this(httpClient, pages, destinationRoot, createDefaultFile, fixupHrefValues)
+			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues)
 		{
 			this.OptimizePageContent = !disableOptimizations;
 			this.HtmlMinifierSettings = htmlMinifierSettings;
@@ -81,9 +74,7 @@ namespace AspNetStatic
 			this.JsMinifier = jsMinifier;
 		}
 
-
 		public StaticPageGeneratorConfig(
-			HttpClient httpClient,
 			IEnumerable<PageInfo> pages,
 			string destinationRoot,
 			bool createDefaultFile,
@@ -95,7 +86,7 @@ namespace AspNetStatic
 			HtmlMinificationSettings? htmlMinifierSettings = default,
 			ICssMinifier? cssMinifier = default,
 			IJsMinifier? jsMinifier = default)
-			: this(httpClient, pages, destinationRoot, createDefaultFile, fixupHrefValues,
+			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
 				  disableOptimizations, htmlMinifierSettings, cssMinifier, jsMinifier)
 		{
 			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
