@@ -30,5 +30,12 @@ namespace AspNetStatic
 				: route.EnsureNotEndsWith(Consts.FwdSlash) + pageFileExtension
 				;
 		}
+
+
+		public static string ToFileSysPath(this string path) =>
+			path is null ? string.Empty : path
+			.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+			.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+			;
 	}
 }

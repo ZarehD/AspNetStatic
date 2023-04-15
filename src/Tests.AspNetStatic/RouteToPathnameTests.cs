@@ -62,7 +62,7 @@
 			var page = new PageInfo(route);
 
 			var actual = RouteToPathname.GetPathname(
-				page, _webroot, createDefaultFile,
+				page, _webroot.ToFileSysPath(), createDefaultFile,
 				_indexFileName, _pageFileExtension,
 				_exclusions);
 
@@ -89,7 +89,7 @@
 			};
 
 			var actual = RouteToPathname.GetPathname(
-				page, _webroot, false,
+				page, _webroot.ToFileSysPath(), false,
 				_indexFileName, _pageFileExtension, _exclusions);
 
 			expected = expected

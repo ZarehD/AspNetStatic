@@ -72,15 +72,10 @@ namespace AspNetStatic
 				}
 			}
 
-			pagePath = pagePath
-				.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
-				.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-				.EnsureNotStartsWith(Path.DirectorySeparatorChar)
-				;
+			pagePath = pagePath.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
 
-			return Path.Combine(rootFolder, pagePath);
+			return Path.Combine(rootFolder.ToFileSysPath(), pagePath);
 		}
-
 
 		public static string StripQueryString(this string url)
 		{

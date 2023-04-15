@@ -90,18 +90,13 @@ namespace AspNetStatic
 						if (!this._ignoreOutFilePathname &&
 							!string.IsNullOrWhiteSpace(page.OutFile))
 						{
-							var outFile = page.OutFile
-								.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
-								.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-								.EnsureNotStartsWith(Path.DirectorySeparatorChar)
-								;
-
+							var outFile = page.OutFile.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
 							var physicalPath = Path.Combine(this._webRoot, outFile);
 
 							if (this._fileSystem.File.Exists(physicalPath))
 							{
-								var newPath = page.OutFile.Replace(
-									Path.DirectorySeparatorChar, Consts.FwdSlash)
+								var newPath = page.OutFile
+									.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
 									.EnsureStartsWith(Consts.FwdSlash);
 
 								this._logger?.ProcessedRoute(path, newPath);
@@ -135,10 +130,9 @@ namespace AspNetStatic
 							if (!string.IsNullOrEmpty(newPath))
 							{
 								var physicalPath =
-									Path.Combine(this._webRoot, newPath
-									.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
-									.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-									.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+									Path.Combine(
+										this._webRoot, newPath.ToFileSysPath()
+										.EnsureNotStartsWith(Path.DirectorySeparatorChar));
 
 								if (this._fileSystem.File.Exists(physicalPath))
 								{
