@@ -194,7 +194,7 @@ Sample Configuration 2:
   - Use your web server's redirect or url-rewrite module to re-route requests (e.g. _/page/_ or _/page/index_ to _/page/index.html_).
     ```c#
     app.GenerateStaticPages(
-      "C:\path\to\destination\root\folder",
+      @"C:\path\to\destination\root\folder",
       commandLineArgs: args, // exit when done if contains 'static-only' parameter
       alwaysDefautFile: true,
       dontUpdateLinks: true);
@@ -205,7 +205,7 @@ If you want to omit static-file generation while you're still developing the sit
 if (args.HasExitAfterStaticGenerationParameter())
 {
   app.GenerateStaticPages(
-    "path\to\destination\root\folder",
+    @"path\to\destination\root\folder",
     exitWhenDone: true,
   );
 }
