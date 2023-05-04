@@ -126,7 +126,7 @@ Url<br/>(route + query) | Is Static Route: false<br/><br/> | Is Static Route: tr
 ---|---|---|---
 /                    | /index.cshtml                  | /index.html                  | /index.html
 /index               | /index.cshtml                  | /index.html                  | /index.html
-/index/              | /index/index.cshtml            | /index.html                  | /index/index.html
+/index/              | /index/index.cshtml            | /index/index.html            | /index/index.html
 /page                | /page.cshtml                   | /page.html                   | /page/index.html
 /page/               | /page/index.cshtml             | /page/index.html             | /page/index.html
 /page/123            | /page.cshtml                   | /page/123.html               | /page/123/index.html
