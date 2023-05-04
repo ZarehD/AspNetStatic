@@ -31,7 +31,7 @@ That means you can use whatever framework, component, or package (or architectur
 
 ## Great, So How Do I Use It?
 
-It's a peace of cake!
+It's a piece of cake!
 
 1. Add the Nuget Package to your ASP.NET Core web app project
    ```
