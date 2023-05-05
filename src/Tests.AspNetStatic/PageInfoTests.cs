@@ -12,7 +12,7 @@
 			var changeFrequency = ChangeFrequency.Daily;
 			var indexPriority = 1.0;
 			var lastModified = DateTime.UtcNow;
-			var minifyOutput = false;
+			var skipOptimization = true;
 
 			var page =
 				new PageInfo(route)
@@ -22,7 +22,7 @@
 					ChangeFrequency = changeFrequency,
 					IndexPriority = indexPriority,
 					LastModified = lastModified,
-					MinifyOutput = minifyOutput,
+					SkipOptimization = skipOptimization,
 				};
 
 			Assert.IsNotNull(page);
@@ -32,7 +32,7 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.MinifyOutput, minifyOutput);
+			Assert.AreEqual(page.SkipOptimization, skipOptimization);
 		}
 
 		[TestMethod]
@@ -44,7 +44,7 @@
 			var changeFrequency = ChangeFrequency.Never;
 			var indexPriority = 0;
 			var lastModified = DateTime.MinValue;
-			var minifyOutput = true;
+			var skipOptimization = false;
 
 			var page =
 				new PageInfo(route)
@@ -60,7 +60,7 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.MinifyOutput, minifyOutput);
+			Assert.AreEqual(page.SkipOptimization, skipOptimization);
 		}
 
 
@@ -75,7 +75,7 @@
 					ChangeFrequency = ChangeFrequency.Daily,
 					IndexPriority = 1.0,
 					LastModified = DateTime.UtcNow,
-					MinifyOutput = false,
+					SkipOptimization = true,
 				};
 
 			var json = System.Text.Json.JsonSerializer.Serialize<PageInfo>(expected);
@@ -87,7 +87,7 @@
 			Assert.AreEqual(expected.ChangeFrequency, actual?.ChangeFrequency);
 			Assert.AreEqual(expected.IndexPriority, actual?.IndexPriority);
 			Assert.AreEqual(expected.LastModified, actual?.LastModified);
-			Assert.AreEqual(expected.MinifyOutput, actual?.MinifyOutput);
+			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
 		}
 	}
 }

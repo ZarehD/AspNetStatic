@@ -134,9 +134,9 @@ namespace AspNetStatic
 			}
 
 			var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
+			var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
 			var cssMinifier = host.Services.GetService<ICssMinifier>();
 			var jsMinifier = host.Services.GetService<IJsMinifier>();
-			var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
@@ -172,9 +172,9 @@ namespace AspNetStatic
 								pageUrlProvider.DefaultFileExclusions,
 								dontOptimizeContent,
 								htmlMinifierSettings,
+								xmlMinifierSettings,
 								cssMinifier,
-								jsMinifier,
-								xmlMinifierSettings);
+								jsMinifier);
 
 						logger.RegenerationConfig(regenerationInterval);
 						var doPeriodicRefresh = regenerationInterval is not null;

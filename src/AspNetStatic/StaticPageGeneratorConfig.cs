@@ -14,7 +14,7 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic
 {
-	public class StaticPageGeneratorConfig
+	internal class StaticPageGeneratorConfig
 	{
 		public List<PageInfo> Pages { get; } = new();
 
@@ -66,9 +66,9 @@ namespace AspNetStatic
 			bool fixupHrefValues,
 			bool disableOptimizations,
 			HtmlMinificationSettings? htmlMinifierSettings = default,
+			XmlMinificationSettings? xmlMinificationSettings = default,
 			ICssMinifier? cssMinifier = default,
-			IJsMinifier? jsMinifier = default,
-			XmlMinificationSettings? xmlMinificationSettings = default)
+			IJsMinifier? jsMinifier = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues)
 		{
 			this.OptimizePageContent = !disableOptimizations;
@@ -88,11 +88,12 @@ namespace AspNetStatic
 			IEnumerable<string> defaultFileExclusions,
 			bool disableOptimizations = default,
 			HtmlMinificationSettings? htmlMinifierSettings = default,
+			XmlMinificationSettings? xmlMinificationSettings = default,
 			ICssMinifier? cssMinifier = default,
-			IJsMinifier? jsMinifier = default,
-			XmlMinificationSettings? xmlMinificationSettings = default)
+			IJsMinifier? jsMinifier = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
-				  disableOptimizations, htmlMinifierSettings, cssMinifier, jsMinifier, xmlMinificationSettings)
+				  disableOptimizations, htmlMinifierSettings, xmlMinificationSettings, 
+				  cssMinifier, jsMinifier)
 		{
 			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.PageFileExtension = Throw.IfNullOrWhiteSpace(fileExtension, nameof(fileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);

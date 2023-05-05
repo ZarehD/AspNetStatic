@@ -61,19 +61,29 @@ namespace AspNetStatic
 		/// </remarks>
 		public string? OutFile { get; init; }
 
+		/// <summary>
+		///		Gets or sets a value that indicates whether to skip optimization 
+		///		for the output of this page.
+		/// </summary>
+		/// <remarks>
+		///		<para>
+		///			Content optimization may pose issues for certain types of content.
+		///			This setting allows for selectively disabling optimization for 
+		///			routes on a case-by-case basis. h/t: @dpenton
+		///		</para>
+		///		<para>
+		///			Applies only when content optimization is enabled during 
+		///			static page generation.
+		///		</para>
+		/// </remarks>
+		public bool SkipOptimization { get; init; }
+
 		public ChangeFrequency ChangeFrequency { get; init; } = ChangeFrequency.Never;
 
 		public DateTime LastModified { get; init; } = DateTime.MinValue;
 
 		public double IndexPriority { get; init; }
 
-		/// <summary>
-		///		Gets or sets if the file output should be minified.
-		/// </summary>
-		/// <remarks>
-		///		Set this value to false if the destination file for this particular route should not be minified.
-		/// </remarks>
-		public bool MinifyOutput { get; init; } = true;
 
 		public PageInfo(string route)
 		{

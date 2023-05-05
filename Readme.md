@@ -94,7 +94,7 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but be sure to specify a unique `OutFile` value for each instance of that route.
-- You can specify that a specific route skip minification for routes you add to the `Pages` collection (see `MinifyOutput` property).
+- You can skip minification for routes you add to the `Pages` collection (see `SkipOptimization` property).
 
 
 ### Routes vs. Generated Static Files

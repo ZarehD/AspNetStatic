@@ -17,7 +17,7 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic
 {
-	public class StaticPageGenerator
+	internal class StaticPageGenerator
 	{
 		public static async Task Execute(
 			StaticPageGeneratorConfig config,
@@ -34,8 +34,8 @@ namespace AspNetStatic
 
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
 
-			IMarkupMinifier htmlMinifier = null!;
-			IMarkupMinifier xmlMinifier = null!;
+			//IMarkupMinifier htmlMinifier = null!;
+			//IMarkupMinifier xmlMinifier = null!;
 
 			logger?.GeneratingStaticPages();
 			logger?.Configuration(config, httpClient);
@@ -101,25 +101,17 @@ namespace AspNetStatic
 							config.AlwaysCreateDefaultFile);
 				}
 
-				if (config.OptimizePageContent && page.MinifyOutput)
+				if (config.OptimizePageContent && !page.SkipOptimization)
 				{
 					logger?.OptimizingHtmlContent(requestUri, pagePathShortName);
 
-					IMarkupMinifier minifier = null!;
-
-					if (pagePath.EndsWith(".xml", true, CultureInfo.InvariantCulture))
-					{
-						xmlMinifier ??= new XmlMinifier(settings: config.XmlMinifierSettings);
-						minifier = xmlMinifier;
-					}
-					else
-					{
-						htmlMinifier ??= new HtmlMinifier(
+					IMarkupMinifier minifier =
+						pagePath.EndsWith(".xml", true, CultureInfo.InvariantCulture)
+						? new XmlMinifier(settings: config.XmlMinifierSettings)
+						: new HtmlMinifier(
 							config.HtmlMinifierSettings,
 							config.CssMinifier,
 							config.JsMinifier);
-						minifier = htmlMinifier;
-					}
 
 					var result = minifier.Minify(pageContent, Encoding.UTF8);
 
