@@ -12,6 +12,7 @@
 			var changeFrequency = ChangeFrequency.Daily;
 			var indexPriority = 1.0;
 			var lastModified = DateTime.UtcNow;
+			var minifyOutput = false;
 
 			var page =
 				new PageInfo(route)
@@ -20,7 +21,8 @@
 					OutFile = outFilePathname,
 					ChangeFrequency = changeFrequency,
 					IndexPriority = indexPriority,
-					LastModified = lastModified
+					LastModified = lastModified,
+					MinifyOutput = minifyOutput,
 				};
 
 			Assert.IsNotNull(page);
@@ -30,6 +32,7 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
+			Assert.AreEqual(page.MinifyOutput, minifyOutput);
 		}
 
 		[TestMethod]
@@ -41,6 +44,7 @@
 			var changeFrequency = ChangeFrequency.Never;
 			var indexPriority = 0;
 			var lastModified = DateTime.MinValue;
+			var minifyOutput = true;
 
 			var page =
 				new PageInfo(route)
@@ -56,6 +60,7 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
+			Assert.AreEqual(page.MinifyOutput, minifyOutput);
 		}
 
 
@@ -69,7 +74,8 @@
 					OutFile = "\\route\\index.html",
 					ChangeFrequency = ChangeFrequency.Daily,
 					IndexPriority = 1.0,
-					LastModified = DateTime.UtcNow
+					LastModified = DateTime.UtcNow,
+					MinifyOutput = false,
 				};
 
 			var json = System.Text.Json.JsonSerializer.Serialize<PageInfo>(expected);
@@ -81,6 +87,7 @@
 			Assert.AreEqual(expected.ChangeFrequency, actual?.ChangeFrequency);
 			Assert.AreEqual(expected.IndexPriority, actual?.IndexPriority);
 			Assert.AreEqual(expected.LastModified, actual?.LastModified);
+			Assert.AreEqual(expected.MinifyOutput, actual?.MinifyOutput);
 		}
 	}
 }

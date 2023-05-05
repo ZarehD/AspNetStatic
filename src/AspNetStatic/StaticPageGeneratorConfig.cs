@@ -40,6 +40,8 @@ namespace AspNetStatic
 
 		public HtmlMinificationSettings? HtmlMinifierSettings { get; init; }
 
+		public XmlMinificationSettings? XmlMinifierSettings { get; init; }
+
 
 		public StaticPageGeneratorConfig(
 			IEnumerable<PageInfo> pages,
@@ -65,11 +67,13 @@ namespace AspNetStatic
 			bool disableOptimizations,
 			HtmlMinificationSettings? htmlMinifierSettings = default,
 			ICssMinifier? cssMinifier = default,
-			IJsMinifier? jsMinifier = default)
+			IJsMinifier? jsMinifier = default,
+			XmlMinificationSettings? xmlMinificationSettings = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues)
 		{
 			this.OptimizePageContent = !disableOptimizations;
 			this.HtmlMinifierSettings = htmlMinifierSettings;
+			this.XmlMinifierSettings = xmlMinificationSettings;
 			this.CssMinifier = cssMinifier;
 			this.JsMinifier = jsMinifier;
 		}
@@ -85,9 +89,10 @@ namespace AspNetStatic
 			bool disableOptimizations = default,
 			HtmlMinificationSettings? htmlMinifierSettings = default,
 			ICssMinifier? cssMinifier = default,
-			IJsMinifier? jsMinifier = default)
+			IJsMinifier? jsMinifier = default,
+			XmlMinificationSettings? xmlMinificationSettings = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
-				  disableOptimizations, htmlMinifierSettings, cssMinifier, jsMinifier)
+				  disableOptimizations, htmlMinifierSettings, cssMinifier, jsMinifier, xmlMinificationSettings)
 		{
 			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.PageFileExtension = Throw.IfNullOrWhiteSpace(fileExtension, nameof(fileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);

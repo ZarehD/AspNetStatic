@@ -35,14 +35,7 @@ namespace AspNetStatic
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
 
 			IMarkupMinifier htmlMinifier = null!;
-			if (config.OptimizePageContent)
-			{
-				htmlMinifier =
-					new HtmlMinifier(
-						config.HtmlMinifierSettings,
-						config.CssMinifier,
-						config.JsMinifier);
-			}
+			IMarkupMinifier xmlMinifier = null!;
 
 			logger?.GeneratingStaticPages();
 			logger?.Configuration(config, httpClient);
@@ -108,11 +101,27 @@ namespace AspNetStatic
 							config.AlwaysCreateDefaultFile);
 				}
 
-				if (config.OptimizePageContent)
+				if (config.OptimizePageContent && page.MinifyOutput)
 				{
 					logger?.OptimizingHtmlContent(requestUri, pagePathShortName);
 
-					var result = htmlMinifier.Minify(pageContent, Encoding.UTF8);
+					IMarkupMinifier minifier = null!;
+
+					if (pagePath.EndsWith(".xml", true, CultureInfo.InvariantCulture))
+					{
+						xmlMinifier ??= new XmlMinifier(settings: config.XmlMinifierSettings);
+						minifier = xmlMinifier;
+					}
+					else
+					{
+						htmlMinifier ??= new HtmlMinifier(
+							config.HtmlMinifierSettings,
+							config.CssMinifier,
+							config.JsMinifier);
+						minifier = htmlMinifier;
+					}
+
+					var result = minifier.Minify(pageContent, Encoding.UTF8);
 
 					if (!result.Errors.Any())
 					{
@@ -130,8 +139,7 @@ namespace AspNetStatic
 
 				logger?.WritingPageFile(requestUri, pagePathShortName, pageContent.Length);
 
-				await fileSystem.File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct); //
-
+				await fileSystem.File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct);
 			}
 		}
 

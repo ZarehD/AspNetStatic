@@ -5,7 +5,6 @@ namespace Tests.AspNetStatic
     {
         private readonly static List<PageInfo> Test_Pages = new(new PageInfo[] { new("/segment/page") });
         private readonly static List<string> Test_Exclusions = new(new[] { "index", "default", "who-this" });
-        private readonly static bool Test_CreateDefaultFile = true;
         private readonly static string Test_DefaultFileName = "default-file-name";
         private readonly static string Test_DefaultFileExtension = ".test-extension";
 

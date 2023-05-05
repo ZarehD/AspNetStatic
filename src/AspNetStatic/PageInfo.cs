@@ -67,6 +67,13 @@ namespace AspNetStatic
 
 		public double IndexPriority { get; init; }
 
+		/// <summary>
+		///		Gets or sets if the file output should be minified.
+		/// </summary>
+		/// <remarks>
+		///		Set this value to false if the destination file for this particular route should not be minified.
+		/// </remarks>
+		public bool MinifyOutput { get; init; } = true;
 
 		public PageInfo(string route)
 		{

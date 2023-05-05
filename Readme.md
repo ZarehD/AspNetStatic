@@ -31,7 +31,7 @@ That means you can use whatever framework, component, or package (or architectur
 
 ## Great, So How Do I Use It?
 
-It's a peace of cake!
+It's a piece of cake!
 
 1. Add the Nuget Package to your ASP.NET Core web app project
    ```
@@ -94,6 +94,7 @@ Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvide
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but be sure to specify a unique `OutFile` value for each instance of that route.
+- You can specify that a specific route skip minification for routes you add to the `Pages` collection (see `MinifyOutput` property).
 
 
 ### Routes vs. Generated Static Files
@@ -193,7 +194,7 @@ Sample Configuration 2:
   - Use your web server's redirect or url-rewrite module to re-route requests (e.g. _/page/_ or _/page/index_ to _/page/index.html_).
     ```c#
     app.GenerateStaticPages(
-      "C:\path\to\destination\root\folder",
+      @"C:\path\to\destination\root\folder",
       commandLineArgs: args, // exit when done if contains 'static-only' parameter
       alwaysDefautFile: true,
       dontUpdateLinks: true);
@@ -204,7 +205,7 @@ If you want to omit static-file generation while you're still developing the sit
 if (args.HasExitAfterStaticGenerationParameter())
 {
   app.GenerateStaticPages(
-    "path\to\destination\root\folder",
+    @"path\to\destination\root\folder",
     exitWhenDone: true,
   );
 }
@@ -299,6 +300,16 @@ To override the default minification settings used by AspNetStatic, register the
   using WebMarkupMin.Core;
   builder.Services.AddSingleton<IJsMinifier>(
     sp => new YuiJsMinifier(...));
+  ```
+
+- __XML__: To configure the XML minifier, register a configured instance of `XmlMinificationSettings`:
+  ```c#
+  using WebMarkupMin.Core;
+  builder.Services.AddSingleton(
+    sp => new XmlMinificationSettings()
+    {
+      ...
+    });
   ```
 
 <br/>
