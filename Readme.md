@@ -104,8 +104,7 @@ Keep the following in mind when specifying routes in the `IStaticPagesInfoProvid
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify route parameters for routes you add to the `Pages` collection. The route parameters are treated as part of the route, and are used in constructing the output file pathname.
 - You can specify a query string for routes you add to the `Pages` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but you will need to specify a unique `OutFile` value for each instance of that route.
-- You can skip content optimization<sup>1</sup> for routes you add to the `Pages` collection (see `SkipOptimization` property).
-- You can also choose the content optimizer<sup>1</sup> for routes you add to the `Pages` collection (see `OptimizerType` property).
+- You can skip content optimization<sup>1</sup> or choose a specific optimizer type for routes you add to the `Pages` collection (see `OptimizerType` property). The default optimizer type setting, `OptimizerType.Auto`, automatically selects the appropriate optimizer.
 - You can set the encoding for content written to output files for routes you add to the `Pages` collection (see `OutputEncoding` property). Default is UTF8.
 
 > 1: Content optimizer options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details.
