@@ -19,12 +19,15 @@ AspNetStatic lets you generate a static website with the same ASP.NET Core tools
 
 But wait, there's more!
 
-AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Senarios_ section below.
+AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Scenarios_ section below.
 
 ### No Frameworks. No Engines. No Opinions!
 
-AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. AspNetStatic does just one thing (well, two, if you count the fallback middleware): create static HTML files for selected routes in your ASP.NET Core app.
-That means you can use whatever framework, component, or package (or architectural style) you want in your app. Want to use a blog engine like BlogEngine.NET? No problem. Want to use a CMS like Orchard or Umbraco? No problem. Want to create a documentation site that uses a markdown processor to render page content? No problem! AspNetStatic doesn't care; it will create optimized static files no matter how the content is produced.
+Build your ASP.NET site the way you've always done. AspNetStatic doesn't have any opinions about how you should build your site.
+AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. 
+AspNetStatic does just one thing (well, two, if you count the fallback middleware): create static files for selected routes in your ASP.NET Core app.
+That means you can use whatever framework, component, or package (or architectural style) you want in your app. Want to use a blog engine like BlogEngine.NET? No problem. Want to use a CMS like Orchard or Umbraco? No problem. Want to create a documentation site that uses a markdown processor to render page content? No problem! 
+AspNetStatic doesn't care; it will create optimized static files no matter how the content is produced.
 
 
 <br/>
@@ -38,7 +41,7 @@ It's a piece of cake!
    dotnet add package AspNetStatic
    ```
 1. Create and register an object that implements `IStaticPagesInfoProvider`
-   - Create an instance of `StaticPagesInfoProvider`, or an object that derrives from `StaticPagesInfoProviderBase`, or one that implements the interface directly
+   - Create an instance of `StaticPagesInfoProvider`, or an object that derives from `StaticPagesInfoProviderBase`, or one that implements the interface directly
    - Populate the `Pages` collection to specify the routes for which to generate static pages
      - Set required `Route` property of each `PageInfo`
      - Set other `PageInfo` properties as appropriate
@@ -67,11 +70,13 @@ It's a piece of cake!
 1. Run your web app
    ```
    dotnet run
-   -OR-
-   dotnet run -- static-only  // exits the app after generating static pages
    ```
 
-   Via launchSettings.json:
+   If you want to exit your app after generating static pages:
+   ```
+   dotnet run -- static-only
+   ```
+   Or, via launchSettings.json:
    ```
    "StaticOnly": {
       "commandName": "Project",
@@ -83,19 +88,25 @@ It's a piece of cake!
 
 Now, whenever you start your app, the static files will be (re-)created from their source Razor pages (or controller action views).
 
+There's also an option to periodically regenerate static pages while your app is running. See __Partial Static Site__ under the __Scenarios__ section below for details.
+
 
 <br/>
 
 ## Routes
 
-Keep the follwing in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
+Keep the following in mind when specifying routes in the `IStaticPagesInfoProvider.Pages` collection.
 
-- Routes must exclude the site's base URI (e.g. __http:<span>://</span>localhost:5000__, __https<span>://www</span>.mysite.com__)
+- Routes must exclude the site's base URI (e.g. __http:<span>://</span>localhost:5000__, __https<span>://www</span>.example.com__)
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
 - You can directly specify the pathname of the file to be generated for routes you add to the `Pages` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
-- You can specify a query string (or route parameters) for routes you add to the `Pages` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but be sure to specify a unique `OutFile` value for each instance of that route.
-- You can skip minification for routes you add to the `Pages` collection (see `SkipOptimization` property).
+- You can specify route parameters for routes you add to the `Pages` collection. The route parameters are treated as part of the route, and are used in constructing the output file pathname.
+- You can specify a query string for routes you add to the `Pages` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but you will need to specify a unique `OutFile` value for each instance of that route.
+- You can skip content optimization<sup>1</sup> for routes you add to the `Pages` collection (see `SkipOptimization` property).
+- You can also choose the content optimizer<sup>1</sup> for routes you add to the `Pages` collection (see `OptimizerType` property).
+- You can set the encoding for content written to output files for routes you add to the `Pages` collection (see `OutputEncoding` property). Default is UTF8.
 
+> 1: Content optimizer options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details.
 
 ### Routes vs. Generated Static Files
 
@@ -169,11 +180,11 @@ app.GenerateStaticPages(
 
 ## Scenarios
 
-> #### In all senarios, ensure that routes for static pages are unincumbered by authentication or authorization requirements.
+> #### In all scenarios, ensure that routes for static pages are unincumbered by authentication or authorization requirements.
 
 ### Standalone Static Site
 
-In this senario, you want to generate a completely static website (to host on Netlify or Azure/AWS storage, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
+In this scenario, you want to generate a completely static website (to host on Netlify or Azure/AWS storage, for instance). Once the static pages are generated, you will take the files in the destination folder (e.g. wwwroot), along with any .css, .js, and image files, and xcopy deploy them to your web host.
 
 Sample Configuration 1:
   - Specify any accessible folder (e.g. _wwwroot_) as the destination-root for the generated static files.
@@ -183,7 +194,7 @@ Sample Configuration 1:
     app.GenerateStaticPages(
       app.Environment.WebRoot,
       exitWhenDone: true,
-      alwaysDefautFile: false,
+      alwaysDefaultFile: false,
       dontUpdateLinks: false);
     ```
 
@@ -196,7 +207,7 @@ Sample Configuration 2:
     app.GenerateStaticPages(
       @"C:\path\to\destination\root\folder",
       commandLineArgs: args, // exit when done if contains 'static-only' parameter
-      alwaysDefautFile: true,
+      alwaysDefaultFile: true,
       dontUpdateLinks: true);
     ```
 
@@ -214,15 +225,15 @@ if (args.HasExitAfterStaticGenerationParameter())
 
 ### Partial Static Site
 
-In this senario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request (pages/views and JSON API's). When the app runs, static (.html) files will be generated for routes you specify. The website will then serve these static files for the specified routes, and dynamic content, as usual, for others.
+In this scenario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request (pages/views and JSON API's). When the app runs, static (.html) files will be generated for routes you specify. The website will then serve these static files for the specified routes, and dynamic content, as usual, for others.
 
-> While static files are being generated, requests for which the static file hasn't yet been generated will be served as dynamic content using the source (.cshtml) page. Once the static file has been generated, it will be used to statisfy requests.
+> While static files are being generated, requests for which the static file hasn't yet been generated will be served as dynamic content using the source (.cshtml) page. Once the static file has been generated, it will be used to satisfy requests.
 
 The configuration options are the same as for a standalone static site, except the following:
  - The destination root folder must be `app.Environment.WebRoot`.
  - You must do one of the following (can do both):
    - Use the AspNetStatic fallback middleware.
-   - Allow links in generaed static files to be updated.
+   - Allow links in generated static files to be updated.
  - Do not exit the app after static files are generated (obviously, right?)
  
 Like this:
@@ -240,7 +251,7 @@ app.Map...();
 app.GenerateStaticPages(
   app.Environment.WebRoot,       // must specify wwwroot
   exitWhenDone: false,           // don't exit after generating static files
-  alwaysDefautFile: true/false,
+  alwaysDefaultFile: true/false,
   dontUpdateLinks: false);       // update links so they refer to the static file
 ...
 app.Run();
@@ -249,7 +260,7 @@ app.Run();
 > #### The fallback middleware only re-routes requests for routes that are specified in the `Pages` collection, and only if the static file exists.
 
 
-#### Regenerate Static Files Periodically
+#### Periodic Regeneration
 
 If the data used in the content of static files changes while the app is running, you can configure periodic regeneration by specifying a value for the `regenerationInterval` parameter in the `GenerateStaticPages()` call. This will result in static files being generated when the app starts, and then periodically based on the specified interval.
 ```c#
@@ -278,39 +289,61 @@ To override the default minification settings used by AspNetStatic, register the
 
 > AspNetStatic uses the excellent WebMarkupMin package to implement the minification feature. For details about the configuration settings, please consult the WebMarkupMin [documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
 
-- __HTML__: To configure the HTML minifier, register a configured instance of `HtmlMinificationSettings`:
-  ```c#
-  using WebMarkupMin.Core;
-  builder.Services.AddSingleton(
-    sp => new HtmlMinificationSettings()
-    {
-      ...
-    });
-  ```
+Content optimization can be customized in one of two ways:
+ 1. Create and register an object that implements `IOptimizerSelector`.
 
-- __CSS__: To configure the CSS minifier, register an object that implements the `ICssMinifier` interface:
-  ```c#
-  using WebMarkupMin.Core;
-  builder.Services.AddSingleton<ICssMinifier>(
-    sp => new YuiCssMinifier(...));
-  ```
+    ```c#
+    public class MyOptimizerSelector : IOptimizerSelector { ... }
+    ...
+    builder.Services.AddSingleton(sp => new MyOptimizerSelector( ... ));
+    ```
 
-- __Javascript__: To configure the Javascript minifier, register an object that implements the `IJsMinifier` interface:
-  ```c#
-  using WebMarkupMin.Core;
-  builder.Services.AddSingleton<IJsMinifier>(
-    sp => new YuiJsMinifier(...));
-  ```
+ 1. Create and register individual settings objects which internally feed into a default `IOptimizerSelector` implementation.
+    - __HTML__: To configure the HTML minifier, register a configured instance of `HtmlMinificationSettings`:
+      ```c#
+      using WebMarkupMin.Core;
+      builder.Services.AddSingleton(
+        sp => new HtmlMinificationSettings()
+        {
+          ...
+        });
+      ```
 
-- __XML__: To configure the XML minifier, register a configured instance of `XmlMinificationSettings`:
-  ```c#
-  using WebMarkupMin.Core;
-  builder.Services.AddSingleton(
-    sp => new XmlMinificationSettings()
-    {
-      ...
-    });
-  ```
+    - __XHTML__: To configure the XHTML minifier, register a configured instance of `XhtmlMinificationSettings`:
+      ```c#
+      using WebMarkupMin.Core;
+      builder.Services.AddSingleton(
+        sp => new XhtmlMinificationSettings()
+        {
+          ...
+        });
+      ```
+
+    - __XML__: To configure the XML minifier, register a configured instance of `XmlMinificationSettings`:
+      ```c#
+      using WebMarkupMin.Core;
+      builder.Services.AddSingleton(
+        sp => new XmlMinificationSettings()
+        {
+          ...
+        });
+      ```
+
+    - __CSS__: To configure the CSS minifier, register an object that implements the `ICssMinifier` interface:
+      ```c#
+      using WebMarkupMin.Core;
+      builder.Services.AddSingleton<ICssMinifier>(
+        sp => new YuiCssMinifier(...));
+      ```
+
+    - __Javascript__: To configure the Javascript minifier, register an object that implements the `IJsMinifier` interface:
+      ```c#
+      using WebMarkupMin.Core;
+      builder.Services.AddSingleton<IJsMinifier>(
+        sp => new YuiJsMinifier(...));
+      ```
+
+
 
 <br/>
 

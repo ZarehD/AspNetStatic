@@ -34,11 +34,16 @@ namespace AspNetStatic
 
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
 
-			//IMarkupMinifier htmlMinifier = null!;
-			//IMarkupMinifier xmlMinifier = null!;
-
 			logger?.GeneratingStaticPages();
 			logger?.Configuration(config, httpClient);
+
+			var optimizeOutput = config.OptimizePageContent;
+			var optimizerSelector = config.OptimizerSelector;
+
+			if (optimizeOutput && (optimizerSelector is null))
+			{
+				Throw.InvalidOp(Properties.Resources.Err_OptimizeWithoutChooser);
+			}
 
 			var destRoot = config.DestinationRoot;
 			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
@@ -52,20 +57,20 @@ namespace AspNetStatic
 
 				logger?.ProcessingPage(page);
 
-				var pagePath = page.GetOutFilePathname(
+				var outFilePathname = page.GetOutFilePathname(
 					destRoot, alwaysDefaultFile,
 					indexFile, fileExtension,
 					exclusionsArray);
 
-				var pagePathShortName = pagePath.Replace(config.DestinationRoot, string.Empty);
+				var outFileShortName = outFilePathname.Replace(config.DestinationRoot, string.Empty);
 
-				logger?.Debug("PagePath = {0}", pagePathShortName);
+				logger?.Debug("PagePath = {0}", outFileShortName);
 
-				RemoveIfExists(fileSystem, pagePath);
+				RemoveIfExists(fileSystem, outFilePathname);
 
-				if (!EnsureFolderExists(fileSystem, pagePath))
+				if (!EnsureFolderExists(fileSystem, outFilePathname))
 				{
-					logger?.FailedToEnsureFolder(pagePath);
+					logger?.FailedToEnsureFolder(outFilePathname);
 					continue;
 				}
 
@@ -87,12 +92,12 @@ namespace AspNetStatic
 				if (string.IsNullOrWhiteSpace(pageContent))
 				{
 					logger?.NoContentForPage(requestUri);
-					return;
+					continue;
 				}
 
 				if (config.UpdateLinks)
 				{
-					logger?.UpdatingHrefValues(pagePathShortName);
+					logger?.UpdatingHrefValues(outFileShortName);
 
 					pageContent =
 						pageContent.FixupHrefValues(
@@ -101,19 +106,15 @@ namespace AspNetStatic
 							config.AlwaysCreateDefaultFile);
 				}
 
-				if (config.OptimizePageContent && !page.SkipOptimization)
+				if (optimizeOutput && !page.SkipOptimization)
 				{
-					logger?.OptimizingHtmlContent(requestUri, pagePathShortName);
+					logger?.OptimizingContent(requestUri, outFileShortName);
 
-					IMarkupMinifier minifier =
-						pagePath.EndsWith(".xml", true, CultureInfo.InvariantCulture)
-						? new XmlMinifier(settings: config.XmlMinifierSettings)
-						: new HtmlMinifier(
-							config.HtmlMinifierSettings,
-							config.CssMinifier,
-							config.JsMinifier);
+					var optimizer = optimizerSelector!.SelectFor(page, outFilePathname);
 
-					var result = minifier.Minify(pageContent, Encoding.UTF8);
+					logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer);
+
+					var result = optimizer.Minify(pageContent, page.OutputEncoding.ToSystemEncodng());
 
 					if (!result.Errors.Any())
 					{
@@ -121,17 +122,17 @@ namespace AspNetStatic
 					}
 					else
 					{
-						logger?.OptimizationErrors(requestUri, pagePathShortName, result.Errors);
+						logger?.OptimizationErrors(requestUri, outFileShortName, result.Errors);
 					}
 					if (result.Warnings.Any())
 					{
-						logger?.OptimizationErrors(requestUri, pagePathShortName, result.Warnings);
+						logger?.OptimizationErrors(requestUri, outFileShortName, result.Warnings);
 					}
 				}
 
-				logger?.WritingPageFile(requestUri, pagePathShortName, pageContent.Length);
+				logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
 
-				await fileSystem.File.WriteAllTextAsync(pagePath, pageContent, Encoding.UTF8, ct);
+				await fileSystem.File.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncodng(), ct);
 			}
 		}
 
@@ -366,19 +367,19 @@ namespace AspNetStatic
 
 		#endregion
 
-		#region 1080 - OptimizingHtmlContent
+		#region 1080 - OptimizingContent
 
-		public static void OptimizingHtmlContent(
+		public static void OptimizingContent(
 			this ILogger<StaticPageGenerator> logger,
 			string pageUrl,
 			string pagePath) =>
-			logger.Imp_OptimizingHtmlContent(
+			logger.Imp_OptimizingContent(
 				pageUrl,
 				pagePath);
 
-		[LoggerMessage(EventId = 1080, EventName = "OptimizingHtmlContent", Level = LogLevel.Information,
+		[LoggerMessage(EventId = 1080, EventName = "OptimizingContent", Level = LogLevel.Information,
 			Message = "StaticPageGenerator: Optimizing page content > PageUrl = {PageUrl}, PagePath = {PagePath}")]
-		private static partial void Imp_OptimizingHtmlContent(
+		private static partial void Imp_OptimizingContent(
 			this ILogger<StaticPageGenerator> logger,
 			string pageUrl,
 			string pagePath);
@@ -426,6 +427,27 @@ namespace AspNetStatic
 			IList<MinificationErrorInfo> warnings);
 
 		#endregion
+		#region 1083 - SelectedOptimizer
+
+		public static void SelectedOptimizer(
+			this ILogger<StaticPageGenerator> logger,
+			string pageUrl,
+			string pagePath,
+			IMarkupMinifier optimizer) =>
+			logger.Imp_SelectedOptimizer(
+				pageUrl,
+				pagePath,
+				optimizer.GetType().Name);
+
+		[LoggerMessage(EventId = 1083, EventName = "SelectedOptimizer", Level = LogLevel.Debug,
+			Message = "StaticPageGenerator: Selected optimizer > PageUrl = {PageUrl}, PagePath = {PagePath}, Optimizer = {Optimizer}")]
+		private static partial void Imp_SelectedOptimizer(
+			this ILogger<StaticPageGenerator> logger,
+			string pageUrl,
+			string pagePath,
+			string optimizer);
+
+		#endregion
 
 		#region 1090 - WritingPageFile
 
@@ -433,19 +455,22 @@ namespace AspNetStatic
 			this ILogger<StaticPageGenerator> logger,
 			string pageUrl,
 			string pagePath,
-			int contentSize) =>
+			int contentSize,
+			EncodingType encoding) =>
 			logger.Imp_WritingPageFile(
 				pageUrl,
 				pagePath,
-				contentSize);
+				contentSize,
+				encoding);
 
 		[LoggerMessage(EventId = 1090, EventName = "WritingPageFile", Level = LogLevel.Information,
-			Message = "StaticPageGenerator: Writing page content to file > PageUrl = {PageUrl}, PagePath = {PagePath}, ContentSize = {ContentSize}")]
+			Message = "StaticPageGenerator: Writing page content to file > PageUrl = {PageUrl}, PagePath = {PagePath}, ContentSize = {ContentSize}, Encoding = {Encoding}")]
 		private static partial void Imp_WritingPageFile(
 			this ILogger<StaticPageGenerator> logger,
 			string pageUrl,
 			string pagePath,
-			int contentSize);
+			int contentSize,
+			EncodingType encoding);
 
 		#endregion
 	}

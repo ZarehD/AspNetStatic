@@ -10,8 +10,6 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
-using WebMarkupMin.Core;
-
 namespace AspNetStatic
 {
 	internal class StaticPageGeneratorConfig
@@ -34,13 +32,7 @@ namespace AspNetStatic
 
 		public bool OptimizePageContent { get; init; } = true;
 
-		public ICssMinifier? CssMinifier { get; init; }
-
-		public IJsMinifier? JsMinifier { get; init; }
-
-		public HtmlMinificationSettings? HtmlMinifierSettings { get; init; }
-
-		public XmlMinificationSettings? XmlMinifierSettings { get; init; }
+		public IOptimizerSelector? OptimizerSelector { get; init; } = null!;
 
 
 		public StaticPageGeneratorConfig(
@@ -65,17 +57,11 @@ namespace AspNetStatic
 			bool createDefaultFile,
 			bool fixupHrefValues,
 			bool disableOptimizations,
-			HtmlMinificationSettings? htmlMinifierSettings = default,
-			XmlMinificationSettings? xmlMinificationSettings = default,
-			ICssMinifier? cssMinifier = default,
-			IJsMinifier? jsMinifier = default)
+			IOptimizerSelector? optimizerSelector = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues)
 		{
 			this.OptimizePageContent = !disableOptimizations;
-			this.HtmlMinifierSettings = htmlMinifierSettings;
-			this.XmlMinifierSettings = xmlMinificationSettings;
-			this.CssMinifier = cssMinifier;
-			this.JsMinifier = jsMinifier;
+			this.OptimizerSelector = Throw.IfNull(this.OptimizePageContent, optimizerSelector);
 		}
 
 		public StaticPageGeneratorConfig(
@@ -87,13 +73,9 @@ namespace AspNetStatic
 			string fileExtension,
 			IEnumerable<string> defaultFileExclusions,
 			bool disableOptimizations = default,
-			HtmlMinificationSettings? htmlMinifierSettings = default,
-			XmlMinificationSettings? xmlMinificationSettings = default,
-			ICssMinifier? cssMinifier = default,
-			IJsMinifier? jsMinifier = default)
+			IOptimizerSelector? optimizerSelector = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
-				  disableOptimizations, htmlMinifierSettings, xmlMinificationSettings, 
-				  cssMinifier, jsMinifier)
+				  disableOptimizations, optimizerSelector)
 		{
 			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.PageFileExtension = Throw.IfNullOrWhiteSpace(fileExtension, nameof(fileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);

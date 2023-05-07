@@ -78,6 +78,10 @@ namespace AspNetStatic
 		/// </remarks>
 		public bool SkipOptimization { get; init; }
 
+		public OptimizerType OptimizerType { get; init; } = OptimizerType.Auto;
+
+		public EncodingType OutputEncoding { get; init; } = EncodingType.UTF8;
+
 		public ChangeFrequency ChangeFrequency { get; init; } = ChangeFrequency.Never;
 
 		public DateTime LastModified { get; init; } = DateTime.MinValue;
@@ -97,4 +101,10 @@ namespace AspNetStatic
 
 
 	public enum ChangeFrequency { Always, Hourly, Daily, Weekly, Monthly, Yearly, Never }
+
+	public enum OptimizerType
+	{
+		Auto, // Auto-select based on OutFile filename extension. Defaults to Html.
+		Html, Xhtml, Xml
+	}
 }

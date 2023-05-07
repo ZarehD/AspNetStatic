@@ -16,6 +16,15 @@ namespace AspNetStatic
 
 			return arg;
 		}
+		public static T? IfNull<T>(bool condition, T? arg, [CallerArgumentExpression("arg")] string? argName = default)
+		{
+			if (condition && (arg is null))
+			{
+				NullArg(argName);
+			}
+
+			return arg;
+		}
 		public static string IfNullOrEmpty([NotNull] string? arg, [CallerArgumentExpression("arg")] string? argName = default, string? message = default, params string[] args)
 		{
 			if (string.IsNullOrEmpty(arg))
@@ -33,6 +42,14 @@ namespace AspNetStatic
 			}
 
 			return arg;
+		}
+
+		public static void IfTrue<TException>(bool condition, string? message = default) where TException : Exception
+		{
+			if (condition)
+			{
+				throw (TException) new Exception(message);
+			}
 		}
 
 		[DoesNotReturn]

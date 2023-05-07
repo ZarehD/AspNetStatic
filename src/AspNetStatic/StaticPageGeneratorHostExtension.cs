@@ -133,10 +133,7 @@ namespace AspNetStatic
 				return;
 			}
 
-			var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
-			var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
-			var cssMinifier = host.Services.GetService<ICssMinifier>();
-			var jsMinifier = host.Services.GetService<IJsMinifier>();
+			var optimizerSelector = GetOptimizerSelector(host, dontOptimizeContent);
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
@@ -171,10 +168,7 @@ namespace AspNetStatic
 								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 								pageUrlProvider.DefaultFileExclusions,
 								dontOptimizeContent,
-								htmlMinifierSettings,
-								xmlMinifierSettings,
-								cssMinifier,
-								jsMinifier);
+								optimizerSelector);
 
 						logger.RegenerationConfig(regenerationInterval);
 						var doPeriodicRefresh = regenerationInterval is not null;
@@ -242,6 +236,35 @@ namespace AspNetStatic
 						logger.Exception(ex);
 					}
 				});
+		}
+
+		private static IOptimizerSelector? GetOptimizerSelector(IHost host, bool dontOptimizeContent)
+		{
+			var result = host.Services.GetService<IOptimizerSelector>();
+
+			if (!dontOptimizeContent && (result is null))
+			{
+				var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
+				var xhtmlMinifierSettings = host.Services.GetService<XhtmlMinificationSettings>();
+				var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
+				var cssMinifier = host.Services.GetService<ICssMinifier>();
+				var jsMinifier = host.Services.GetService<IJsMinifier>();
+
+				result =
+					new OptimizerSelector(
+						new HtmlMinifier(
+							htmlMinifierSettings,
+							cssMinifier,
+							jsMinifier),
+						new XhtmlMinifier(
+							xhtmlMinifierSettings,
+							cssMinifier,
+							jsMinifier),
+						new XmlMinifier(
+							xmlMinifierSettings));
+			}
+
+			return result;
 		}
 
 		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>

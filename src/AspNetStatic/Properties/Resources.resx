@@ -132,6 +132,9 @@
   <data name="Err_MissingDefaultFileName" xml:space="preserve">
     <value>Missing required value for Default-File-Name configuration setting.</value>
   </data>
+  <data name="Err_OptimizeWithoutChooser" xml:space="preserve">
+    <value>Optimization is enabled but no minifier selector provided.</value>
+  </data>
   <data name="Err_RouteForPageNotWellFormed" xml:space="preserve">
     <value>Route for page is not well-formed. Expected a {0} URI.</value>
     <comment>0: UriKind</comment>

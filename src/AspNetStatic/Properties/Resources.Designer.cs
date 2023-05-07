@@ -106,6 +106,15 @@ namespace AspNetStatic.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Optimization is enabled but no minifier selector provided..
+        /// </summary>
+        internal static string Err_OptimizeWithoutChooser {
+            get {
+                return ResourceManager.GetString("Err_OptimizeWithoutChooser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Route for page is not well-formed. Expected a {0} URI..
         /// </summary>
         internal static string Err_RouteForPageNotWellFormed {

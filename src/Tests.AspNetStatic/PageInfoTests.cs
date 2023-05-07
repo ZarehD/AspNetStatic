@@ -1,4 +1,7 @@
-﻿namespace Tests.AspNetStatic
+﻿using System.Text;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Tests.AspNetStatic
 {
 	[TestClass]
 	public class PageInfoTests
@@ -13,6 +16,7 @@
 			var indexPriority = 1.0;
 			var lastModified = DateTime.UtcNow;
 			var skipOptimization = true;
+			var minifierSelector = OptimizerType.Auto;
 
 			var page =
 				new PageInfo(route)
@@ -23,6 +27,8 @@
 					IndexPriority = indexPriority,
 					LastModified = lastModified,
 					SkipOptimization = skipOptimization,
+					//MinifierSelector= minifierSelector,
+					//OutputEncoding = EncodingType.UTF8,
 				};
 
 			Assert.IsNotNull(page);
@@ -33,6 +39,8 @@
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
 			Assert.AreEqual(page.SkipOptimization, skipOptimization);
+			Assert.AreEqual(page.OptimizerType, minifierSelector);
+			Assert.AreEqual(page.OutputEncoding, EncodingType.UTF8);
 		}
 
 		[TestMethod]
@@ -45,12 +53,16 @@
 			var indexPriority = 0;
 			var lastModified = DateTime.MinValue;
 			var skipOptimization = false;
+			var minifierSelector = OptimizerType.Html;
+			var encoding = EncodingType.ASCII;
 
 			var page =
 				new PageInfo(route)
 				{
 					Query = queryString,
 					OutFile = pageFilePathname,
+					OptimizerType = minifierSelector,
+					OutputEncoding = encoding,
 				};
 
 			Assert.IsNotNull(page);
@@ -61,6 +73,8 @@
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
 			Assert.AreEqual(page.SkipOptimization, skipOptimization);
+			Assert.AreEqual(page.OptimizerType, minifierSelector);
+			Assert.AreEqual(page.OutputEncoding, encoding);
 		}
 
 
@@ -76,6 +90,8 @@
 					IndexPriority = 1.0,
 					LastModified = DateTime.UtcNow,
 					SkipOptimization = true,
+					OptimizerType = OptimizerType.Xml,
+					OutputEncoding = EncodingType.UTF32,
 				};
 
 			var json = System.Text.Json.JsonSerializer.Serialize<PageInfo>(expected);
@@ -88,6 +104,8 @@
 			Assert.AreEqual(expected.IndexPriority, actual?.IndexPriority);
 			Assert.AreEqual(expected.LastModified, actual?.LastModified);
 			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
+			Assert.AreEqual(expected.OptimizerType, actual?.OptimizerType);
+			Assert.AreEqual(expected.OutputEncoding, actual?.OutputEncoding);
 		}
 	}
 }
