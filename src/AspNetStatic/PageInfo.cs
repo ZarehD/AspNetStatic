@@ -61,22 +61,7 @@ namespace AspNetStatic
 		/// </remarks>
 		public string? OutFile { get; init; }
 
-		/// <summary>
-		///		Gets or sets a value that indicates whether to skip optimization 
-		///		for the output of this page.
-		/// </summary>
-		/// <remarks>
-		///		<para>
-		///			Content optimization may pose issues for certain types of content.
-		///			This setting allows for selectively disabling optimization for 
-		///			routes on a case-by-case basis. h/t: @dpenton
-		///		</para>
-		///		<para>
-		///			Applies only when content optimization is enabled during 
-		///			static page generation.
-		///		</para>
-		/// </remarks>
-		public bool SkipOptimization { get; init; }
+		public bool SkipOptimization => this.OptimizerType == OptimizerType.None;
 
 		public OptimizerType OptimizerType { get; init; } = OptimizerType.Auto;
 
@@ -105,6 +90,7 @@ namespace AspNetStatic
 	public enum OptimizerType
 	{
 		Auto, // Auto-select based on OutFile filename extension. Defaults to Html.
+		None, // no optimization
 		Html, Xhtml, Xml
 	}
 }

@@ -15,8 +15,7 @@ namespace Tests.AspNetStatic
 			var changeFrequency = ChangeFrequency.Daily;
 			var indexPriority = 1.0;
 			var lastModified = DateTime.UtcNow;
-			var skipOptimization = true;
-			var minifierSelector = OptimizerType.Auto;
+			var optimizerType = OptimizerType.Auto;
 
 			var page =
 				new PageInfo(route)
@@ -26,9 +25,6 @@ namespace Tests.AspNetStatic
 					ChangeFrequency = changeFrequency,
 					IndexPriority = indexPriority,
 					LastModified = lastModified,
-					SkipOptimization = skipOptimization,
-					//MinifierSelector= minifierSelector,
-					//OutputEncoding = EncodingType.UTF8,
 				};
 
 			Assert.IsNotNull(page);
@@ -38,8 +34,8 @@ namespace Tests.AspNetStatic
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.SkipOptimization, skipOptimization);
-			Assert.AreEqual(page.OptimizerType, minifierSelector);
+			Assert.AreEqual(page.SkipOptimization, page.OptimizerType == OptimizerType.None);
+			Assert.AreEqual(page.OptimizerType, optimizerType);
 			Assert.AreEqual(page.OutputEncoding, EncodingType.UTF8);
 		}
 
@@ -52,8 +48,7 @@ namespace Tests.AspNetStatic
 			var changeFrequency = ChangeFrequency.Never;
 			var indexPriority = 0;
 			var lastModified = DateTime.MinValue;
-			var skipOptimization = false;
-			var minifierSelector = OptimizerType.Html;
+			var optimizerType = OptimizerType.Html;
 			var encoding = EncodingType.ASCII;
 
 			var page =
@@ -61,7 +56,7 @@ namespace Tests.AspNetStatic
 				{
 					Query = queryString,
 					OutFile = pageFilePathname,
-					OptimizerType = minifierSelector,
+					OptimizerType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -72,8 +67,41 @@ namespace Tests.AspNetStatic
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.SkipOptimization, skipOptimization);
-			Assert.AreEqual(page.OptimizerType, minifierSelector);
+			Assert.AreEqual(page.SkipOptimization, page.OptimizerType == OptimizerType.None);
+			Assert.AreEqual(page.OptimizerType, optimizerType);
+			Assert.AreEqual(page.OutputEncoding, encoding);
+		}
+
+		[TestMethod]
+		public void Test_Ctor_3()
+		{
+			var route = "/";
+			var queryString = "/x/y";
+			var pageFilePathname = "\\index.html";
+			var changeFrequency = ChangeFrequency.Never;
+			var indexPriority = 0;
+			var lastModified = DateTime.MinValue;
+			var optimizerType = OptimizerType.None;
+			var encoding = EncodingType.UTF32;
+
+			var page =
+				new PageInfo(route)
+				{
+					Query = queryString,
+					OutFile = pageFilePathname,
+					OptimizerType = optimizerType,
+					OutputEncoding = encoding,
+				};
+
+			Assert.IsNotNull(page);
+			Assert.AreEqual(page.Route, route, ignoreCase: true);
+			Assert.AreEqual(page.Query, queryString, ignoreCase: true);
+			Assert.AreEqual(page.OutFile, pageFilePathname, ignoreCase: true);
+			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
+			Assert.AreEqual(page.IndexPriority, indexPriority);
+			Assert.AreEqual(page.LastModified, lastModified);
+			Assert.AreEqual(page.SkipOptimization, page.OptimizerType == OptimizerType.None);
+			Assert.AreEqual(page.OptimizerType, optimizerType);
 			Assert.AreEqual(page.OutputEncoding, encoding);
 		}
 
@@ -89,9 +117,8 @@ namespace Tests.AspNetStatic
 					ChangeFrequency = ChangeFrequency.Daily,
 					IndexPriority = 1.0,
 					LastModified = DateTime.UtcNow,
-					SkipOptimization = true,
 					OptimizerType = OptimizerType.Xml,
-					OutputEncoding = EncodingType.UTF32,
+					OutputEncoding = EncodingType.BigEndianUnicode,
 				};
 
 			var json = System.Text.Json.JsonSerializer.Serialize<PageInfo>(expected);
