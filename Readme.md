@@ -291,8 +291,7 @@ To override the default minification settings used by AspNetStatic, register the
 > AspNetStatic uses the excellent WebMarkupMin package to implement the minification feature. For details about the configuration settings, please consult the WebMarkupMin [documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
 
 Content optimization can be customized in one of two ways:
- 1. Create and register an object that implements `IOptimizerSelector`.
-
+ 1. Create and register an object that implements `IOptimizerSelector`. In addition to specifying custom optimizer configurations, this option allows you to implement your own custom logic for selecting the optimizer to use for a page.
     ```c#
     public class MyOptimizerSelector : IOptimizerSelector { ... }
     ...
