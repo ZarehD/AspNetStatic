@@ -10,7 +10,7 @@
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<!--<PackageIcon></PackageIcon>-->
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/ZarehD/AspNetStatic</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/ZarehD/AspNetStatic</PackageProjectUrl>
 
