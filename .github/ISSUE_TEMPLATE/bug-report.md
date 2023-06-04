@@ -1,14 +1,14 @@
 ---
-name: Bug report
+name: Bug Report
 about: Create a bug report to help us improve
 title: ''
 labels: ''
-assignees: ''
+assignees: ZarehD
 
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+A clear and concise description of what the bug is. Be thorough and provide as much relevant detail as possible.
 
 **To Reproduce**
 Steps to reproduce the behavior:
