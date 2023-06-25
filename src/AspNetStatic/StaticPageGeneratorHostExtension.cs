@@ -34,7 +34,7 @@ namespace AspNetStatic
 		///		are examined for the "static-only" parameter.
 		/// </param>
 		/// <param name="destinationRoot"></param>
-		/// <param name="alwaysDefautFile"></param>
+		/// <param name="alwaysDefaultFile"></param>
 		/// <param name="dontUpdateLinks"></param>
 		/// <param name="dontOptimizeContent"></param>
 		/// <param name="regenerationInterval"></param>
@@ -42,14 +42,14 @@ namespace AspNetStatic
 			this IHost host,
 			string destinationRoot,
 			string[] commandLineArgs,
-			bool alwaysDefautFile = default,
+			bool alwaysDefaultFile = default,
 			bool dontUpdateLinks = default,
 			bool dontOptimizeContent = default,
 			TimeSpan? regenerationInterval = default) =>
 			host.GenerateStaticPages(
 				destinationRoot,
 				commandLineArgs.HasExitAfterStaticGenerationParameter(),
-				alwaysDefautFile, dontUpdateLinks, dontOptimizeContent,
+				alwaysDefaultFile, dontUpdateLinks, dontOptimizeContent,
 				regenerationInterval);
 
 		/// <summary>
