@@ -32,7 +32,7 @@ namespace AspNetStatic
 		/// <remarks>
 		///		The specified value is appended to the value specified in 
 		///		<see cref="Route"/> and should start with a '?' character.
-		///		(see <see cref="Url"/> proprty).
+		///		(see <see cref="Url"/> property).
 		/// </remarks>
 		public string? Query { get; init; }
 

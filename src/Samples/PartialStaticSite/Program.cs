@@ -66,7 +66,7 @@ app.MapRazorPages();
 app.GenerateStaticPages(
 	app.Environment.WebRootPath,
 	exitWhenDone: exitWhenDone,
-	alwaysDefautFile: false,
+	alwaysDefaultFile: false,
 	dontUpdateLinks: false,
 	dontOptimizeContent: false,
 	regenerationInterval: regenInterval);

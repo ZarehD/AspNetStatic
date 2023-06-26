@@ -39,7 +39,7 @@ namespace Tests.AspNetStatic
 
 		private static RequestDelegate GetNextMiddleware() => new((r) => Task.CompletedTask);
 
-		private static IStaticPagesInfoProvider GetPagenfoProvider() => new PageInfoProvider();
+		private static IStaticPagesInfoProvider GetPageInfoProvider() => new PageInfoProvider();
 
 		private static IWebHostEnvironment GetWebHostEnvironment()
 		{
@@ -66,7 +66,7 @@ namespace Tests.AspNetStatic
 		[DataRow("/page/p1", "/page/p1", true)]
 		public async Task Test_Fallbacks_AutoPath(
 			string requestPath, string expectedPath,
-			bool alwaysDefaultfile)
+			bool alwaysDefaultFile)
 		{
 			// Setup...
 			//
@@ -74,7 +74,7 @@ namespace Tests.AspNetStatic
 			var path = parts[0];
 			var query = parts.Length > 1 ? parts[1] : null;
 
-			var pageInfoProvider = GetPagenfoProvider();
+			var pageInfoProvider = GetPageInfoProvider();
 
 			var createFile =
 				!expectedPath.EndsWith(Consts.FwdSlash) &&
@@ -103,7 +103,7 @@ namespace Tests.AspNetStatic
 				Options.Create<StaticPageFallbackMiddlewareOptions>(
 					new()
 					{
-						AlwaysDefaultFile = alwaysDefaultfile
+						AlwaysDefaultFile = alwaysDefaultFile
 					}));
 
 
@@ -145,7 +145,7 @@ namespace Tests.AspNetStatic
 			var path = parts[0];
 			var query = parts.Length > 1 ? parts[1] : null;
 
-			var pageInfoProvider = GetPagenfoProvider();
+			var pageInfoProvider = GetPageInfoProvider();
 
 			var createFile =
 				!expectedPath.EndsWith(Consts.FwdSlash) &&

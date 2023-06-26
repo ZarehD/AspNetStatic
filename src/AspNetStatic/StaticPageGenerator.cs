@@ -114,7 +114,7 @@ namespace AspNetStatic
 
 					logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer);
 
-					var result = optimizer.Minify(pageContent, page.OutputEncoding.ToSystemEncodng());
+					var result = optimizer.Minify(pageContent, page.OutputEncoding.ToSystemEncoding());
 
 					if (!result.Errors.Any())
 					{
@@ -132,7 +132,7 @@ namespace AspNetStatic
 
 				logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
 
-				await fileSystem.File.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncodng(), ct);
+				await fileSystem.File.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct);
 			}
 		}
 

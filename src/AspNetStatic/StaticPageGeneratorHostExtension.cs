@@ -64,14 +64,14 @@ namespace AspNetStatic
 		///		Specifies whether to exit the app (gracefully shut the web app down) 
 		///		after generating the static files.
 		/// </param>
-		/// <param name="alwaysDefautFile">
+		/// <param name="alwaysDefaultFile">
 		///		<para>
 		///			Specifies whether to always create default files for pages 
 		///			(true) even if a route specifies a page name, or an html file 
 		///			bearing the page name (false).
 		///		</para>
 		///		<para>
-		///			Does not affct routes that end with a trailing forward slash.
+		///			Does not affect routes that end with a trailing forward slash.
 		///			A default file will always be generated for such routes.
 		///		</para>
 		///		<para>
@@ -88,27 +88,27 @@ namespace AspNetStatic
 		///		<para>
 		///			Href values will be modified such that a value of /page is 
 		///			converted to /page.html or /page/index.html depending on 
-		///			<paramref name="alwaysDefautFile"/>.
+		///			<paramref name="alwaysDefaultFile"/>.
 		///		</para>
 		/// </param>
 		/// <param name="dontOptimizeContent">
 		///		<para>
-		///			Specifies whether to NOT optimize the content of generated static fiels.
+		///			Specifies whether to omit optimizing the content of generated static fiels.
 		///		</para>
 		///		<para>
 		///			By default, when this parameter is <c>false</c>, content of the generated 
-		///			static file will be minified. Specify <c>true</c> to omit the optimizations.
+		///			static file will be optimized. Specify <c>true</c> to omit the optimizations.
 		///		</para>
 		/// </param>
 		/// <param name="regenerationInterval">
-		///		Specifies whther the periodic regeneration is enabled (non-null value),
-		///		and the interval between regeneration events.
+		///		Specifies whether periodic re-generation is enabled (non-null value),
+		///		and the interval between re-generation events.
 		/// </param>
 		public static void GenerateStaticPages(
 			this IHost host,
 			string destinationRoot,
 			bool exitWhenDone = default,
-			bool alwaysDefautFile = default,
+			bool alwaysDefaultFile = default,
 			bool dontUpdateLinks = default,
 			bool dontOptimizeContent = default,
 			TimeSpan? regenerationInterval = default)
@@ -162,7 +162,7 @@ namespace AspNetStatic
 							new StaticPageGeneratorConfig(
 								pageUrlProvider.Pages,
 								destinationRoot,
-								alwaysDefautFile,
+								alwaysDefaultFile,
 								!dontUpdateLinks,
 								pageUrlProvider.DefaultFileName,
 								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
