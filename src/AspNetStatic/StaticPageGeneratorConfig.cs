@@ -30,7 +30,7 @@ namespace AspNetStatic
 
 		public List<string> DefaultFileExclusions { get; } = new(new[] { "index", "default" });
 
-		public bool OptimizePageContent { get; init; } = true;
+		public bool OptimizePageContent { get; }
 
 		public IOptimizerSelector? OptimizerSelector { get; init; } = null!;
 
@@ -40,7 +40,7 @@ namespace AspNetStatic
 			string destinationRoot,
 			bool createDefaultFile,
 			bool fixupHrefValues,
-			bool disableOptimizations,
+			bool enableOptimization,
 			IOptimizerSelector? optimizerSelector = default)
 		{
 			this.DestinationRoot = Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
@@ -52,7 +52,7 @@ namespace AspNetStatic
 				this.Pages.AddRange(pages);
 			}
 
-			this.OptimizePageContent = !disableOptimizations;
+			this.OptimizePageContent = enableOptimization;
 			this.OptimizerSelector = Throw.IfNull(this.OptimizePageContent, optimizerSelector);
 		}
 
@@ -64,10 +64,10 @@ namespace AspNetStatic
 			string defaultFileName,
 			string fileExtension,
 			IEnumerable<string> defaultFileExclusions,
-			bool disableOptimizations = default,
+			bool enableOptimization = default,
 			IOptimizerSelector? optimizerSelector = default)
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
-				  disableOptimizations, optimizerSelector)
+				  enableOptimization, optimizerSelector)
 		{
 			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.PageFileExtension = Throw.IfNullOrWhiteSpace(fileExtension, nameof(fileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);

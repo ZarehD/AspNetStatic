@@ -167,7 +167,7 @@ namespace AspNetStatic
 								pageUrlProvider.DefaultFileName,
 								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 								pageUrlProvider.DefaultFileExclusions,
-								dontOptimizeContent,
+								!dontOptimizeContent,
 								optimizerSelector);
 
 						logger.RegenerationConfig(regenerationInterval);
