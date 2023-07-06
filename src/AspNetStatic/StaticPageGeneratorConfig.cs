@@ -39,7 +39,9 @@ namespace AspNetStatic
 			IEnumerable<PageInfo> pages,
 			string destinationRoot,
 			bool createDefaultFile,
-			bool fixupHrefValues)
+			bool fixupHrefValues,
+			bool disableOptimizations,
+			IOptimizerSelector? optimizerSelector = default)
 		{
 			this.DestinationRoot = Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
 			this.AlwaysCreateDefaultFile = createDefaultFile;
@@ -49,17 +51,7 @@ namespace AspNetStatic
 			{
 				this.Pages.AddRange(pages);
 			}
-		}
 
-		public StaticPageGeneratorConfig(
-			IEnumerable<PageInfo> pages,
-			string destinationRoot,
-			bool createDefaultFile,
-			bool fixupHrefValues,
-			bool disableOptimizations,
-			IOptimizerSelector? optimizerSelector = default)
-			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues)
-		{
 			this.OptimizePageContent = !disableOptimizations;
 			this.OptimizerSelector = Throw.IfNull(this.OptimizePageContent, optimizerSelector);
 		}
