@@ -10,7 +10,7 @@
   "profiles": {
     "Static Pages": {
       "commandName": "Project",
-      "commandLineArgs": "static-only",
+      "commandLineArgs": "--static-only",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "https://localhost:5095",

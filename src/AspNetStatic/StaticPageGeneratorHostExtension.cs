@@ -27,30 +27,49 @@ namespace AspNetStatic
 {
 	public static class StaticPageGeneratorHostExtension
 	{
-		/// <summary>
-		///		Generates static pages for the configured pages.
-		/// </summary>
-		/// <param name="host"></param>
-		/// <param name="commandLineArgs">
-		///		The commandline arguments passed to your web app. The arguments must be convertible to 
-		///		<see cref="GenerateStaticPagesOptions"/> model. Argument "destination-root" is required.
-		/// </param>
+		///  <summary>
+		/// 		Generates static pages for the configured pages.
+		///  </summary>
+		///  <param name="host"></param>
+		///  <param name="commandLineArgs">
+		/// 		The commandline arguments passed to your web app. The arguments must be convertible to 
+		/// 		<see cref="GenerateStaticPagesOptions"/> model.
+		///  </param>
 		public static void GenerateStaticPages(
 			this IHost host,
-			string[] commandLineArgs)
+			string[] commandLineArgs
+			)
 		{
-			new Parser().ParseArguments<GenerateStaticPagesOptions>(commandLineArgs)
-				.WithParsed(o =>
-				{
-					host.GenerateStaticPages(
-						o.DestinationRoot, o.ExitWhenDone, o.AlwaysDefaultFile, 
-						o.DontUpdateLinks, o.DontOptimizeContent, 
-						o.RegenerationInterval == null ? null : TimeSpan.FromMilliseconds((double) o.RegenerationInterval));
-				})
-				.WithNotParsed(errors =>
-				{
-					throw new ArgumentException($"{errors.First().Tag.ToString()} error occured with parsing commandline arguments.");
-				});
+			GenerateStaticPagesOptions parsedOptions = GenerateStaticPagesOptions.ParseOptions(commandLineArgs);
+			
+			host.GenerateStaticPages(
+				parsedOptions.DestinationRoot!,
+				parsedOptions.ExitWhenDone, parsedOptions.AlwaysDefaultFile, 
+				parsedOptions.DontUpdateLinks, parsedOptions.DontOptimizeContent, 
+				parsedOptions.RegenerationInterval == null ? null : TimeSpan.FromMilliseconds((double) parsedOptions.RegenerationInterval));
+		}
+		
+		///  <summary>
+		/// 		Generates static pages for the configured pages.
+		///  </summary>
+		///  <param name="host"></param>
+		///  <param name="options">
+		/// 		Static site generation behavior options
+		///  </param>
+		public static void GenerateStaticPages(
+			this IHost host,
+			GenerateStaticPagesOptions options
+			)
+		{
+			if (options.DestinationRoot == null)
+			{
+				throw new ArgumentException($"{nameof(options.DestinationRoot)} cannot be null!");
+			}
+			host.GenerateStaticPages(
+				options.DestinationRoot,
+				options.ExitWhenDone, options.AlwaysDefaultFile, 
+				options.DontUpdateLinks, options.DontOptimizeContent, 
+				options.RegenerationInterval == null ? null : TimeSpan.FromMilliseconds((double) options.RegenerationInterval));
 		}
 		
 

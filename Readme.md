@@ -53,8 +53,8 @@ It's a piece of cake!
        new PageInfo[]
        {
          new("/") { ... },
-         new("/privacy") { ... }
-         new("/blog/posts/1") { OutFile = @"blog\post-1.html" }
+         new("/privacy") { ... },
+         new("/blog/posts/1") { OutFile = @"blog\post-1.html" },
          new("/blog/posts/2") { OutFile = @"blog\post-2-dark.html", Query = "?theme=dark" }
        }));
    ```
@@ -74,7 +74,7 @@ It's a piece of cake!
 
    If you want to exit your app after generating static pages:
    ```
-   dotnet run -- static-only
+   dotnet run -- --static-only
    ```
    Or, via launchSettings.json:
    ```

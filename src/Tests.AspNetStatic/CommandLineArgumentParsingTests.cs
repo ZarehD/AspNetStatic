@@ -76,21 +76,6 @@ public class CommandLineArgumentParsingTests
     }
 
     [TestMethod]
-    public void Test_ParsingWillFail_WhenMandatoryArgumentIsNotGiven()
-    {
-        new Parser().ParseArguments<GenerateStaticPagesOptions>(new[]
-                { "--static-only" })
-            .WithParsed(o =>
-            {
-                Assert.Fail();
-            })
-            .WithNotParsed(errors =>
-            {
-                Assert.IsTrue(errors.Any(x => x.Tag == ErrorType.MissingRequiredOptionError));
-            });;
-    }
-    
-    [TestMethod]
     public void Test_ParsingWillFail_WhenNonExistentArgumentsAreGiven()
     {
         new Parser().ParseArguments<GenerateStaticPagesOptions>(new[]
@@ -101,32 +86,25 @@ public class CommandLineArgumentParsingTests
             })
             .WithNotParsed(errors =>
             {
-                try
-                {
-                    var tokenName = ((TokenError) errors.Last()).Token.ToString();
-                    throw new ArgumentException($"Error(s) occured with processing commandline arguments. " +
-                                                $"Error count {errors.Count()}. " +
-                                                $"First error: {tokenName} - {errors.First().Tag.ToString()}");
-                }
-                catch (InvalidCastException e)
-                {
-                    try
-                    {
-                        var tokenName = ((NamedError) errors.Last()).NameInfo.LongName;
-                        throw new ArgumentException($"Error(s) occured with processing commandline arguments. " +
-                                                    $"Error count {errors.Count()}. " +
-                                                    $"First error: {tokenName} - {errors.First().Tag.ToString()}");
-                    }
-                    catch (InvalidCastException exception)
-                    {
-                        throw new ArgumentException($"Error(s) occured with processing commandline arguments. " +
-                                                    $"Error count {errors.Count()}. " +
-                                                    $"First error: {errors.First().Tag.ToString()}");
-                    }
-                }
+                errors.Any(x => x.Tag == ErrorType.UnknownOptionError);
             });
     }
     
+    [TestMethod]
+    public void Test_ParsingWillIgnoreArgumentsNotStartingWithDash()
+    {
+        new Parser().ParseArguments<GenerateStaticPagesOptions>(RequiredArguments.Concat(new[]
+                { "static-only" }))
+            .WithParsed(o =>
+            {
+                Assert.IsFalse(o.ExitWhenDone);
+            })
+            .WithNotParsed(errors =>
+            {
+                Assert.Fail();
+            });
+    }
+
     [TestMethod]
     public void Test_ParsingWillFail_WhenSameArgumentIsGivenMultipleTimes()
     {

@@ -5,15 +5,6 @@ using AspNetStatic.Models;
 using CommandLine;
 using PartialStaticSite;
 
-GenerateStaticPagesOptions? options = null;
-new Parser().ParseArguments<GenerateStaticPagesOptions>(args)
-	.WithNotParsed(errors =>
-	{
-		throw new ArgumentException("Cannot parse commandline arguments!");
-	})
-	.WithParsed(x => options = x);
-// var exitWhenDone = args.HasExitAfterStaticGenerationParameter();
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRouting(
@@ -48,6 +39,12 @@ var intervalStr = app.Configuration["AspNetStatic:RegenTimer"];
 TimeSpan? regenInterval = TimeSpan.TryParse(intervalStr, out var ts) ? ts : null;
 
 
+var options = new GenerateStaticPagesOptions()
+{
+	DestinationRoot = GenerateStaticPagesOptions.ParseOptions(args, app.Environment.WebRootPath).DestinationRoot!,
+	RegenerationInterval = regenInterval?.TotalMilliseconds,
+};
+
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Error");
@@ -71,13 +68,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-app.GenerateStaticPages(
-	app.Environment.WebRootPath,
-	exitWhenDone: options.ExitWhenDone,
-	alwaysDefaultFile: options.AlwaysDefaultFile,
-	dontUpdateLinks: options.DontUpdateLinks,
-	dontOptimizeContent: options.DontOptimizeContent,
-	regenerationInterval: regenInterval);
+app.GenerateStaticPages(options);
 
 app.Run();
 
