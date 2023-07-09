@@ -1,10 +1,18 @@
 #define ENABLE_STATIC_PAGE_FALLBACK
 
 using AspNetStatic;
+using AspNetStatic.Models;
+using CommandLine;
 using PartialStaticSite;
 
-
-var exitWhenDone = args.HasExitAfterStaticGenerationParameter();
+GenerateStaticPagesOptions? options = null;
+new Parser().ParseArguments<GenerateStaticPagesOptions>(args)
+	.WithNotParsed(errors =>
+	{
+		throw new ArgumentException("Cannot parse commandline arguments!");
+	})
+	.WithParsed(x => options = x);
+// var exitWhenDone = args.HasExitAfterStaticGenerationParameter();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,10 +73,10 @@ app.MapRazorPages();
 
 app.GenerateStaticPages(
 	app.Environment.WebRootPath,
-	exitWhenDone: exitWhenDone,
-	alwaysDefaultFile: false,
-	dontUpdateLinks: false,
-	dontOptimizeContent: false,
+	exitWhenDone: options.ExitWhenDone,
+	alwaysDefaultFile: options.AlwaysDefaultFile,
+	dontUpdateLinks: options.DontUpdateLinks,
+	dontOptimizeContent: options.DontOptimizeContent,
 	regenerationInterval: regenInterval);
 
 app.Run();

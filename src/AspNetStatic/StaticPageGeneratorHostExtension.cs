@@ -13,6 +13,8 @@ the specific language governing permissions and limitations under the License.
 #define USE_PERIODIC_TIMER
 
 using System.IO.Abstractions;
+using AspNetStatic.Models;
+using CommandLine;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,27 +32,27 @@ namespace AspNetStatic
 		/// </summary>
 		/// <param name="host"></param>
 		/// <param name="commandLineArgs">
-		///		The commandline arguments passed to your web app. The args 
-		///		are examined for the "static-only" parameter.
+		///		The commandline arguments passed to your web app. The arguments must be convertible to 
+		///		<see cref="GenerateStaticPagesOptions"/> model. Argument "destination-root" is required.
 		/// </param>
-		/// <param name="destinationRoot"></param>
-		/// <param name="alwaysDefaultFile"></param>
-		/// <param name="dontUpdateLinks"></param>
-		/// <param name="dontOptimizeContent"></param>
-		/// <param name="regenerationInterval"></param>
 		public static void GenerateStaticPages(
 			this IHost host,
-			string destinationRoot,
-			string[] commandLineArgs,
-			bool alwaysDefaultFile = default,
-			bool dontUpdateLinks = default,
-			bool dontOptimizeContent = default,
-			TimeSpan? regenerationInterval = default) =>
-			host.GenerateStaticPages(
-				destinationRoot,
-				commandLineArgs.HasExitAfterStaticGenerationParameter(),
-				alwaysDefaultFile, dontUpdateLinks, dontOptimizeContent,
-				regenerationInterval);
+			string[] commandLineArgs)
+		{
+			new Parser().ParseArguments<GenerateStaticPagesOptions>(commandLineArgs)
+				.WithParsed(o =>
+				{
+					host.GenerateStaticPages(
+						o.DestinationRoot, o.ExitWhenDone, o.AlwaysDefaultFile, 
+						o.DontUpdateLinks, o.DontOptimizeContent, 
+						o.RegenerationInterval == null ? null : TimeSpan.FromMilliseconds((double) o.RegenerationInterval));
+				})
+				.WithNotParsed(errors =>
+				{
+					throw new ArgumentException($"{errors.First().Tag.ToString()} error occured with parsing commandline arguments.");
+				});
+		}
+		
 
 		/// <summary>
 		///		Generates static pages for the configured pages.
@@ -82,7 +84,7 @@ namespace AspNetStatic
 		/// <param name="dontUpdateLinks">
 		///		<para>
 		///			Indicates, when true, that the href value of [a] and [area] 
-		///			HTML tags should not be modofied to refer to the generated 
+		///			HTML tags should not be modified to refer to the generated 
 		///			static pages.
 		///		</para>
 		///		<para>
@@ -93,7 +95,7 @@ namespace AspNetStatic
 		/// </param>
 		/// <param name="dontOptimizeContent">
 		///		<para>
-		///			Specifies whether to omit optimizing the content of generated static fiels.
+		///			Specifies whether to omit optimizing the content of generated static files.
 		///		</para>
 		///		<para>
 		///			By default, when this parameter is <c>false</c>, content of the generated 
@@ -267,9 +269,6 @@ namespace AspNetStatic
 			return result;
 		}
 
-		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>
-			(args is not null) && args.Any(a => a.HasSameText(STATIC_ONLY));
-
 		private static readonly CancellationTokenSource _appShutdown = new();
 		private static readonly HttpClient _httpClient = new();
 #if USE_PERIODIC_TIMER
@@ -277,8 +276,6 @@ namespace AspNetStatic
 #else
 		private static readonly System.Timers.Timer _timer = new();
 #endif
-
-		private const string STATIC_ONLY = "static-only";
 	}
 
 
