@@ -2,7 +2,6 @@
 
 using AspNetStatic;
 using AspNetStatic.Models;
-using CommandLine;
 using PartialStaticSite;
 
 var builder = WebApplication.CreateBuilder(args);
