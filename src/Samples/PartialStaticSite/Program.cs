@@ -4,8 +4,6 @@ using AspNetStatic;
 using PartialStaticSite;
 
 
-var exitWhenDone = args.HasExitAfterStaticGenerationParameter();
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRouting(
@@ -36,6 +34,7 @@ builder.Services.AddStaticPageFallback(
 
 var app = builder.Build();
 
+var exitWhenDone = args.HasExitWhenDoneArg();
 var intervalStr = app.Configuration["AspNetStatic:RegenTimer"];
 TimeSpan? regenInterval = TimeSpan.TryParse(intervalStr, out var ts) ? ts : null;
 

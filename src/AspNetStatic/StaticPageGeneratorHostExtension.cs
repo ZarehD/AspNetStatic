@@ -28,33 +28,6 @@ namespace AspNetStatic
 		/// <summary>
 		///		Generates static pages for the configured pages.
 		/// </summary>
-		/// <param name="host"></param>
-		/// <param name="commandLineArgs">
-		///		The commandline arguments passed to your web app. The args 
-		///		are examined for the "static-only" parameter.
-		/// </param>
-		/// <param name="destinationRoot"></param>
-		/// <param name="alwaysDefaultFile"></param>
-		/// <param name="dontUpdateLinks"></param>
-		/// <param name="dontOptimizeContent"></param>
-		/// <param name="regenerationInterval"></param>
-		public static void GenerateStaticPages(
-			this IHost host,
-			string destinationRoot,
-			string[] commandLineArgs,
-			bool alwaysDefaultFile = default,
-			bool dontUpdateLinks = default,
-			bool dontOptimizeContent = default,
-			TimeSpan? regenerationInterval = default) =>
-			host.GenerateStaticPages(
-				destinationRoot,
-				commandLineArgs.HasExitAfterStaticGenerationParameter(),
-				alwaysDefaultFile, dontUpdateLinks, dontOptimizeContent,
-				regenerationInterval);
-
-		/// <summary>
-		///		Generates static pages for the configured pages.
-		/// </summary>
 		/// <param name="host">An instance of the AspNetCore app host.</param>
 		/// <param name="destinationRoot">
 		///		The path to the root folder where generated static page 
@@ -267,9 +240,6 @@ namespace AspNetStatic
 			return result;
 		}
 
-		public static bool HasExitAfterStaticGenerationParameter(this string[] args) =>
-			(args is not null) && args.Any(a => a.HasSameText(STATIC_ONLY));
-
 		private static readonly CancellationTokenSource _appShutdown = new();
 		private static readonly HttpClient _httpClient = new();
 #if USE_PERIODIC_TIMER
@@ -277,8 +247,6 @@ namespace AspNetStatic
 #else
 		private static readonly System.Timers.Timer _timer = new();
 #endif
-
-		private const string STATIC_ONLY = "static-only";
 	}
 
 

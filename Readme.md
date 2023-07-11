@@ -53,8 +53,8 @@ It's a piece of cake!
        new PageInfo[]
        {
          new("/") { ... },
-         new("/privacy") { ... }
-         new("/blog/posts/1") { OutFile = @"blog\post-1.html" }
+         new("/privacy") { ... },
+         new("/blog/posts/1") { OutFile = @"blog\post-1.html" },
          new("/blog/posts/2") { OutFile = @"blog\post-2-dark.html", Query = "?theme=dark" }
        }));
    ```
@@ -63,7 +63,7 @@ It's a piece of cake!
    ...
    app.MapRazorPages();
    ...
-   app.GenerateStaticPages(app.Environment.WebRootPath, args);
+   app.GenerateStaticPages(app.Environment.WebRootPath);
    ...
    app.Run();
    ```
@@ -72,25 +72,9 @@ It's a piece of cake!
    dotnet run
    ```
 
-   If you want to exit your app after generating static pages:
-   ```
-   dotnet run -- static-only
-   ```
-   Or, via launchSettings.json:
-   ```
-   "profiles": {
-     "StaticOnly": {
-         "commandName": "Project",
-         "commandLineArgs": "static-only",
-         "launchBrowser": false,
-         "applicationUrl": "https://localhost:5000",
-     }
-   }
-   ```
-
 Now, whenever you start your app, the static files will be (re-)created from their source Razor pages (or controller action views).
 
-There's also an option to periodically regenerate static pages while your app is running. See __Partial Static Site__ under the __Scenarios__ section below for details.
+There are also options for exiting the app after generating static pages, or to periodically regenerate static pages while your app is running. See the __Scenarios__ section below for details.
 
 
 <br/>
@@ -205,16 +189,31 @@ Sample Configuration 2:
   - Don't update href attribute value for \<a\> and \<area\> tags that refer to static pages.
   - Use your web server's redirect or url-rewrite module to re-route requests (e.g. _/page/_ or _/page/index_ to _/page/index.html_).
     ```c#
+    // true when app is executed with one of the following args...
+    //  dotnet run -- static-only
+    //  dotnet run -- exit-when-done
+    var exitWhenDone = args.HasExitWhenDoneArg();
+
     app.GenerateStaticPages(
       @"C:\path\to\destination\root\folder",
-      commandLineArgs: args, // exit when done if contains 'static-only' parameter
+      exitWhenDone: exitWhenDone,
       alwaysDefaultFile: true,
       dontUpdateLinks: true);
     ```
 
-If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a StaticOnly profile in _launchSettings.json_ (as shown earlier) and surround the `app.GenerateStaticPages()` call with an IF gate.
+If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a profile in _launchSettings.json_ and surround the `GenerateStaticPages()` call with an IF gate.
+```
+"profiles": {
+  "GenStaticPages": {
+      "commandName": "Project",
+      "commandLineArgs": "exit-when-done",
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:5000",
+  }
+}
+```
 ```c#
-if (args.HasExitAfterStaticGenerationParameter())
+if (args.HasExitWhenDoneArg())
 {
   app.GenerateStaticPages(
     @"path\to\destination\root\folder",
