@@ -56,7 +56,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\Readme.md" Link="Readme.md" />
+		<None Include="..\..\Readme.md" Link="Readme.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
