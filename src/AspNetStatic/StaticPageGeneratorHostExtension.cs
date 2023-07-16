@@ -13,6 +13,7 @@ the specific language governing permissions and limitations under the License.
 #define USE_PERIODIC_TIMER
 
 using System.IO.Abstractions;
+using System.Net.Http;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +27,9 @@ namespace AspNetStatic
 	public static class StaticPageGeneratorHostExtension
 	{
 		/// <summary>
-		///		Generates static pages for the configured pages.
+		///		Registers an action that will generates static pages when 
+		///		the application is done loading (is ready to serve pages), 
+		///		and periodically thereafter.
 		/// </summary>
 		/// <param name="host">An instance of the AspNetCore app host.</param>
 		/// <param name="destinationRoot">
@@ -98,6 +101,7 @@ namespace AspNetStatic
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
+
 			var pageUrlProvider = host.Services.GetRequiredService<IStaticPagesInfoProvider>();
 
 			if (!pageUrlProvider.Pages.Any())
@@ -120,8 +124,8 @@ namespace AspNetStatic
 						var hostFeatures = host.Services.GetRequiredService<IServer>().Features;
 						var serverAddresses = hostFeatures.Get<IServerAddressesFeature>();
 						if (serverAddresses is null) Throw.InvalidOp($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
-						var hostUrls = serverAddresses.Addresses;
 
+						var hostUrls = serverAddresses.Addresses;
 						var baseUri =
 							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttps)) ??
 							hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp));
@@ -209,6 +213,149 @@ namespace AspNetStatic
 						logger.Exception(ex);
 					}
 				});
+		}
+
+		/// <summary>
+		///		Generates static pages (now, upon execution).
+		/// </summary>
+		/// <remarks>
+		///		NOTE: Call this method only when the application 
+		///		has 'started' and is ready to serve pages.
+		/// </remarks>
+		/// <param name="host">An instance of the AspNetCore app host.</param>
+		/// <param name="destinationRoot">
+		///		The path to the root folder where generated static page 
+		///		files (and subfolders) will be placed.
+		/// </param>
+		/// <param name="alwaysDefaultFile">
+		///		<para>
+		///			Specifies whether to always create default files for pages 
+		///			(true) even if a route specifies a page name, or an html file 
+		///			bearing the page name (false).
+		///		</para>
+		///		<para>
+		///			Does not affect routes that end with a trailing forward slash.
+		///			A default file will always be generated for such routes.
+		///		</para>
+		///		<para>
+		///			Whereas /page/ will always produce /page/index.html, /page will 
+		///			produce /page/index.html (true) or /page.html (false).
+		///		</para>
+		/// </param>
+		/// <param name="dontUpdateLinks">
+		///		<para>
+		///			Indicates, when true, that the href value of [a] and [area] 
+		///			HTML tags should not be modofied to refer to the generated 
+		///			static pages.
+		///		</para>
+		///		<para>
+		///			Href values will be modified such that a value of /page is 
+		///			converted to /page.html or /page/index.html depending on 
+		///			<paramref name="alwaysDefaultFile"/>.
+		///		</para>
+		/// </param>
+		/// <param name="dontOptimizeContent">
+		///		<para>
+		///			Specifies whether to omit optimizing the content of generated static fiels.
+		///		</para>
+		///		<para>
+		///			By default, when this parameter is <c>false</c>, content of the generated 
+		///			static file will be optimized. Specify <c>true</c> to omit the optimizations.
+		///		</para>
+		/// </param>
+		/// <param name="httpClientName">
+		///		Optional. The name of a configured HTTP client to use for fetching pages.
+		/// </param>
+		/// <param name="ct">The object to monitor for cancellation requests.</param>
+		/// <returns>
+		///		An object representing the async operation that will return 
+		///		a boolean True if the operation succeeded, or False otherwise.
+		/// </returns>
+		public static async Task<bool> GenerateStaticPagesNow(
+			this IHost host,
+			string destinationRoot,
+			bool alwaysDefaultFile = default,
+			bool dontUpdateLinks = default,
+			bool dontOptimizeContent = default,
+			string? httpClientName = default,
+			CancellationToken ct = default)
+		{
+			Throw.IfNull(host, nameof(host));
+			Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+
+			var fileSystem = host.Services.GetService<IFileSystem>() ?? new FileSystem();
+
+			if (!fileSystem.Directory.Exists(destinationRoot))
+			{
+				Throw.InvalidOp(Properties.Resources.Err_InvalidDestinationRoot);
+			}
+
+			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
+
+			var pageUrlProvider = host.Services.GetRequiredService<IStaticPagesInfoProvider>();
+
+			if (!pageUrlProvider.Pages.Any())
+			{
+				logger.NoPagesToProcess();
+				return false;
+			}
+
+			var optimizerSelector = GetOptimizerSelector(host, dontOptimizeContent);
+
+			var hostFeatures = host.Services.GetRequiredService<IServer>().Features;
+			var serverAddresses = hostFeatures.Get<IServerAddressesFeature>();
+			if (serverAddresses is null) Throw.InvalidOp($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
+
+			var hostUrls = serverAddresses.Addresses;
+			var baseUri =
+				hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttps)) ??
+				hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp));
+			if (baseUri is null) Throw.InvalidOp(Properties.Resources.Err_HostNotHttpService);
+
+			var httpClient =
+				host.Services.GetService<IHttpClientFactory>()?.CreateClient() ??
+				new HttpClient()
+				{
+					BaseAddress = new Uri(baseUri),
+					Timeout = TimeSpan.FromSeconds(90),
+				};
+
+			if (!httpClient.DefaultRequestHeaders.Any(
+					x =>
+					x.Key.Equals(HeaderNames.UserAgent, StringComparison.OrdinalIgnoreCase) &&
+					x.Value.Any(y => y.Equals(Consts.AspNetStatic, StringComparison.OrdinalIgnoreCase))))
+			{
+				httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
+			}
+
+			try
+			{
+				await StaticPageGenerator.Execute(
+					new StaticPageGeneratorConfig(
+						pageUrlProvider.Pages,
+						destinationRoot,
+						alwaysDefaultFile,
+						!dontUpdateLinks,
+						pageUrlProvider.DefaultFileName,
+						pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
+						pageUrlProvider.DefaultFileExclusions,
+						!dontOptimizeContent,
+						optimizerSelector),
+					httpClient,
+					fileSystem,
+					loggerFactory,
+					ct);
+
+				return true;
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				logger.Exception(ex);
+			}
+
+			return false;
 		}
 
 		private static IOptimizerSelector? GetOptimizerSelector(IHost host, bool dontOptimizeContent)
