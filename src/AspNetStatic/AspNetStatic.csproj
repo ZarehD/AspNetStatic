@@ -13,6 +13,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/ZarehD/AspNetStatic</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/ZarehD/AspNetStatic</PackageProjectUrl>
+		<PackageReadmeFile>Readme.md</PackageReadmeFile>
 
 		<AssemblyName>AspNetStatic</AssemblyName>
 		<RootNamespace>AspNetStatic</RootNamespace>
@@ -34,9 +35,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="TestableIO.System.IO.Abstractions" Version="19.2.11" />
-	  <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.11" />
-	  <PackageReference Include="WebMarkupMin.Core" Version="2.13.9" />
+		<PackageReference Include="TestableIO.System.IO.Abstractions" Version="19.2.11" />
+		<PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.11" />
+		<PackageReference Include="WebMarkupMin.Core" Version="2.13.9" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -52,6 +53,10 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\Readme.md" Link="Readme.md" />
 	</ItemGroup>
 
 </Project>
