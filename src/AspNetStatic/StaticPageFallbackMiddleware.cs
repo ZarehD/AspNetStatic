@@ -75,11 +75,7 @@ namespace AspNetStatic
 		{
 			if (this._haveStaticPages)
 			{
-				var isAspNetStatic =
-					ctx.Request.Headers.TryGetValue(HeaderNames.UserAgent, out var ua) &&
-					ua.Contains(Consts.AspNetStatic);
-
-				if (!isAspNetStatic)
+				if (!ctx.Request.IsAspNetStaticRequest())
 				{
 					var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
 					var query = ctx.Request.QueryString.Value.EnsureStartsWith('?', true);
