@@ -80,6 +80,9 @@ namespace AspNetStatic
 		///		Specifies whether periodic re-generation is enabled (non-null value),
 		///		and the interval between re-generation events.
 		/// </param>
+		/// <param name="httpTimeoutSeconds">
+		///		The HttpClient request timeout (in seconds) while fetching page content.
+		/// </param>
 		public static void GenerateStaticPages(
 			this IHost host,
 			string destinationRoot,
@@ -87,7 +90,8 @@ namespace AspNetStatic
 			bool alwaysDefaultFile = default,
 			bool dontUpdateLinks = default,
 			bool dontOptimizeContent = default,
-			TimeSpan? regenerationInterval = default)
+			TimeSpan? regenerationInterval = default,
+			ulong httpTimeoutSeconds = 90)
 		{
 			Throw.IfNull(host, nameof(host));
 			Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
@@ -132,7 +136,7 @@ namespace AspNetStatic
 						if (baseUri is null) Throw.InvalidOp(Properties.Resources.Err_HostNotHttpService);
 
 						_httpClient.BaseAddress = new Uri(baseUri);
-						_httpClient.Timeout = TimeSpan.FromSeconds(90);
+						_httpClient.Timeout = TimeSpan.FromSeconds(httpTimeoutSeconds);
 						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
 
 						var generatorConfig =
@@ -266,6 +270,15 @@ namespace AspNetStatic
 		/// <param name="httpClientName">
 		///		Optional. The name of a configured HTTP client to use for fetching pages.
 		/// </param>
+		/// <param name="httpTimeoutSeconds">
+		///		<para>
+		///			The HttpClient request timeout (in seconds) while fetching page content.
+		///		</para>
+		///		<para>
+		///			NOTE: Applies only when the HttpClient instance is created locally, or 
+		///			when the timeout for the acquired instance is <see cref="Timespan.Zero"/>.
+		///		</para>
+		/// </param>
 		/// <param name="ct">The object to monitor for cancellation requests.</param>
 		/// <returns>
 		///		An object representing the async operation that will return 
@@ -278,6 +291,7 @@ namespace AspNetStatic
 			bool dontUpdateLinks = default,
 			bool dontOptimizeContent = default,
 			string? httpClientName = default,
+			ulong httpTimeoutSeconds = 90,
 			CancellationToken ct = default)
 		{
 			Throw.IfNull(host, nameof(host));
@@ -313,13 +327,26 @@ namespace AspNetStatic
 				hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp));
 			if (baseUri is null) Throw.InvalidOp(Properties.Resources.Err_HostNotHttpService);
 
+			var httpClientFactory = host.Services.GetService<IHttpClientFactory>();
+
 			var httpClient =
-				host.Services.GetService<IHttpClientFactory>()?.CreateClient() ??
-				new HttpClient()
+				(httpClientFactory is null)
+				? new HttpClient()
 				{
 					BaseAddress = new Uri(baseUri),
-					Timeout = TimeSpan.FromSeconds(90),
-				};
+					Timeout = TimeSpan.FromSeconds(httpTimeoutSeconds),
+				}
+				: string.IsNullOrWhiteSpace(httpClientName)
+				? httpClientFactory.CreateClient()
+				: httpClientFactory.CreateClient(httpClientName)
+				;
+
+			httpClient.BaseAddress ??= new Uri(baseUri);
+
+			if (httpClient.Timeout == TimeSpan.Zero)
+			{
+				httpClient.Timeout = TimeSpan.FromSeconds(httpTimeoutSeconds);
+			}
 
 			if (!httpClient.DefaultRequestHeaders.Any(
 					x =>
