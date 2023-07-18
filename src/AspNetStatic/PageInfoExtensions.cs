@@ -32,8 +32,9 @@ namespace AspNetStatic
 			bool routesAreCaseSensitive = default) =>
 			(pages is null) || !pages.Any() ? default :
 			pages.FirstOrDefault(
-				p => route.Equals(Consts.FSlash) ? p.Route.Equals(Consts.FSlash) :
-				p.Route.NormalizeRoute().Equals(
+				p => route.Equals(Consts.FSlash)
+				? p.Route.Equals(Consts.FSlash)
+				: p.Route.NormalizeRoute().Equals(
 					route.NormalizeRoute(),
 					routesAreCaseSensitive
 					? StringComparison.Ordinal
@@ -44,8 +45,9 @@ namespace AspNetStatic
 			bool routesAreCaseSensitive = default) =>
 			(pages is null) || !pages.Any() ? default :
 			pages.FirstOrDefault(
-				p => url.Equals(Consts.FSlash) ? p.Url.Equals(Consts.FSlash) :
-				p.Url.NormalizeUrl().Equals(
+				p => url.Equals(Consts.FSlash)
+				? p.Url.Equals(Consts.FSlash)
+				: p.Url.NormalizeUrl().Equals(
 					url.NormalizeUrl(),
 					routesAreCaseSensitive
 					? StringComparison.Ordinal
