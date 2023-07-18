@@ -11,7 +11,6 @@ the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
 using System.IO.Abstractions;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using WebMarkupMin.Core;
 
@@ -28,9 +27,9 @@ namespace AspNetStatic
 		{
 			if (ct.IsCancellationRequested) return;
 
-			Throw.IfNull(config, nameof(config));
-			Throw.IfNull(httpClient, nameof(httpClient));
-			Throw.IfNull(fileSystem, nameof(fileSystem));
+			Throw.IfNull(config);
+			Throw.IfNull(httpClient);
+			Throw.IfNull(fileSystem);
 
 			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
 
@@ -136,6 +135,122 @@ namespace AspNetStatic
 			}
 		}
 
+		public static async Task ExecuteForPage(
+			PageInfo page,
+			StaticPageGeneratorConfig config,
+			HttpClient httpClient,
+			IFileSystem fileSystem,
+			ILoggerFactory? loggerFactory = default,
+			CancellationToken ct = default)
+		{
+			if (ct.IsCancellationRequested) return;
+
+			Throw.IfNull(page);
+			Throw.IfNull(config);
+			Throw.IfNull(httpClient);
+			Throw.IfNull(fileSystem);
+
+			var logger = loggerFactory?.CreateLogger<StaticPageGenerator>();
+
+			logger?.GeneratingStaticPages();
+			logger?.ConfigurationSinglePage(page, config, httpClient);
+
+			var optimizeOutput = config.OptimizePageContent;
+			var optimizerSelector = config.OptimizerSelector;
+
+			if (optimizeOutput && (optimizerSelector is null))
+			{
+				Throw.InvalidOp(Properties.Resources.Err_OptimizeWithoutChooser);
+			}
+
+			var destRoot = config.DestinationRoot;
+			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
+			var indexFile = config.IndexFileName;
+			var fileExtension = config.PageFileExtension;
+			var exclusionsArray = config.DefaultFileExclusions.ToArray();
+
+			if (ct.IsCancellationRequested) return;
+
+			logger?.ProcessingPage(page);
+
+			var outFilePathname = page.GetOutFilePathname(
+				destRoot, alwaysDefaultFile,
+				indexFile, fileExtension,
+				exclusionsArray);
+
+			var outFileShortName = outFilePathname.Replace(config.DestinationRoot, string.Empty);
+
+			logger?.Debug("PagePath = {0}", outFileShortName);
+
+			RemoveIfExists(fileSystem, outFilePathname);
+
+			if (!EnsureFolderExists(fileSystem, outFilePathname))
+			{
+				logger?.FailedToEnsureFolder(outFilePathname);
+				return;
+			}
+
+			var requestUri = page.Url;
+
+			logger?.FetchingPageContent(requestUri);
+
+			var pageContent = string.Empty;
+
+			try
+			{
+				pageContent = await httpClient.GetStringAsync(requestUri, ct);
+			}
+			catch (Exception ex)
+			{
+				logger?.Exception(ex);
+			}
+
+			if (string.IsNullOrWhiteSpace(pageContent))
+			{
+				logger?.NoContentForPage(requestUri);
+				return;
+			}
+
+			if (config.UpdateLinks)
+			{
+				logger?.UpdatingHrefValues(outFileShortName);
+
+				pageContent =
+					pageContent.FixupHrefValues(
+						config.Pages,
+						config.IndexFileName, config.PageFileExtension,
+						config.AlwaysCreateDefaultFile);
+			}
+
+			if (optimizeOutput && !page.SkipOptimization)
+			{
+				logger?.OptimizingContent(requestUri, outFileShortName);
+
+				var optimizer = optimizerSelector!.SelectFor(page, outFilePathname);
+
+				logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer);
+
+				var result = optimizer.Minify(pageContent, page.OutputEncoding.ToSystemEncoding());
+
+				if (!result.Errors.Any())
+				{
+					pageContent = result.MinifiedContent;
+				}
+				else
+				{
+					logger?.OptimizationErrors(requestUri, outFileShortName, result.Errors);
+				}
+				if (result.Warnings.Any())
+				{
+					logger?.OptimizationErrors(requestUri, outFileShortName, result.Warnings);
+				}
+			}
+
+			logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
+
+			await fileSystem.File.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct);
+		}
+
 		private static void RemoveIfExists(IFileSystem fs, string pageDiskPath)
 		{
 			Throw.IfNull(fs, nameof(fs));
@@ -194,6 +309,39 @@ namespace AspNetStatic
 			Message = "StaticPageGenerator: Configuration > PageCount = {PageCount}, BaseUri = {BaseUri}, DestinationRoot = {DestinationRoot}, AlwaysDefaultFile = {AlwaysDefaultFile}, UpdateLinks = {UpdateLinks}, DefaultFileName = {DefaultFileName}, PageFileExtension = {PageFileExtension}, DefaultFileExclusions = {DefaultFileExclusions}")]
 		private static partial void Imp_Configuration(
 			this ILogger<StaticPageGenerator> logger,
+			int pageCount,
+			string baseUri,
+			string destinationRoot,
+			bool alwaysDefaultFile,
+			bool updateLinks,
+			string defaultFileName,
+			string pageFileExtension,
+			IEnumerable<string> defaultFileExclusions);
+
+		#endregion
+		#region 9002 - ConfigurationSinglePage
+
+		public static void ConfigurationSinglePage(
+			this ILogger<StaticPageGenerator> logger,
+			PageInfo page,
+			StaticPageGeneratorConfig config,
+			HttpClient httpClient) =>
+			logger.Imp_ConfigurationSinglePage(
+				page.Url,
+				config.Pages.Count,
+				httpClient.BaseAddress?.ToString() ?? "Unknown Base Address",
+				config.DestinationRoot,
+				config.AlwaysCreateDefaultFile,
+				config.UpdateLinks,
+				config.DefaultFileName,
+				config.PageFileExtension,
+				config.DefaultFileExclusions);
+
+		[LoggerMessage(EventId = 9002, EventName = "ConfigurationSinglePage", Level = LogLevel.Information,
+			Message = "StaticPageGenerator: ConfigurationSinglePage > PageUrl = {PageUrl}, PageCount = {PageCount}, BaseUri = {BaseUri}, DestinationRoot = {DestinationRoot}, AlwaysDefaultFile = {AlwaysDefaultFile}, UpdateLinks = {UpdateLinks}, DefaultFileName = {DefaultFileName}, PageFileExtension = {PageFileExtension}, DefaultFileExclusions = {DefaultFileExclusions}")]
+		private static partial void Imp_ConfigurationSinglePage(
+			this ILogger<StaticPageGenerator> logger,
+			string pageUrl,
 			int pageCount,
 			string baseUri,
 			string destinationRoot,
