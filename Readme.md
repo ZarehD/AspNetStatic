@@ -146,7 +146,7 @@ builder.Services.AddRouting(
   });
 ...
 app.GenerateStaticPages(
-  alwaysDefaultFile: false);   // generated pages: /index.html and /page.index.html
+  alwaysDefaultFile: false);   // generated pages: /index.html and /page.html
 
 --OR--
 
