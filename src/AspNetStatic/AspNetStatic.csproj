@@ -19,7 +19,7 @@
 		<RootNamespace>AspNetStatic</RootNamespace>
 		<PackageId>AspNetStatic</PackageId>
 		<Title>AspNetStatic</Title>
-		<PackageTags>.net;.net core;asp.net core;C#;static;site;website;html;generator</PackageTags>
+		<PackageTags>asp.net,core,static,site,generator,ssg,website,html</PackageTags>
 
 		<Authors>Zareh DerGevorkian</Authors>
 		<Company>Zareh DerGevorkian</Company>
