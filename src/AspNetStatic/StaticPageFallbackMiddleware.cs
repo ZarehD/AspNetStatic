@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
 
 namespace AspNetStatic
 {
@@ -45,10 +44,10 @@ namespace AspNetStatic
 		{
 			this._logger = logger;
 
-			this._fileSystem = Throw.IfNull(fileSystem, nameof(fileSystem));
-			this._next = Throw.IfNull(next, nameof(next));
-			this._pageInfoProvider = Throw.IfNull(pageInfoProvider, nameof(pageInfoProvider));
-			Throw.IfNull(environment, nameof(environment));
+			this._fileSystem = Throw.IfNull(fileSystem);
+			this._next = Throw.IfNull(next);
+			this._pageInfoProvider = Throw.IfNull(pageInfoProvider);
+			Throw.IfNull(environment);
 			var options = optionsAccessor?.Value ?? new StaticPageFallbackMiddlewareOptions();
 
 			this._haveStaticPages = this._pageInfoProvider.Pages.Any();

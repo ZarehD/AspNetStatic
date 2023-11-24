@@ -117,7 +117,7 @@
 		{
 			var page = new PageInfo("/");
 
-			Assert.ThrowsException<ArgumentException>(
+			Assert.ThrowsException<ArgumentNullException>(
 				() => page.GetOutFilePathname(
 					_nullString, false,
 					_indexFileName, _pageFileExtension,
@@ -141,7 +141,7 @@
 		{
 			var page = new PageInfo("/");
 
-			Assert.ThrowsException<ArgumentException>(
+			Assert.ThrowsException<ArgumentNullException>(
 				() => page.GetOutFilePathname(
 					_webroot, false,
 					_nullString, _pageFileExtension,
@@ -165,7 +165,7 @@
 		{
 			var page = new PageInfo("/");
 
-			Assert.ThrowsException<ArgumentException>(
+			Assert.ThrowsException<ArgumentNullException>(
 				() => page.GetOutFilePathname(
 					_webroot, false,
 					_indexFileName, _nullString,

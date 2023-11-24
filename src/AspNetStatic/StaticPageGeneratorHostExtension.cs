@@ -93,14 +93,13 @@ namespace AspNetStatic
 			ulong httpTimeoutSeconds = c_DefaultHttpTimeoutSeconds)
 		{
 			Throw.IfNull(host);
-			Throw.IfNullOrWhiteSpace(destinationRoot, message: Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhitespace(destinationRoot);
 
 			var fileSystem = host.Services.GetService<IFileSystem>() ?? new FileSystem();
 
-			if (!fileSystem.Directory.Exists(destinationRoot))
-			{
-				Throw.InvalidOp(Properties.Resources.Err_InvalidDestinationRoot);
-			}
+			Throw.DirectoryNotFoundWhen(
+				() => !fileSystem.Directory.Exists(destinationRoot),
+				SR.Err_InvalidDestinationRoot);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
@@ -288,14 +287,13 @@ namespace AspNetStatic
 			CancellationToken ct = default)
 		{
 			Throw.IfNull(host);
-			Throw.IfNullOrWhiteSpace(destinationRoot, message: Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhitespace(destinationRoot);
 
 			var fileSystem = host.Services.GetService<IFileSystem>() ?? new FileSystem();
 
-			if (!fileSystem.Directory.Exists(destinationRoot))
-			{
-				Throw.InvalidOp(Properties.Resources.Err_InvalidDestinationRoot);
-			}
+			Throw.DirectoryNotFoundWhen(
+				() => !fileSystem.Directory.Exists(destinationRoot),
+				SR.Err_InvalidDestinationRoot);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
@@ -434,7 +432,7 @@ namespace AspNetStatic
 			CancellationToken ct = default)
 		{
 			Throw.IfNull(host);
-			Throw.IfNullOrWhiteSpace(pageUrl, message: Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhitespace(pageUrl);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
@@ -545,14 +543,13 @@ namespace AspNetStatic
 		{
 			Throw.IfNull(host);
 			Throw.IfNull(page);
-			Throw.IfNullOrWhiteSpace(destinationRoot, message: Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhitespace(destinationRoot);
 
 			var fileSystem = host.Services.GetService<IFileSystem>() ?? new FileSystem();
 
-			if (!fileSystem.Directory.Exists(destinationRoot))
-			{
-				Throw.InvalidOp(Properties.Resources.Err_InvalidDestinationRoot);
-			}
+			Throw.DirectoryNotFoundWhen(
+				() => !fileSystem.Directory.Exists(destinationRoot),
+				SR.Err_InvalidDestinationRoot);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
@@ -594,15 +591,21 @@ namespace AspNetStatic
 		{
 			var hostFeatures = host.Services.GetRequiredService<IServer>().Features;
 			var serverAddresses = hostFeatures.Get<IServerAddressesFeature>();
-			if (serverAddresses is null) Throw.InvalidOp($"Feature '{typeof(IServerAddressesFeature)}' is not present.");
 
-			var hostUrls = serverAddresses.Addresses;
+			Throw.InvalidOpWhen(
+				() => serverAddresses is null,
+				$"Feature '{typeof(IServerAddressesFeature)}' is not present.");
+
+			var hostUrls = serverAddresses!.Addresses;
 			var baseUri =
 				hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttps)) ??
 				hostUrls.FirstOrDefault(x => x.StartsWith(Uri.UriSchemeHttp));
-			if (baseUri is null) Throw.InvalidOp(Properties.Resources.Err_HostNotHttpService);
 
-			return baseUri;
+			Throw.InvalidOpWhen(
+				() => baseUri is null,
+				SR.Err_HostNotHttpService);
+
+			return baseUri!;
 		}
 
 		private static HttpClient GetHttpClient(IHost host, string? httpClientName, ulong httpTimeoutSeconds)

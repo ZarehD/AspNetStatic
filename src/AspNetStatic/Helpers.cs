@@ -20,9 +20,9 @@ namespace AspNetStatic
 			this string route, string[] exclusions,
 			string defaultFileName, string pageFileExtension)
 		{
-			Throw.IfNullOrWhiteSpace(route, nameof(route), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
-			Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
-			Throw.IfNullOrWhiteSpace(pageFileExtension, nameof(pageFileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNullOrWhitespace(route);
+			Throw.IfNullOrWhitespace(defaultFileName);
+			Throw.IfNullOrWhitespace(pageFileExtension);
 
 			return
 				((exclusions is null) || !exclusions.Any(
@@ -41,10 +41,8 @@ namespace AspNetStatic
 			string pageFileExtension,
 			string[] exclusions)
 		{
-			Throw.IfNull(page, nameof(page));
-			Throw.IfNullOrWhiteSpace(
-				rootFolder, nameof(rootFolder),
-				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNull(page);
+			Throw.IfNullOrWhitespace(rootFolder);
 
 			var pagePath = string.Empty;
 
@@ -54,23 +52,18 @@ namespace AspNetStatic
 			}
 			else
 			{
-				Throw.IfNullOrWhiteSpace(
-					indexFileName, nameof(indexFileName),
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
-
-				Throw.IfNullOrWhiteSpace(
-					pageFileExtension, nameof(pageFileExtension),
-					Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+				Throw.IfNullOrWhitespace(indexFileName);
+				Throw.IfNullOrWhitespace(pageFileExtension);
 
 				exclusions ??= Array.Empty<string>();
 
 				var pageRoute = page.Route.StripQueryString();
 				var uriKind = UriKind.Relative;
 
-				if (!Uri.IsWellFormedUriString(pageRoute, uriKind))
-				{
-					Throw.InvalidOp(Properties.Resources.Err_RouteForPageNotWellFormed, uriKind.ToString());
-				}
+				Throw.InvalidOpWhen(
+					() => !Uri.IsWellFormedUriString(pageRoute, uriKind),
+					SR.Err_RouteForPageNotWellFormed.SF(uriKind.ToString()));
+
 				pagePath = pageRoute;
 
 				if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
@@ -104,9 +97,7 @@ namespace AspNetStatic
 
 		public static string StripQueryString(this string url)
 		{
-			//Throw.IfNullOrWhiteSpace(
-			//	url, nameof(url),
-			//	Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			//Throw.IfNullOrWhitespace(url);
 
 			if (string.IsNullOrWhiteSpace(url)) return url;
 
@@ -123,8 +114,8 @@ namespace AspNetStatic
 			bool alwaysDefaultFile = default,
 			bool routesAreCaseSensitive = default)
 		{
-			Throw.IfNull(htmlContent, nameof(htmlContent));
-			Throw.IfNull(pages, nameof(pages));
+			Throw.IfNull(htmlContent);
+			Throw.IfNull(pages);
 
 			if (string.IsNullOrWhiteSpace(htmlContent)) return htmlContent;
 			if (!pages.Any()) return htmlContent;

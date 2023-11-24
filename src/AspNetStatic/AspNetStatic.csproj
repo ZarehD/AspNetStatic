@@ -27,7 +27,7 @@
 		<Copyright>Copyright 2023 Zareh DerGevorkian. All rights reserved</Copyright>
 		<Product>AspNetStatic</Product>
 		<Description>Transforms ASP.NET Core into a static site generator.</Description>
-		<Version>0.18.0</Version>
+		<Version>0.18.2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -37,6 +37,7 @@
 	<ItemGroup>
 		<PackageReference Include="TestableIO.System.IO.Abstractions" Version="19.2.87" />
 		<PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.87" />
+		<PackageReference Include="ThrowGuard" Version="1.0.0" />
 		<PackageReference Include="WebMarkupMin.Core" Version="2.14.0" />
 	</ItemGroup>
 

@@ -39,10 +39,9 @@ namespace AspNetStatic
 			var optimizeOutput = config.OptimizePageContent;
 			var optimizerSelector = config.OptimizerSelector;
 
-			if (optimizeOutput && (optimizerSelector is null))
-			{
-				Throw.InvalidOp(Properties.Resources.Err_OptimizeWithoutChooser);
-			}
+			Throw.InvalidOpWhen(
+				() => optimizeOutput && (optimizerSelector is null),
+				SR.Err_OptimizeWithoutChooser);
 
 			var destRoot = config.DestinationRoot;
 			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
@@ -160,10 +159,9 @@ namespace AspNetStatic
 			var optimizeOutput = config.OptimizePageContent;
 			var optimizerSelector = config.OptimizerSelector;
 
-			if (optimizeOutput && (optimizerSelector is null))
-			{
-				Throw.InvalidOp(Properties.Resources.Err_OptimizeWithoutChooser);
-			}
+			Throw.InvalidOpWhen(
+				() => optimizeOutput && (optimizerSelector is null),
+				SR.Err_OptimizeWithoutChooser);
 
 			var destRoot = config.DestinationRoot;
 			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
@@ -257,10 +255,8 @@ namespace AspNetStatic
 
 		private static void RemoveIfExists(IFileSystem fs, string pageDiskPath)
 		{
-			Throw.IfNull(fs, nameof(fs));
-			Throw.IfNullOrWhiteSpace(
-				pageDiskPath, nameof(pageDiskPath),
-				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNull(fs);
+			Throw.IfNullOrWhitespace(pageDiskPath);
 
 			if (fs.File.Exists(pageDiskPath))
 			{
@@ -270,10 +266,8 @@ namespace AspNetStatic
 
 		private static bool EnsureFolderExists(IFileSystem fs, string pageDiskPath)
 		{
-			Throw.IfNull(fs, nameof(fs));
-			Throw.IfNullOrWhiteSpace(
-				pageDiskPath, nameof(pageDiskPath),
-				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			Throw.IfNull(fs);
+			Throw.IfNullOrWhitespace(pageDiskPath);
 
 			var folder = fs.Directory.GetParent(pageDiskPath);
 

@@ -66,7 +66,7 @@ namespace Tests.AspNetStatic
         {
             var sut = new TestStaticPagesInfoProvider();
 
-            Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileName(null!));
+            Assert.ThrowsException<ArgumentNullException>(() => sut.SetDefaultFileName(null!));
             Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileName(string.Empty));
             Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileName(" "));
         }
@@ -87,7 +87,7 @@ namespace Tests.AspNetStatic
         {
             var sut = new TestStaticPagesInfoProvider();
 
-            Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExtension(null!));
+            Assert.ThrowsException<ArgumentNullException>(() => sut.SetDefaultFileExtension(null!));
             Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExtension(string.Empty));
             Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExtension(" "));
         }

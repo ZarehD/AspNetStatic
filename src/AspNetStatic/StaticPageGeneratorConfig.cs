@@ -43,7 +43,7 @@ namespace AspNetStatic
 			bool enableOptimization,
 			IOptimizerSelector? optimizerSelector = default)
 		{
-			this.DestinationRoot = Throw.IfNullOrWhiteSpace(destinationRoot, nameof(destinationRoot), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			this.DestinationRoot = Throw.IfNullOrWhitespace(destinationRoot);
 			this.AlwaysCreateDefaultFile = createDefaultFile;
 			this.UpdateLinks = fixupHrefValues;
 
@@ -53,7 +53,7 @@ namespace AspNetStatic
 			}
 
 			this.OptimizePageContent = enableOptimization;
-			this.OptimizerSelector = Throw.IfNull(this.OptimizePageContent, optimizerSelector);
+			this.OptimizerSelector = Throw.IfNull(optimizerSelector, () => this.OptimizePageContent);
 		}
 
 		public StaticPageGeneratorConfig(
@@ -69,8 +69,8 @@ namespace AspNetStatic
 			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
 				  enableOptimization, optimizerSelector)
 		{
-			this.DefaultFileName = Throw.IfNullOrWhiteSpace(defaultFileName, nameof(defaultFileName), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
-			this.PageFileExtension = Throw.IfNullOrWhiteSpace(fileExtension, nameof(fileExtension), Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
+			this.DefaultFileName = Throw.IfNullOrWhitespace(defaultFileName);
+			this.PageFileExtension = Throw.IfNullOrWhitespace(fileExtension);
 
 			if ((defaultFileExclusions is not null) && defaultFileExclusions.Any())
 			{

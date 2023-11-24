@@ -99,7 +99,7 @@ namespace Tests.AspNetStatic
 		[TestMethod]
 		public void Test_Ctor_Bad_DefaultFile_Ext()
 		{
-			Assert.ThrowsException<ArgumentException>(
+			Assert.ThrowsException<ArgumentNullException>(
 				() => new StaticPageGeneratorConfig(
 					_pages, _destRoot, true, true,
 					null!, _defaultFileExt,
@@ -121,7 +121,7 @@ namespace Tests.AspNetStatic
 		[TestMethod]
 		public void Test_Ctor_Bad_DefaultFile_Name()
 		{
-			Assert.ThrowsException<ArgumentException>(
+			Assert.ThrowsException<ArgumentNullException>(
 				() => new StaticPageGeneratorConfig(
 					_pages, _destRoot, true, true,
 					_defaultFileName, null!,
@@ -143,7 +143,7 @@ namespace Tests.AspNetStatic
 		[TestMethod]
 		public void Test_Ctor_Bad_DestRoot()
 		{
-			Assert.ThrowsException<ArgumentException>(
+			Assert.ThrowsException<ArgumentNullException>(
 				() => new StaticPageGeneratorConfig(
 					_pages, null!, true, true,
 					true, null));

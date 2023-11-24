@@ -30,15 +30,15 @@
             var emptyString = string.Empty;
             var whitespace = " ";
 
-            Assert.ThrowsException<ArgumentException>(() => nullString!.ToDefaultFileFallback(_exclusions, _indexFileName, _fileExtension));
+            Assert.ThrowsException<ArgumentNullException>(() => nullString!.ToDefaultFileFallback(_exclusions, _indexFileName, _fileExtension));
             Assert.ThrowsException<ArgumentException>(() => emptyString.ToDefaultFileFallback(_exclusions, _indexFileName, _fileExtension));
             Assert.ThrowsException<ArgumentException>(() => whitespace.ToDefaultFileFallback(_exclusions, _indexFileName, _fileExtension));
 
-            Assert.ThrowsException<ArgumentException>(() => route.ToDefaultFileFallback(_exclusions, nullString!, _fileExtension));
+            Assert.ThrowsException<ArgumentNullException>(() => route.ToDefaultFileFallback(_exclusions, nullString!, _fileExtension));
             Assert.ThrowsException<ArgumentException>(() => route.ToDefaultFileFallback(_exclusions, emptyString, _fileExtension));
             Assert.ThrowsException<ArgumentException>(() => route.ToDefaultFileFallback(_exclusions, whitespace, _fileExtension));
 
-            Assert.ThrowsException<ArgumentException>(() => route.ToDefaultFileFallback(_exclusions, _indexFileName, nullString!));
+            Assert.ThrowsException<ArgumentNullException>(() => route.ToDefaultFileFallback(_exclusions, _indexFileName, nullString!));
             Assert.ThrowsException<ArgumentException>(() => route.ToDefaultFileFallback(_exclusions, _indexFileName, emptyString));
             Assert.ThrowsException<ArgumentException>(() => route.ToDefaultFileFallback(_exclusions, _indexFileName, whitespace));
         }

@@ -11,3 +11,5 @@ the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
 global using System.Globalization;
+global using ThrowGuard;
+global using SR = AspNetStatic.Properties.Resources;

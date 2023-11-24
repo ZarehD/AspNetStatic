@@ -76,11 +76,7 @@ namespace AspNetStatic
 
 		public PageInfo(string route)
 		{
-			Throw.IfNullOrWhiteSpace(
-				route, nameof(route),
-				Properties.Resources.Err_ValueCannotBeNullEmptyWhitespace);
-
-			this.Route = route;
+			this.Route = Throw.IfNullOrWhitespace(route);
 		}
 	}
 

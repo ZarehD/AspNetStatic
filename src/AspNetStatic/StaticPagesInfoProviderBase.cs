@@ -40,16 +40,14 @@ namespace AspNetStatic
 
 
 
-		protected virtual void SetDefaultFileName(string name) => this.defaultFileName = Throw.IfNullOrWhiteSpace(name, nameof(name), Properties.Resources.Err_MissingDefaultFileName);
-		protected virtual void SetDefaultFileExtension(string extension) => this.defaultFileExtension = Throw.IfNullOrWhiteSpace(extension, nameof(extension), Properties.Resources.Err_MissingDefaultFileExtension);
+		protected virtual void SetDefaultFileName(string name) => this.defaultFileName = Throw.IfNullOrWhitespace(name, SR.Err_MissingDefaultFileName);
+		protected virtual void SetDefaultFileExtension(string extension) => this.defaultFileExtension = Throw.IfNullOrWhitespace(extension, SR.Err_MissingDefaultFileExtension);
 		protected virtual void SetDefaultFileExclusions(string[] newExclusions)
 		{
-			if (newExclusions.Any(s => string.IsNullOrWhiteSpace(s)))
-			{
-				Throw.BadArg(
-					nameof(newExclusions),
-					Properties.Resources.Err_ArrayElementNullOrWhitespace);
-			}
+			Throw.BadArgWhen(
+				() => newExclusions.Any(s => string.IsNullOrWhiteSpace(s)),
+				SR.Err_ArrayElementNullOrWhitespace,
+				nameof(newExclusions));
 
 			this.exclusions.Clear();
 			this.exclusions.AddRange(newExclusions);

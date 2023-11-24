@@ -21,7 +21,7 @@ namespace AspNetStatic
 			IEnumerable<string>? dffExclusions = default)
 			: base()
 		{
-			this.pages.AddRange(Throw.IfNull(pages, nameof(pages)));
+			this.pages.AddRange(Throw.IfNull(pages));
 
 			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);
 			if (defaultFileExtension is not null) SetDefaultFileExtension(defaultFileExtension);
