@@ -81,7 +81,7 @@ namespace AspNetStatic
 
 				try
 				{
-					pageContent = await httpClient.GetStringAsync(requestUri, ct);
+					pageContent = await httpClient.GetStringAsync(requestUri, ct).ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
@@ -131,7 +131,9 @@ namespace AspNetStatic
 
 				logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
 
-				await fileSystem.File.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct);
+				await fileSystem.File
+					.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct)
+					.ConfigureAwait(false);
 			}
 		}
 
@@ -198,7 +200,7 @@ namespace AspNetStatic
 
 			try
 			{
-				pageContent = await httpClient.GetStringAsync(requestUri, ct);
+				pageContent = await httpClient.GetStringAsync(requestUri, ct).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -248,7 +250,9 @@ namespace AspNetStatic
 
 			logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
 
-			await fileSystem.File.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct);
+			await fileSystem.File
+				.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct)
+				.ConfigureAwait(false);
 		}
 
 		private static void RemoveIfExists(IFileSystem fs, string pageDiskPath)
