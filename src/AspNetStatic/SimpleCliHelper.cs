@@ -17,9 +17,11 @@ namespace AspNetStatic
 		public static bool HasExitWhenDoneArg(this string[] args) =>
 			(args is not null) && args.Any(
 				a =>
+				a.HasSameText(SSG) ||
 				a.HasSameText(STATIC_ONLY) ||
 				a.HasSameText(EXIT_WHEN_DONE));
 
+		private const string SSG = "ssg";
 		private const string STATIC_ONLY = "static-only";
 		private const string EXIT_WHEN_DONE = "exit-when-done";
 	}
