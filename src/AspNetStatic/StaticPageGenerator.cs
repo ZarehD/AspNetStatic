@@ -10,7 +10,9 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+using System.Diagnostics.Contracts;
 using System.IO.Abstractions;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using WebMarkupMin.Core;
 
@@ -36,102 +38,27 @@ namespace AspNetStatic
 			logger?.GeneratingStaticPages();
 			logger?.Configuration(config, httpClient);
 
-			var optimizeOutput = config.OptimizePageContent;
-			var optimizerSelector = config.OptimizerSelector;
-
 			Throw.InvalidOpWhen(
-				() => optimizeOutput && (optimizerSelector is null),
+				() => config.OptimizePageContent &&
+				(config.OptimizerSelector is null),
 				SR.Err_OptimizeWithoutChooser);
 
-			var destRoot = config.DestinationRoot;
-			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
-			var indexFile = config.IndexFileName;
-			var fileExtension = config.PageFileExtension;
-			var exclusionsArray = config.DefaultFileExclusions.ToArray();
+			var processConfig =
+				new ProcessConfig(
+					config.Pages,
+					config.UpdateLinks,
+					config.OptimizePageContent,
+					config.OptimizerSelector,
+					config.DestinationRoot,
+					config.AlwaysCreateDefaultFile,
+					config.IndexFileName,
+					config.PageFileExtension,
+					config.DefaultFileExclusions,
+					httpClient, fileSystem, logger);
 
 			foreach (var page in config.Pages)
 			{
-				if (ct.IsCancellationRequested) break;
-
-				logger?.ProcessingPage(page);
-
-				var outFilePathname = page.GetOutFilePathname(
-					destRoot, alwaysDefaultFile,
-					indexFile, fileExtension,
-					exclusionsArray);
-
-				var outFileShortName = outFilePathname.Replace(config.DestinationRoot, string.Empty);
-
-				logger?.Debug("PagePath = {0}", outFileShortName);
-
-				RemoveIfExists(fileSystem, outFilePathname);
-
-				if (!EnsureFolderExists(fileSystem, outFilePathname))
-				{
-					logger?.FailedToEnsureFolder(outFilePathname);
-					continue;
-				}
-
-				var requestUri = page.Url;
-
-				logger?.FetchingPageContent(requestUri);
-
-				var pageContent = string.Empty;
-
-				try
-				{
-					pageContent = await httpClient.GetStringAsync(requestUri, ct).ConfigureAwait(false);
-				}
-				catch (Exception ex)
-				{
-					logger?.Exception(ex);
-				}
-
-				if (string.IsNullOrWhiteSpace(pageContent))
-				{
-					logger?.NoContentForPage(requestUri);
-					continue;
-				}
-
-				if (config.UpdateLinks)
-				{
-					logger?.UpdatingHrefValues(outFileShortName);
-
-					pageContent =
-						pageContent.FixupHrefValues(
-							config.Pages,
-							config.IndexFileName, config.PageFileExtension,
-							config.AlwaysCreateDefaultFile);
-				}
-
-				if (optimizeOutput && !page.SkipOptimization)
-				{
-					logger?.OptimizingContent(requestUri, outFileShortName);
-
-					var optimizer = optimizerSelector!.SelectFor(page, outFilePathname);
-
-					logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer);
-
-					var result = optimizer.Minify(pageContent, page.OutputEncoding.ToSystemEncoding());
-
-					if (!result.Errors.Any())
-					{
-						pageContent = result.MinifiedContent;
-					}
-					else
-					{
-						logger?.OptimizationErrors(requestUri, outFileShortName, result.Errors);
-					}
-					if (result.Warnings.Any())
-					{
-						logger?.OptimizationErrors(requestUri, outFileShortName, result.Warnings);
-					}
-				}
-
-				logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
-
-				await fileSystem.File
-					.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct)
+				await ProcessPage(page, processConfig, ct)
 					.ConfigureAwait(false);
 			}
 		}
@@ -156,35 +83,55 @@ namespace AspNetStatic
 			logger?.GeneratingStaticPages();
 			logger?.ConfigurationSinglePage(page, config, httpClient);
 
-			var optimizeOutput = config.OptimizePageContent;
-			var optimizerSelector = config.OptimizerSelector;
-
 			Throw.InvalidOpWhen(
-				() => optimizeOutput && (optimizerSelector is null),
+				() => config.OptimizePageContent &&
+				(config.OptimizerSelector is null),
 				SR.Err_OptimizeWithoutChooser);
 
-			var destRoot = config.DestinationRoot;
-			var alwaysDefaultFile = config.AlwaysCreateDefaultFile;
-			var indexFile = config.IndexFileName;
-			var fileExtension = config.PageFileExtension;
-			var exclusionsArray = config.DefaultFileExclusions.ToArray();
+			await ProcessPage(
+				page, new ProcessConfig(
+					config.Pages,
+					config.UpdateLinks,
+					config.OptimizePageContent,
+					config.OptimizerSelector,
+					config.DestinationRoot,
+					config.AlwaysCreateDefaultFile,
+					config.IndexFileName,
+					config.PageFileExtension,
+					config.DefaultFileExclusions,
+					httpClient, fileSystem, logger),
+				ct).ConfigureAwait(false);
+		}
+
+		[Pure, MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static async Task ProcessPage(
+			PageInfo page,
+			ProcessConfig config,
+			CancellationToken ct = default)
+		{
+			Throw.IfNull(page);
+			Throw.IfNull(config);
+
+			var logger = config.Logger;
 
 			if (ct.IsCancellationRequested) return;
 
 			logger?.ProcessingPage(page);
 
 			var outFilePathname = page.GetOutFilePathname(
-				destRoot, alwaysDefaultFile,
-				indexFile, fileExtension,
-				exclusionsArray);
+				config.DestinationRoot,
+				config.AlwaysCreateDefaultFile,
+				config.IndexFileName,
+				config.PageFileExtension,
+				config.FileExclusions);
 
 			var outFileShortName = outFilePathname.Replace(config.DestinationRoot, string.Empty);
 
 			logger?.Debug("PagePath = {0}", outFileShortName);
 
-			RemoveIfExists(fileSystem, outFilePathname);
+			RemoveIfExists(config.FileSystem, outFilePathname);
 
-			if (!EnsureFolderExists(fileSystem, outFilePathname))
+			if (!EnsureFolderExists(config.FileSystem, outFilePathname))
 			{
 				logger?.FailedToEnsureFolder(outFilePathname);
 				return;
@@ -198,7 +145,8 @@ namespace AspNetStatic
 
 			try
 			{
-				pageContent = await httpClient.GetStringAsync(requestUri, ct).ConfigureAwait(false);
+				pageContent = await config.HttpClient.GetStringAsync(
+					requestUri, ct).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -217,16 +165,16 @@ namespace AspNetStatic
 
 				pageContent =
 					pageContent.FixupHrefValues(
-						config.Pages,
+						config.AllPages,
 						config.IndexFileName, config.PageFileExtension,
 						config.AlwaysCreateDefaultFile);
 			}
 
-			if (optimizeOutput && !page.SkipOptimization)
+			if (config.OptimizeOutput && !page.SkipOptimization)
 			{
 				logger?.OptimizingContent(requestUri, outFileShortName);
 
-				var optimizer = optimizerSelector!.SelectFor(page, outFilePathname);
+				var optimizer = config.OptimizerSelector!.SelectFor(page, outFilePathname);
 
 				logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer);
 
@@ -248,7 +196,7 @@ namespace AspNetStatic
 
 			logger?.WritingPageFile(requestUri, outFileShortName, pageContent.Length, page.OutputEncoding);
 
-			await fileSystem.File
+			await config.FileSystem.File
 				.WriteAllTextAsync(outFilePathname, pageContent, page.OutputEncoding.ToSystemEncoding(), ct)
 				.ConfigureAwait(false);
 		}
@@ -280,6 +228,54 @@ namespace AspNetStatic
 
 			return true;
 		}
+
+		#region local types
+
+		private class ProcessConfig
+		{
+			public ProcessConfig(
+				IEnumerable<PageInfo> allPages,
+				bool updateLinks,
+				bool optimizeOutput,
+				IOptimizerSelector? optimizerSelector,
+				string destinationRoot,
+				bool alwaysCreateDefaultFile,
+				string indexFileName,
+				string pageFileExtension,
+				IEnumerable<string> fileExclusions,
+				HttpClient httpClient,
+				IFileSystem fileSystem,
+				ILogger<StaticPageGenerator>? logger)
+			{
+				this.AllPages = Throw.IfNull(allPages);
+				this.UpdateLinks = updateLinks;
+				this.OptimizeOutput = optimizeOutput;
+				this.OptimizerSelector = optimizerSelector;
+				this.DestinationRoot = Throw.IfNullOrWhitespace(destinationRoot);
+				this.AlwaysCreateDefaultFile = alwaysCreateDefaultFile;
+				this.IndexFileName = Throw.IfNullOrWhitespace(indexFileName);
+				this.PageFileExtension = Throw.IfNullOrWhitespace(pageFileExtension);
+				this.FileExclusions = Throw.IfNull(fileExclusions).ToArray();
+				this.HttpClient = Throw.IfNull(httpClient);
+				this.FileSystem = Throw.IfNull(fileSystem);
+				this.Logger = logger;
+			}
+
+			public IEnumerable<PageInfo> AllPages { get; }
+			public bool UpdateLinks { get; }
+			public bool OptimizeOutput { get; }
+			public IOptimizerSelector? OptimizerSelector { get; }
+			public string DestinationRoot { get; }
+			public bool AlwaysCreateDefaultFile { get; }
+			public string IndexFileName { get; }
+			public string PageFileExtension { get; }
+			public string[] FileExclusions { get; }
+			public HttpClient HttpClient { get; }
+			public IFileSystem FileSystem { get; }
+			public ILogger<StaticPageGenerator>? Logger { get; }
+		}
+
+		#endregion
 	}
 
 
