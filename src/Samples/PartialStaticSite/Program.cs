@@ -35,9 +35,10 @@ builder.Services.AddStaticPageFallback(
 var app = builder.Build();
 
 var exitWhenDone = args.HasExitWhenDoneArg();
-var intervalStr = app.Configuration["AspNetStatic:RegenTimer"];
-TimeSpan? regenInterval = TimeSpan.TryParse(intervalStr, out var ts) ? ts : null;
-
+TimeSpan? regenInterval =
+	!exitWhenDone &&
+	TimeSpan.TryParse(app.Configuration["AspNetStatic:RegenTimer"], out var ts)
+	? ts : null;
 
 if (!app.Environment.IsDevelopment())
 {
@@ -73,6 +74,9 @@ app.GenerateStaticPages(
 app.Run();
 
 #if DEBUG
-Console.WriteLine("Press any Key to exit...");
-Console.ReadKey();
+if (!exitWhenDone)
+{
+	Console.WriteLine("Press any Key to exit...");
+	Console.ReadKey();
+}
 #endif

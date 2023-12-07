@@ -8,9 +8,9 @@
     }
   },
   "profiles": {
-    "Static Pages": {
+    "SSG": {
       "commandName": "Project",
-      "commandLineArgs": "static-only",
+      "commandLineArgs": "ssg",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "https://localhost:5095",
