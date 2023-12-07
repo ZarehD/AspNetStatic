@@ -32,7 +32,7 @@ AspNetStatic doesn't care; it will create optimized static files no matter how t
 
 <br/>
 
-## Great, So How Do I Use It?
+## Great. So how do I use it?
 
 It's a piece of cake!
 
@@ -342,10 +342,12 @@ Content optimization can be customized in one of two ways:
         sp => new YuiJsMinifier(...));
       ```
 
-
-
 <br/>
 
 ## License
 
 [Apache 2.0](https://github.com/ZarehD/AspNetStatic/blob/master/LICENSE)
+
+<br/>
+
+If you like this project, or find it useful, please give it a star. Thank you.
