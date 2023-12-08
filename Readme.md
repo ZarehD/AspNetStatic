@@ -15,13 +15,13 @@ Well, now there is!
 
 ### Create a static site from your ASP.NET Core generated content
 
-AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator!
+AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator.
 
 But wait, there's more!
 
 AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Scenarios_ section below.
 
-Oh, and one more thing, AspNetStatic also works with Blazor websites!
+Oh, and one more thing, AspNetStatic also works with Blazor websites.
 
 > Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. Server mode (SignalR) **may** be okay, but I haven't tested it. Basically, as long as the content has completed rendering by the time **AspNetStatic** receives it (i.e. HttpClient response), you're golden.
 
@@ -38,7 +38,7 @@ AspNetStatic doesn't care; it will create optimized static files no matter how t
 
 ## Great. So how do I use it?
 
-It's a piece of cake!
+It's a piece of cake.
 
 1. Add the Nuget Package to your ASP.NET Core web app project
    ```
@@ -208,14 +208,20 @@ Sample Configuration 2:
 If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a profile in _launchSettings.json_ and surround the `GenerateStaticPages()` call with an IF gate.
 ```
 "profiles": {
-  "GenStaticPages": {
+  "SSG": {
       "commandName": "Project",
-      "commandLineArgs": "exit-when-done",
+      "commandLineArgs": "ssg",
       "launchBrowser": false,
       "applicationUrl": "https://localhost:5000",
   }
 }
 ```
+Or from the command line...
+```
+dotnet run -- ssg
+```
+
+Then, in the startup code (_Program.cs_)
 ```c#
 if (args.HasExitWhenDoneArg())
 {
