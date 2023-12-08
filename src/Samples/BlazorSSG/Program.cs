@@ -61,8 +61,7 @@ if (!onlyServeStaticContent)
 	{
 		app.GenerateStaticPages(
 			app.Environment.WebRootPath,
-			exitWhenDone: true,
-			dontOptimizeContent: true);
+			exitWhenDone: true);
 	}
 }
 
