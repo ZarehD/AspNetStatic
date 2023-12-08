@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.87" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\AspNetStatic\AspNetStatic.csproj" />
+	</ItemGroup>
+
+</Project>
