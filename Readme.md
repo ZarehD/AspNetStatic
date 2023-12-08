@@ -21,6 +21,10 @@ But wait, there's more!
 
 AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Scenarios_ section below.
 
+Oh, and one more thing, AspNetStatic also works with Blazor websites!
+
+> Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. Server mode (SignalR) **may** be okay, but I haven't tested it. Basically, as long as the content has completed rendering by the time **AspNetStatic** receives it (i.e. HttpClient response), you're golden.
+
 ### No Frameworks. No Engines. No Opinions!
 
 Build your ASP.NET site the way you've always done. AspNetStatic doesn't have any opinions about how you should build your server-rendered site.
