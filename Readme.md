@@ -193,9 +193,8 @@ Sample Configuration 2:
   - Don't update href attribute value for \<a\> and \<area\> tags that refer to static pages.
   - Use your web server's redirect or url-rewrite module to re-route requests (e.g. _/page/_ or _/page/index_ to _/page/index.html_).
     ```c#
-    // true when app is executed with one of the following args...
-    //  dotnet run -- static-only
-    //  dotnet run -- exit-when-done
+    // true when app is executed with one of the marker args, such as SSG.
+    //  dotnet run -- ssg
     var exitWhenDone = args.HasExitWhenDoneArg();
 
     app.GenerateStaticPages(
@@ -205,7 +204,7 @@ Sample Configuration 2:
       dontUpdateLinks: true);
     ```
 
-If you want to omit static-file generation while you're still developing the site (to save CPU cycles?), you could configure a profile in _launchSettings.json_ and surround the `GenerateStaticPages()` call with an IF gate.
+If you want to omit static-file generation while you're still developing the site, you can configure a _launchSettings_ profile for SSG mode operation. To enable this,  you would surround the `GenerateStaticPages()` call with an IF gate.
 ```
 "profiles": {
   "SSG": {
@@ -216,11 +215,6 @@ If you want to omit static-file generation while you're still developing the sit
   }
 }
 ```
-Or from the command line...
-```
-dotnet run -- ssg
-```
-
 Then, in the startup code (_Program.cs_)
 ```c#
 if (args.HasExitWhenDoneArg())
@@ -231,13 +225,15 @@ if (args.HasExitWhenDoneArg())
   );
 }
 ```
+Now you can use the SSG profile to launch your app in SSG mode (to generate static content, then exit), and a differrent launch profile while you're in development mode, editing the site content.
+
 
 
 ### Partial Static Site
 
 In this scenario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request (pages/views and JSON API's). When the app runs, static (.html) files will be generated for routes you specify. The website will then serve these static files for the specified routes, and dynamic content, as usual, for others.
 
-> While static files are being generated, requests for which the static file hasn't yet been generated will be served as dynamic content using the source (.cshtml) page. Once the static file has been generated, it will be used to satisfy requests.
+> While static files are being generated, requests to routes for which a static file has not yet been generated will be served as dynamicly generated content (using the source .cshtml page). Once the static file for that route has been generated, it will be used to satisfy subsequent requests.
 
 The configuration options are the same as for a standalone static site, except the following:
  - The destination root folder must be `app.Environment.WebRoot`.
@@ -262,12 +258,12 @@ app.GenerateStaticPages(
   app.Environment.WebRoot,       // must specify wwwroot
   exitWhenDone: false,           // don't exit after generating static files
   alwaysDefaultFile: true/false,
-  dontUpdateLinks: false);       // update links so they refer to the static file
+  dontUpdateLinks: false);       // update links so they refer to static files
 ...
 app.Run();
 ```
 
-> #### The fallback middleware only re-routes requests for routes that are specified in the `Pages` collection, and only if the static file exists.
+> #### NOTE: The fallback middleware only re-routes requests for routes that match entries in the `Pages` collection, and only if a generated static file exists for that route.
 
 
 #### Periodic Regeneration
