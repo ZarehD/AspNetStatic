@@ -20,8 +20,8 @@ namespace AspNetStatic
 			string? defaultFileName = default,
 			string? defaultFileExtension = default,
 			IEnumerable<string>? dffExclusions = default,
-			bool skipProcessingPageResources = default,
-			bool skipProcessingOtherResources = default)
+			bool skipPageResources = default,
+			bool skipOtherResources = default)
 			: base()
 		{
 			if (pages?.Any() ?? false) this.pages.AddRange(pages);
@@ -29,8 +29,8 @@ namespace AspNetStatic
 			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);
 			if (defaultFileExtension is not null) SetDefaultFileExtension(defaultFileExtension);
 			if (dffExclusions is not null) SetDefaultFileExclusions(dffExclusions.ToArray());
-			this.SkipProcessingPageResources = skipProcessingPageResources;
-			this.SkipProcessingOtherResources = skipProcessingOtherResources;
+			this.SkipProcessingPageResources = skipPageResources;
+			this.SkipProcessingOtherResources = skipOtherResources;
 		}
 	}
 }

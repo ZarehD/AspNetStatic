@@ -53,8 +53,16 @@ namespace AspNetStatic
 		/// </summary>
 		string[] DefaultFileExclusions { get; }
 
+		/// <summary>
+		///		Gets a value that indicates whether to skip generating static files 
+		///		for entries in the <see cref="PageResources"/> collection.
+		/// </summary>
 		public bool SkipProcessingPageResources { get; }
 
+		/// <summary>
+		///		Gets a value that indicates whether to skip generating static files 
+		///		for entries in the <see cref="OtherResources"/> collection.
+		/// </summary>
 		public bool SkipProcessingOtherResources { get; }
 	}
 }
