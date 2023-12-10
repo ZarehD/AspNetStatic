@@ -20,9 +20,8 @@ var onlyServeStaticContent = "SHOW_STATIC_CONTENT_ONLY".Equals(
 
 builder.Services.AddRazorComponents();
 
-builder.Services.AddSingleton<IStaticPagesInfoProvider>(
-	new StaticPagesInfoProvider(
-		SampleStaticPages.GetCollection()));
+builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
+	StaticResourcesInfo.GetProvider());
 
 //-----------------------------------------------------------
 // The SSG launchSettings config adds the "ssg" command-line 
@@ -59,8 +58,17 @@ if (!onlyServeStaticContent)
 
 	if (runningInSsgMode)
 	{
-		app.GenerateStaticPages(
-			app.Environment.WebRootPath,
+		// NOTE: This folder name is specified in .gitIgnore
+		// in order to avoid tracking the generated files.
+		const string SSG_DEST_ROOT_FOLDER_NAME = "BlazorSsgOutput";
+
+		var SsgOutputPath = Path.Combine(
+			"../", SSG_DEST_ROOT_FOLDER_NAME);
+
+		Directory.CreateDirectory(SsgOutputPath);
+
+		app.GenerateStaticContent(
+			SsgOutputPath,
 			exitWhenDone: true);
 	}
 }

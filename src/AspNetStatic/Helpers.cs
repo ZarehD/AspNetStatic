@@ -33,8 +33,25 @@ namespace AspNetStatic
 				;
 		}
 
+		public static string ToFileSysPath(this string path) =>
+			path is null ? string.Empty : path
+			.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+			.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+			;
+
+		public static string StripQueryString(this string url)
+		{
+			//Throw.IfNullOrWhitespace(url);
+
+			if (string.IsNullOrWhiteSpace(url)) return url;
+
+			var idx = url.IndexOf('?');
+			return idx > -1 ? url[0..idx] : url;
+		}
+
+
 		public static string GetOutFilePathname(
-			this PageInfo page,
+			this PageResource page,
 			string rootFolder,
 			bool alwaysCreateDefaultFile,
 			string indexFileName,
@@ -62,7 +79,7 @@ namespace AspNetStatic
 
 				Throw.InvalidOpWhen(
 					() => !Uri.IsWellFormedUriString(pageRoute, uriKind),
-					SR.Err_RouteForPageNotWellFormed.SF(uriKind.ToString()));
+					SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
 
 				pagePath = pageRoute;
 
@@ -89,26 +106,59 @@ namespace AspNetStatic
 			return Path.Combine(rootFolder.ToFileSysPath(), pagePath);
 		}
 
-		public static string ToFileSysPath(this string path) =>
-			path is null ? string.Empty : path
-			.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
-			.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-			;
-
-		public static string StripQueryString(this string url)
+		public static string GetOutFilePathname(
+			this NonPageResource resource,
+			string rootFolder)
 		{
-			//Throw.IfNullOrWhitespace(url);
+			Throw.IfNull(resource);
+			Throw.IfNullOrWhitespace(rootFolder);
 
-			if (string.IsNullOrWhiteSpace(url)) return url;
+			var resourcePath = string.Empty;
 
-			var idx = url.IndexOf('?');
-			return idx > -1 ? url[0..idx] : url;
+			if (!string.IsNullOrWhiteSpace(resource.OutFile))
+			{
+				resourcePath = resource.OutFile;
+			}
+			else
+			{
+				var resourceRoute = resource.Route.StripQueryString();
+				var uriKind = UriKind.Relative;
+
+				Throw.InvalidOpWhen(
+					() => !Uri.IsWellFormedUriString(resourceRoute, uriKind),
+					SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
+
+				resourcePath = resourceRoute;
+
+				if (resourcePath.EndsWith(Consts.FwdSlash) ||
+					resourcePath.EndsWith(Consts.BakSlash) ||
+					!Path.HasExtension(resourcePath))
+				{
+					var derivedExtension = resource switch
+					{
+						CssResource => Consts.Ext_Css,
+						JsResource => Consts.Ext_Js,
+						BinResource => Consts.Ext_Bin,
+						_ => Consts.Ext_Unk
+					};
+
+					resourcePath =
+						resourcePath
+						.EnsureNotEndsWith(Consts.BakSlash)
+						.EnsureNotEndsWith(Consts.FwdSlash) +
+						$"{resourcePath}{derivedExtension}";
+				}
+			}
+
+			resourcePath = resourcePath.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
+
+			return Path.Combine(rootFolder.ToFileSysPath(), resourcePath);
 		}
 
 
 		public static string FixupHrefValues(
 			this string htmlContent,
-			IEnumerable<PageInfo> pages,
+			IEnumerable<PageResource> pages,
 			string defaultFileName,
 			string pageFileExtension,
 			bool alwaysDefaultFile = default,
@@ -132,7 +182,7 @@ namespace AspNetStatic
 				{
 					var href = m.Groups[1].Value;
 
-					var page = pages.GetPageForUrl(href, routesAreCaseSensitive);
+					var page = pages.GetResourceForUrl(href, routesAreCaseSensitive);
 
 					if (page is null) return m.Value;
 

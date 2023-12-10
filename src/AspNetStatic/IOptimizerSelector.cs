@@ -16,6 +16,10 @@ namespace AspNetStatic
 {
 	public interface IOptimizerSelector
 	{
-		IMarkupMinifier SelectFor(PageInfo page, string outFilePathname);
+		IMarkupMinifier SelectFor(PageResource page, string outFilePathname);
+
+		ICssMinifier SelectFor(CssResource cssResource, string outFilePathname);
+
+		IJsMinifier SelectFor(JsResource jsResource, string outFilePathname);
 	}
 }

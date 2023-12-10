@@ -25,7 +25,7 @@ namespace AspNetStatic
 		private readonly ILogger<StaticPageFallbackMiddleware>? _logger;
 		private readonly IFileSystem _fileSystem;
 		private readonly RequestDelegate _next;
-		private readonly IStaticPagesInfoProvider _pageInfoProvider;
+		private readonly IStaticResourcesInfoProvider _pageInfoProvider;
 		private readonly bool _haveStaticPages;
 		private readonly bool _alwaysDefaultFile;
 		private readonly bool _ignoreOutFilePathname;
@@ -38,7 +38,7 @@ namespace AspNetStatic
 			ILogger<StaticPageFallbackMiddleware>? logger,
 			IFileSystem fileSystem,
 			RequestDelegate next,
-			IStaticPagesInfoProvider pageInfoProvider,
+			IStaticResourcesInfoProvider pageInfoProvider,
 			IWebHostEnvironment environment,
 			IOptions<StaticPageFallbackMiddlewareOptions>? optionsAccessor)
 		{
@@ -50,7 +50,7 @@ namespace AspNetStatic
 			Throw.IfNull(environment);
 			var options = optionsAccessor?.Value ?? new StaticPageFallbackMiddlewareOptions();
 
-			this._haveStaticPages = this._pageInfoProvider.Pages.Any();
+			this._haveStaticPages = this._pageInfoProvider.PageResources.Any();
 			this._pageFileExtension = this._pageInfoProvider.PageFileExtension.EnsureStartsWith(".");
 			this._defaultFileName = $"{this._pageInfoProvider.DefaultFileName}{this._pageFileExtension}";
 			this._exclusions = this._pageInfoProvider.DefaultFileExclusions;
@@ -61,7 +61,7 @@ namespace AspNetStatic
 			this._webRoot = environment.WebRootPath;
 
 			this._logger?.Configuration(
-				this._pageInfoProvider.Pages.Count(),
+				this._pageInfoProvider.PageResources.Count(),
 				this._alwaysDefaultFile,
 				this._ignoreOutFilePathname,
 				this._webRoot,
@@ -78,7 +78,7 @@ namespace AspNetStatic
 				{
 					var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
 					var query = ctx.Request.QueryString.Value.EnsureStartsWith('?', true);
-					var page = this._pageInfoProvider.Pages.GetPageForUrl($"{path}{query}");
+					var page = this._pageInfoProvider.PageResources.GetResourceForUrl($"{path}{query}");
 
 					if (page is not null)
 					{
@@ -164,9 +164,9 @@ namespace AspNetStatic
 		/// <summary>
 		///		Gets or sets a value that, when true, indicates that 
 		///		the fallback route should ignore the value specified 
-		///		in <see cref="PageInfo.OutFile"/>, and instead 
+		///		in <see cref="PageResource.OutFile"/>, and instead 
 		///		use apply the usual rules to determine the fallback route; 
-		///		otherwise, if <see cref="PageInfo.OutFile"/> 
+		///		otherwise, if <see cref="PageResource.OutFile"/> 
 		///		specifies a file pathname, it should be used as 
 		///		the fallback route.
 		/// </summary>

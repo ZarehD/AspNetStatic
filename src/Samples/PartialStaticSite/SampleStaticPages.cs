@@ -4,8 +4,8 @@ namespace PartialStaticSite
 {
 	public static class SampleStaticPages
 	{
-		public static IEnumerable<PageInfo> GetCollection() =>
-			new PageInfo[]
+		public static IEnumerable<PageResource> GetCollection() =>
+			new PageResource[]
 			{
 				new("/"),
 				new("/") { Query = "?p1=v1", OutFile = "index-p1v1.htm" },

@@ -12,24 +12,8 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	internal static class Consts
+	public enum ChangeFrequency
 	{
-		public static readonly char BakSlash = '\\';
-		public static readonly char FwdSlash = '/';
-		public static readonly string BSlash = BakSlash.ToString();
-		public static readonly string FSlash = FwdSlash.ToString();
-
-		public static readonly string AspNetStatic = nameof(AspNetStatic);
-
-		public static readonly string Ext_Unk = ".unknown";
-		public static readonly string Ext_Htm = ".html";
-		public static readonly string Ext_Css = ".css";
-		public static readonly string Ext_Js = ".js";
-		public static readonly string Ext_Bin = ".bin";
-
-		public static readonly string DefaultIndexFile = "index";
-		public static readonly string DefaultIndexFileFullName = $"{DefaultIndexFile}{Ext_Htm}";
-
-		public static readonly string[] DefaultFileExclusions = { DefaultIndexFile, "default" };
+		Always, Hourly, Daily, Weekly, Monthly, Yearly, Never
 	}
 }

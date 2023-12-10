@@ -12,32 +12,38 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public abstract class StaticPagesInfoProviderBase : IStaticPagesInfoProvider
+	public abstract class StaticResourcesInfoProviderBase : IStaticResourcesInfoProvider
 	{
-		public IEnumerable<PageInfo> Pages => this.pages.ToArray();
-		protected readonly List<PageInfo> pages = new();
+		public IEnumerable<PageResource> PageResources => this.pages.ToArray();
+		protected readonly List<PageResource> pages = new();
+
+		public IEnumerable<NonPageResource> OtherResources => this.otherResources.ToArray();
+		protected readonly List<NonPageResource> otherResources = new();
 
 		/// <inheritdoc/>
 		/// <remarks>
 		///		Defaults to "index".
 		/// </remarks>
 		public string DefaultFileName => this.defaultFileName;
-		protected string defaultFileName = "index";
+		protected string defaultFileName = Consts.DefaultIndexFile;
 
 		/// <inheritdoc/>
 		/// <remarks>
 		///		Defaults to ".html".
 		/// </remarks>
 		public string PageFileExtension => this.defaultFileExtension;
-		protected string defaultFileExtension = ".html";
+		protected string defaultFileExtension = Consts.Ext_Htm;
 
 		/// <inheritdoc/>
 		/// <remarks>
 		///		Defaults to ["index", "default"].
 		/// </remarks>
 		public string[] DefaultFileExclusions => this.exclusions.ToArray();
-		protected readonly List<string> exclusions = new(new[] { "index", "default" });
+		protected readonly List<string> exclusions = new(Consts.DefaultFileExclusions);
 
+		public bool SkipProcessingPageResources { get; protected set; }
+
+		public bool SkipProcessingOtherResources { get; protected set; }
 
 
 		protected virtual void SetDefaultFileName(string name) => this.defaultFileName = Throw.IfNullOrWhitespace(name, SR.Err_MissingDefaultFileName);

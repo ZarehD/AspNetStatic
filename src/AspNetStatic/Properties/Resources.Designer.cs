@@ -115,11 +115,11 @@ namespace AspNetStatic.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Route for page is not well-formed. Expected a {0} URI..
+        ///   Looks up a localized string similar to Route for resource is not well-formed. Expected a {0} URI..
         /// </summary>
-        internal static string Err_RouteForPageNotWellFormed {
+        internal static string Err_RouteForResourceNotWellFormed {
             get {
-                return ResourceManager.GetString("Err_RouteForPageNotWellFormed", resourceCulture);
+                return ResourceManager.GetString("Err_RouteForResourceNotWellFormed", resourceCulture);
             }
         }
         

@@ -135,8 +135,8 @@
   <data name="Err_OptimizeWithoutChooser" xml:space="preserve">
     <value>Optimization is enabled but no minifier selector provided.</value>
   </data>
-  <data name="Err_RouteForPageNotWellFormed" xml:space="preserve">
-    <value>Route for page is not well-formed. Expected a {0} URI.</value>
+  <data name="Err_RouteForResourceNotWellFormed" xml:space="preserve">
+    <value>Route for resource is not well-formed. Expected a {0} URI.</value>
     <comment>0: UriKind</comment>
   </data>
   <data name="Err_ValueCannotBeNullEmptyWhitespace" xml:space="preserve">

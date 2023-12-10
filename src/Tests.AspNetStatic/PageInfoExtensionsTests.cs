@@ -3,8 +3,8 @@
 	[TestClass]
 	public class PageInfoExtensionsTests
 	{
-		private static readonly List<PageInfo> _pages =
-			new(new PageInfo[]
+		private static readonly List<PageResource> _pages =
+			new(new PageResource[]
 			{
 				new("/"),
 				new("/privacy"),
@@ -40,7 +40,7 @@
 		public void Test_Pages_ContainsPageForRoute(
 			string route, bool isCaseSensitive, bool expected)
 		{
-			var actual = _pages.ContainsPageForRoute(route, isCaseSensitive);
+			var actual = _pages.ContainsResourceForRoute(route, isCaseSensitive);
 			Assert.AreEqual(expected, actual);
 		}
 
@@ -64,7 +64,7 @@
 		public void Test_Pages_ContainsPageForUrl(
 			string url, bool isCaseSensitive, bool expected)
 		{
-			var actual = _pages.ContainsPageForUrl(url, isCaseSensitive);
+			var actual = _pages.ContainsResourceForUrl(url, isCaseSensitive);
 			Assert.AreEqual(expected, actual);
 		}
 
@@ -85,7 +85,7 @@
 		public void Test_Pages_GetPageForRoute(
 			string route, bool isCaseSensitive, bool expected)
 		{
-			var page = _pages.GetPageForRoute(route, isCaseSensitive);
+			var page = _pages.GetResourceForRoute(route, isCaseSensitive);
 			var actual = page is not null;
 			Assert.AreEqual(expected, actual);
 		}
@@ -110,7 +110,7 @@
 		public void Test_Pages_GetPageForUrl(
 			string url, bool isCaseSensitive, bool expected)
 		{
-			var page = _pages.GetPageForUrl(url, isCaseSensitive);
+			var page = _pages.GetResourceForUrl(url, isCaseSensitive);
 			var actual = page is not null;
 			Assert.AreEqual(expected, actual);
 		}

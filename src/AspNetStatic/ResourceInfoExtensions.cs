@@ -12,26 +12,26 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public static class PageInfoExtensions
+	public static class ResourceInfoExtensions
 	{
-		public static bool ContainsPageForRoute(
-			this IEnumerable<PageInfo> pages, string route,
+		public static bool ContainsResourceForRoute(
+			this IEnumerable<ResourceInfoBase> resources, string route,
 			bool routesAreCaseSensitive = default) =>
-			(pages is not null) && pages.Any() &&
-			(pages.GetPageForRoute(route, routesAreCaseSensitive) is not null);
+			(resources is not null) && resources.Any() &&
+			(resources.GetResourceForRoute(route, routesAreCaseSensitive) is not null);
 
-		public static bool ContainsPageForUrl(
-			this IEnumerable<PageInfo> pages, string url,
+		public static bool ContainsResourceForUrl(
+			this IEnumerable<ResourceInfoBase> resources, string url,
 			bool routesAreCaseSensitive = default) =>
-			(pages is not null) && pages.Any() &&
-			(pages.GetPageForUrl(url, routesAreCaseSensitive) is not null);
+			(resources is not null) && resources.Any() &&
+			(resources.GetResourceForUrl(url, routesAreCaseSensitive) is not null);
 
 
-		public static PageInfo? GetPageForRoute(
-			this IEnumerable<PageInfo> pages, string route,
+		public static ResourceInfoBase? GetResourceForRoute(
+			this IEnumerable<ResourceInfoBase> resources, string route,
 			bool routesAreCaseSensitive = default) =>
-			(pages is null) || !pages.Any() ? default :
-			pages.FirstOrDefault(
+			(resources is null) || !resources.Any() ? default :
+			resources.FirstOrDefault(
 				p => route.Equals(Consts.FSlash)
 				? p.Route.Equals(Consts.FSlash)
 				: p.Route.NormalizeRoute().Equals(
@@ -40,11 +40,11 @@ namespace AspNetStatic
 					? StringComparison.Ordinal
 					: StringComparison.OrdinalIgnoreCase));
 
-		public static PageInfo? GetPageForUrl(
-			this IEnumerable<PageInfo> pages, string url,
+		public static ResourceInfoBase? GetResourceForUrl(
+			this IEnumerable<ResourceInfoBase> resources, string url,
 			bool routesAreCaseSensitive = default) =>
-			(pages is null) || !pages.Any() ? default :
-			pages.FirstOrDefault(
+			(resources is null) || !resources.Any() ? default :
+			resources.FirstOrDefault(
 				p => url.Equals(Consts.FSlash)
 				? p.Url.Equals(Consts.FSlash)
 				: p.Url.NormalizeUrl().Equals(

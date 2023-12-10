@@ -15,7 +15,7 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic
 {
-	public class NullMinifier : IMarkupMinifier
+	public class NullMarkupMinifier : IMarkupMinifier
 	{
 		public MarkupMinificationResult Minify(string content) => new(content);
 		public MarkupMinificationResult Minify(string content, string fileContext) => new(content);

@@ -12,20 +12,25 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public class StaticPagesInfoProvider : StaticPagesInfoProviderBase
+	public class StaticResourcesInfoProvider : StaticResourcesInfoProviderBase
 	{
-		public StaticPagesInfoProvider(
-			IEnumerable<PageInfo> pages,
+		public StaticResourcesInfoProvider(
+			IEnumerable<PageResource>? pages,
+			IEnumerable<NonPageResource>? otherResources,
 			string? defaultFileName = default,
 			string? defaultFileExtension = default,
-			IEnumerable<string>? dffExclusions = default)
+			IEnumerable<string>? dffExclusions = default,
+			bool skipProcessingPageResources = default,
+			bool skipProcessingOtherResources = default)
 			: base()
 		{
-			this.pages.AddRange(Throw.IfNull(pages));
-
+			if (pages?.Any() ?? false) this.pages.AddRange(pages);
+			if (otherResources?.Any() ?? false) this.otherResources.AddRange(otherResources);
 			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);
 			if (defaultFileExtension is not null) SetDefaultFileExtension(defaultFileExtension);
 			if (dffExclusions is not null) SetDefaultFileExclusions(dffExclusions.ToArray());
+			this.SkipProcessingPageResources = skipProcessingPageResources;
+			this.SkipProcessingOtherResources = skipProcessingOtherResources;
 		}
 	}
 }

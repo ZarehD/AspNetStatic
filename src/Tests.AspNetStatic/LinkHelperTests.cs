@@ -16,8 +16,8 @@
 		private static readonly string _indexFileName = "index.html";
 		private static readonly string _fileExtension = ".html";
 		private static readonly string[] _exclusions = new[] { "index", "default" };
-		private static readonly List<PageInfo> _pages =
-			new(new PageInfo[]
+		private static readonly List<PageResource> _pages =
+			new(new PageResource[]
 			{
 				new("/"),
 				new("/") { Query = "?p1=v1", OutFile = File_Index_p1v1 },
@@ -164,8 +164,8 @@
 		//[DataRow(@"/pages/page/route-parm", "?p1=v1")]
 		//public void Test_FindPage(string route, string? query)
 		//{
-		//	var page = new PageInfo(route) { QueryString = query };
-		//	var pages = new List<PageInfo>(new[] { page });
+		//	var page = new PageResourcesInfo(route) { QueryString = query };
+		//	var pages = new List<PageResourcesInfo>(new[] { page });
 
 		//	var expected = page;
 		//	var actual = pages.FindPage(page.Url);

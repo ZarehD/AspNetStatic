@@ -23,7 +23,7 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic
 {
-	public static class StaticPageGeneratorHostExtension
+	public static class StaticGeneratorHostExtension
 	{
 		/// <summary>
 		///		Registers an action that will generates static pages when 
@@ -82,7 +82,7 @@ namespace AspNetStatic
 		/// <param name="httpTimeoutSeconds">
 		///		The HttpClient request timeout (in seconds) while fetching page content.
 		/// </param>
-		public static void GenerateStaticPages(
+		public static void GenerateStaticContent(
 			this IHost host,
 			string destinationRoot,
 			bool exitWhenDone = default,
@@ -102,11 +102,11 @@ namespace AspNetStatic
 				SR.Err_InvalidDestinationRoot);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
+			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticPagesInfoProvider>();
+			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 
-			if (!pageUrlProvider.Pages.Any())
+			if (!pageUrlProvider.PageResources.Any())
 			{
 				logger.NoPagesToProcess();
 				return;
@@ -128,16 +128,18 @@ namespace AspNetStatic
 						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
 
 						var generatorConfig =
-							new StaticPageGeneratorConfig(
-								pageUrlProvider.Pages,
+							new StaticGeneratorConfig(
+								pageUrlProvider.PageResources,
+								pageUrlProvider.OtherResources,
 								destinationRoot,
 								alwaysDefaultFile,
 								!dontUpdateLinks,
 								pageUrlProvider.DefaultFileName,
 								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 								pageUrlProvider.DefaultFileExclusions,
-								!dontOptimizeContent,
-								optimizerSelector);
+								!dontOptimizeContent, optimizerSelector,
+								pageUrlProvider.SkipProcessingPageResources,
+								pageUrlProvider.SkipProcessingOtherResources);
 
 						logger.RegenerationConfig(regenerationInterval);
 						var doPeriodicRefresh = regenerationInterval is not null;
@@ -148,7 +150,7 @@ namespace AspNetStatic
 							if (doPeriodicRefresh) _timer = new(regenerationInterval!.Value);
 							do
 							{
-								await StaticPageGenerator.Execute(
+								await StaticGenerator.Execute(
 									generatorConfig,
 									_httpClient, fileSystem,
 									loggerFactory, _appShutdown.Token)
@@ -276,7 +278,7 @@ namespace AspNetStatic
 		///		An object representing the async operation that will return 
 		///		a boolean True if the operation succeeded, or False otherwise.
 		/// </returns>
-		public static async Task<bool> GenerateStaticPagesNow(
+		public static async Task<bool> GenerateStaticContentNow(
 			this IHost host,
 			string destinationRoot,
 			bool alwaysDefaultFile = default,
@@ -296,11 +298,11 @@ namespace AspNetStatic
 				SR.Err_InvalidDestinationRoot);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
+			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticPagesInfoProvider>();
+			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 
-			if (!pageUrlProvider.Pages.Any())
+			if (!pageUrlProvider.PageResources.Any())
 			{
 				logger.NoPagesToProcess();
 				return false;
@@ -312,17 +314,19 @@ namespace AspNetStatic
 
 			try
 			{
-				await StaticPageGenerator.Execute(
-					new StaticPageGeneratorConfig(
-						pageUrlProvider.Pages,
+				await StaticGenerator.Execute(
+					new StaticGeneratorConfig(
+						pageUrlProvider.PageResources,
+						pageUrlProvider.OtherResources,
 						destinationRoot,
 						alwaysDefaultFile,
 						!dontUpdateLinks,
 						pageUrlProvider.DefaultFileName,
 						pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 						pageUrlProvider.DefaultFileExclusions,
-						!dontOptimizeContent,
-						optimizerSelector),
+						!dontOptimizeContent, optimizerSelector,
+						pageUrlProvider.SkipProcessingPageResources,
+						pageUrlProvider.SkipProcessingOtherResources),
 					httpClient,
 					fileSystem,
 					loggerFactory,
@@ -353,10 +357,10 @@ namespace AspNetStatic
 		///			The URL for the page to be generated.
 		///		</para>
 		///		<para>
-		///			The specified URL must uniquely identify a <see cref="PageInfo"/> entry 
-		///			in the configured <see cref="IStaticPagesInfoProvider.Pages"/> 
-		///			collection by matching its <see cref="PageInfo.Route"/> and 
-		///			<see cref="PageInfo.Query"/> properties.
+		///			The specified URL must uniquely identify a <see cref="PageResource"/> entry 
+		///			in the configured <see cref="IStaticResourcesInfoProvider.PageResources"/> 
+		///			collection by matching its <see cref="PageResource.Route"/> and 
+		///			<see cref="PageResource.Query"/> properties.
 		///		</para>
 		///		<para>
 		///			The URL must contain the page route and query parameters, if any. 
@@ -435,26 +439,26 @@ namespace AspNetStatic
 			Throw.IfNullOrWhitespace(pageUrl);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
+			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticPagesInfoProvider>();
+			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 
-			if (!pageUrlProvider.Pages.Any())
+			if (!pageUrlProvider.PageResources.Any())
 			{
 				logger.NoPagesToProcess();
 				return false;
 			}
 
-			var page = pageUrlProvider.Pages.GetPageForUrl(pageUrl);
+			var page = pageUrlProvider.PageResources.GetResourceForUrl(pageUrl);
 
-			if (page is null)
+			if ((page is null) || (page is not PageResource))
 			{
 				logger.PageNotFound(pageUrl);
 				return false;
 			}
 
 			return await host.GenerateStaticPage(
-				page,
+				(PageResource) page,
 				destinationRoot,
 				alwaysDefaultFile,
 				dontUpdateLinks,
@@ -532,7 +536,7 @@ namespace AspNetStatic
 		/// </returns>
 		public static async Task<bool> GenerateStaticPage(
 			this IHost host,
-			PageInfo page,
+			PageResource page,
 			string destinationRoot,
 			bool alwaysDefaultFile = default,
 			bool dontUpdateLinks = default,
@@ -552,24 +556,26 @@ namespace AspNetStatic
 				SR.Err_InvalidDestinationRoot);
 
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-			var logger = loggerFactory.CreateLogger(nameof(StaticPageGeneratorHostExtension));
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticPagesInfoProvider>();
+			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
+			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 			var optimizerSelector = GetOptimizerSelector(host, dontOptimizeContent);
 			var httpClient = GetHttpClient(host, httpClientName, httpTimeoutSeconds);
 
 			try
 			{
-				await StaticPageGenerator.ExecuteForPage(
-					page, new StaticPageGeneratorConfig(
-						pageUrlProvider.Pages,
+				await StaticGenerator.ExecuteForPage(
+					page, new StaticGeneratorConfig(
+						pageUrlProvider.PageResources,
+						pageUrlProvider.OtherResources,
 						destinationRoot,
 						alwaysDefaultFile,
 						!dontUpdateLinks,
 						pageUrlProvider.DefaultFileName,
 						pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 						pageUrlProvider.DefaultFileExclusions,
-						!dontOptimizeContent,
-						optimizerSelector),
+						!dontOptimizeContent, optimizerSelector,
+						pageUrlProvider.SkipProcessingPageResources,
+						pageUrlProvider.SkipProcessingOtherResources),
 					httpClient,
 					fileSystem,
 					loggerFactory,
@@ -658,16 +664,11 @@ namespace AspNetStatic
 
 				result =
 					new OptimizerSelector(
-						new HtmlMinifier(
-							htmlMinifierSettings,
-							cssMinifier,
-							jsMinifier),
-						new XhtmlMinifier(
-							xhtmlMinifierSettings,
-							cssMinifier,
-							jsMinifier),
-						new XmlMinifier(
-							xmlMinifierSettings));
+						new HtmlMinifier(htmlMinifierSettings, cssMinifier, jsMinifier),
+						new XhtmlMinifier(xhtmlMinifierSettings, cssMinifier, jsMinifier),
+						new XmlMinifier(xmlMinifierSettings),
+						cssMinifier ?? new KristensenCssMinifier(),
+						jsMinifier ?? new CrockfordJsMinifier());
 			}
 
 			return result;

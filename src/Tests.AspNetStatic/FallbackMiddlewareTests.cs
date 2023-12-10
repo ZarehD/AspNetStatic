@@ -16,8 +16,8 @@ namespace Tests.AspNetStatic
 		private static readonly string File_Doc_P4_567_P1V1 = "doc/page4-567-p1v1.htm".ToFileSysPath();
 		private static readonly string File_Doc_P4_789_P1V1 = "doc/page4-789-p1v1.htm".ToFileSysPath();
 
-		private static readonly List<PageInfo> _pages =
-			new(new PageInfo[]
+		private static readonly List<PageResource> _pages =
+			new(new PageResource[]
 			{
 				new("/"),
 				new("/blog/"),
@@ -29,9 +29,9 @@ namespace Tests.AspNetStatic
 				new("/doc/p4/789/") { Query = "?p1=v1", OutFile = File_Doc_P4_789_P1V1 },
 			});
 
-		private class PageInfoProvider : StaticPagesInfoProvider
+		private class PageInfoProvider : StaticResourcesInfoProvider
 		{
-			public PageInfoProvider() : base(_pages) { }
+			public PageInfoProvider() : base(_pages, null) { }
 		}
 
 		private static ILogger<StaticPageFallbackMiddleware> GetMiddlewareLogger() =>
@@ -39,7 +39,7 @@ namespace Tests.AspNetStatic
 
 		private static RequestDelegate GetNextMiddleware() => new((r) => Task.CompletedTask);
 
-		private static IStaticPagesInfoProvider GetPageInfoProvider() => new PageInfoProvider();
+		private static IStaticResourcesInfoProvider GetPageInfoProvider() => new PageInfoProvider();
 
 		private static IWebHostEnvironment GetWebHostEnvironment()
 		{
@@ -79,7 +79,7 @@ namespace Tests.AspNetStatic
 			var createFile =
 				!expectedPath.EndsWith(Consts.FwdSlash) &&
 				Path.HasExtension(expectedPath) &&
-				pageInfoProvider.Pages.ContainsPageForUrl(requestPath);
+				pageInfoProvider.PageResources.ContainsResourceForUrl(requestPath);
 
 			var diskFilePathname = GetOutFileFullPath(expectedPath);
 
@@ -150,7 +150,7 @@ namespace Tests.AspNetStatic
 			var createFile =
 				!expectedPath.EndsWith(Consts.FwdSlash) &&
 				Path.HasExtension(expectedPath) &&
-				pageInfoProvider.Pages.ContainsPageForUrl(requestPath);
+				pageInfoProvider.PageResources.ContainsResourceForUrl(requestPath);
 
 			var diskFilePathname = GetOutFileFullPath(expectedPath);
 

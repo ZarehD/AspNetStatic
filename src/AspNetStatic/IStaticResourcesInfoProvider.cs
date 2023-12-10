@@ -12,9 +12,11 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public interface IStaticPagesInfoProvider
+	public interface IStaticResourcesInfoProvider
 	{
-		IEnumerable<PageInfo> Pages { get; }
+		IEnumerable<PageResource> PageResources { get; }
+
+		IEnumerable<NonPageResource> OtherResources { get; }
 
 		/// <summary>
 		///		<para>
@@ -50,5 +52,9 @@ namespace AspNetStatic
 		///		</para>
 		/// </summary>
 		string[] DefaultFileExclusions { get; }
+
+		public bool SkipProcessingPageResources { get; }
+
+		public bool SkipProcessingOtherResources { get; }
 	}
 }

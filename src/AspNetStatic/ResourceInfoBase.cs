@@ -13,11 +13,11 @@ the specific language governing permissions and limitations under the License.
 namespace AspNetStatic
 {
 	[Serializable]
-	public class PageInfo
+	public abstract class ResourceInfoBase
 	{
 		/// <summary>
-		///		Gets or sets the route to the page (e.g. /blog/article1), 
-		///		including any relevant route parameter values.
+		///		Gets or sets the route to the content item, a URI resource 
+		///		(e.g. /blog/article1 or /css/site.css), including route parameter values.
 		/// </summary>
 		/// <remarks>
 		///		The specified route must be relative to the base URI 
@@ -31,7 +31,7 @@ namespace AspNetStatic
 		/// </summary>
 		/// <remarks>
 		///		The specified value is appended to the value specified in 
-		///		<see cref="Route"/> and should start with a '?' character.
+		///		<see cref="Route"/> and can start with a '?' character.
 		///		(see <see cref="Url"/> property).
 		/// </remarks>
 		public string? Query { get; init; }
@@ -43,7 +43,7 @@ namespace AspNetStatic
 
 		/// <summary>
 		///		Gets or sets the pathname (path and filename) of the file 
-		///		that will be created for this page.
+		///		that will be created for this content/resource.
 		/// </summary>
 		/// <remarks>
 		///		<para>
@@ -51,42 +51,29 @@ namespace AspNetStatic
 		///			where generated static files will be placed. Directory 
 		///			separator characters at the start of the value will be 
 		///			automatically removed, but other absolute path specifiers 
-		///			will not.
+		///			will not, and will therefore cause in error.
 		///		</para>
 		///		<para>
 		///			The value specified for this property will override any logic 
-		///			used for constructing the pathname of the generated file for 
-		///			this page, including any file extension for the file.
+		///			used for constructing the pathname of the generated file.
 		///		</para>
 		/// </remarks>
 		public string? OutFile { get; init; }
+
+		/// <summary>
+		///		Gets the encoding type to use when writing textual content 
+		///		to the file specified in <see cref="OutFile"/>.
+		/// </summary>
+		public EncodingType OutputEncoding { get; init; } = EncodingType.UTF8;
 
 		public bool SkipOptimization => this.OptimizerType == OptimizerType.None;
 
 		public OptimizerType OptimizerType { get; init; } = OptimizerType.Auto;
 
-		public EncodingType OutputEncoding { get; init; } = EncodingType.UTF8;
 
-		public ChangeFrequency ChangeFrequency { get; init; } = ChangeFrequency.Never;
-
-		public DateTime LastModified { get; init; } = DateTime.MinValue;
-
-		public double IndexPriority { get; init; }
-
-
-		public PageInfo(string route)
+		public ResourceInfoBase(string route)
 		{
 			this.Route = Throw.IfNullOrWhitespace(route);
 		}
-	}
-
-
-	public enum ChangeFrequency { Always, Hourly, Daily, Weekly, Monthly, Yearly, Never }
-
-	public enum OptimizerType
-	{
-		Auto, // Auto-select based on OutFile filename extension. Defaults to Html.
-		None, // no optimization
-		Html, Xhtml, Xml
 	}
 }

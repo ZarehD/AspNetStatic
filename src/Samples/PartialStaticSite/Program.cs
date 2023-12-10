@@ -16,8 +16,8 @@ builder.Services.AddRouting(
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton<IStaticPagesInfoProvider>(
-	new StaticPagesInfoProvider(SampleStaticPages.GetCollection()));
+builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
+	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection(), null));
 
 #region app.UseStaticPageFallback()
 #if ENABLE_STATIC_PAGE_FALLBACK
@@ -63,7 +63,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-app.GenerateStaticPages(
+app.GenerateStaticContent(
 	app.Environment.WebRootPath,
 	exitWhenDone: exitWhenDone,
 	alwaysDefaultFile: false,
