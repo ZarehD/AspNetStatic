@@ -8,7 +8,7 @@ namespace Sample.BlazorSsg
 	{
 		public static StaticResourcesInfoProvider GetProvider()
 		{
-			var provider = new StaticResourcesInfoProvider(null);
+			var provider = new StaticResourcesInfoProvider();
 
 			provider.Add(GetPageResources());
 			provider.Add(GetCssResources());

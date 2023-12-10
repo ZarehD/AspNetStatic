@@ -14,6 +14,8 @@ namespace AspNetStatic
 {
 	internal static class Consts
 	{
+		public static readonly Type TypeOfPageResource = typeof(PageResource);
+
 		public static readonly char BakSlash = '\\';
 		public static readonly char FwdSlash = '/';
 		public static readonly string BSlash = BakSlash.ToString();

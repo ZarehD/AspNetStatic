@@ -129,8 +129,7 @@ namespace AspNetStatic
 
 						var generatorConfig =
 							new StaticGeneratorConfig(
-								pageUrlProvider.PageResources,
-								pageUrlProvider.OtherResources,
+								pageUrlProvider.Resources,
 								destinationRoot,
 								alwaysDefaultFile,
 								!dontUpdateLinks,
@@ -138,8 +137,10 @@ namespace AspNetStatic
 								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 								pageUrlProvider.DefaultFileExclusions,
 								!dontOptimizeContent, optimizerSelector,
-								pageUrlProvider.SkipProcessingPageResources,
-								pageUrlProvider.SkipProcessingOtherResources);
+								pageUrlProvider.SkipPageResources,
+								pageUrlProvider.SkipCssResources,
+								pageUrlProvider.SkipJsResources,
+								pageUrlProvider.SkipBinResources);
 
 						logger.RegenerationConfig(regenerationInterval);
 						var doPeriodicRefresh = regenerationInterval is not null;
@@ -316,8 +317,7 @@ namespace AspNetStatic
 			{
 				await StaticGenerator.Execute(
 					new StaticGeneratorConfig(
-						pageUrlProvider.PageResources,
-						pageUrlProvider.OtherResources,
+						pageUrlProvider.Resources,
 						destinationRoot,
 						alwaysDefaultFile,
 						!dontUpdateLinks,
@@ -325,8 +325,10 @@ namespace AspNetStatic
 						pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 						pageUrlProvider.DefaultFileExclusions,
 						!dontOptimizeContent, optimizerSelector,
-						pageUrlProvider.SkipProcessingPageResources,
-						pageUrlProvider.SkipProcessingOtherResources),
+						pageUrlProvider.SkipPageResources,
+						pageUrlProvider.SkipCssResources,
+						pageUrlProvider.SkipJsResources,
+						pageUrlProvider.SkipBinResources),
 					httpClient,
 					fileSystem,
 					loggerFactory,
@@ -565,8 +567,7 @@ namespace AspNetStatic
 			{
 				await StaticGenerator.ExecuteForPage(
 					page, new StaticGeneratorConfig(
-						pageUrlProvider.PageResources,
-						pageUrlProvider.OtherResources,
+						pageUrlProvider.Resources,
 						destinationRoot,
 						alwaysDefaultFile,
 						!dontUpdateLinks,
@@ -574,8 +575,10 @@ namespace AspNetStatic
 						pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
 						pageUrlProvider.DefaultFileExclusions,
 						!dontOptimizeContent, optimizerSelector,
-						pageUrlProvider.SkipProcessingPageResources,
-						pageUrlProvider.SkipProcessingOtherResources),
+						pageUrlProvider.SkipPageResources,
+						pageUrlProvider.SkipCssResources,
+						pageUrlProvider.SkipJsResources,
+						pageUrlProvider.SkipBinResources),
 					httpClient,
 					fileSystem,
 					loggerFactory,

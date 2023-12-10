@@ -42,7 +42,7 @@ namespace AspNetStatic
 				() => config.OptimizePageContent && (config.OptimizerSelector is null),
 				SR.Err_OptimizeWithoutChooser);
 
-			if (!config.SkipProcessingPageResources && config.Pages.Any())
+			if (!config.SkipPageResources && config.Pages.Any())
 			{
 				var pageResourceProcessorConfig =
 					new PageResourceProcessorConfig(
@@ -64,7 +64,7 @@ namespace AspNetStatic
 				}
 			}
 
-			if (!config.SkipProcessingOtherResources && config.OtherResources.Any())
+			if (config.OtherResources.Any())
 			{
 				var otherResourceProcessorConfig =
 					new OtherResourceProcessorConfig(
@@ -75,6 +75,10 @@ namespace AspNetStatic
 
 				foreach (var resource in config.OtherResources)
 				{
+					if (config.SkipCssResources && resource is CssResource) continue;
+					if (config.SkipJsResources && resource is JsResource) continue;
+					if (config.SkipBinResources && resource is BinResource) continue;
+
 					await ProcessOtherResource(resource, otherResourceProcessorConfig, ct)
 						.ConfigureAwait(false);
 				}
@@ -541,7 +545,7 @@ namespace AspNetStatic
 			StaticGeneratorConfig config,
 			HttpClient httpClient) =>
 			logger.Imp_Configuration(
-				config.Pages.Count,
+				config.Pages.Count(),
 				httpClient.BaseAddress?.ToString() ?? "Unknown Base Address",
 				config.DestinationRoot,
 				config.AlwaysCreateDefaultFile,
@@ -573,7 +577,7 @@ namespace AspNetStatic
 			HttpClient httpClient) =>
 			logger.Imp_ConfigurationSinglePage(
 				page.Url,
-				config.Pages.Count,
+				config.Pages.Count(),
 				httpClient.BaseAddress?.ToString() ?? "Unknown Base Address",
 				config.DestinationRoot,
 				config.AlwaysCreateDefaultFile,

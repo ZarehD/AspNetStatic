@@ -14,11 +14,19 @@ namespace AspNetStatic
 {
 	public abstract class StaticResourcesInfoProviderBase : IStaticResourcesInfoProvider
 	{
-		public IEnumerable<PageResource> PageResources => this.pages.ToArray();
-		protected readonly List<PageResource> pages = new();
+		protected readonly List<ResourceInfoBase> resources = new();
 
-		public IEnumerable<NonPageResource> OtherResources => this.otherResources.ToArray();
-		protected readonly List<NonPageResource> otherResources = new();
+		public IEnumerable<ResourceInfoBase> Resources => this.resources.ToArray();
+
+		public IEnumerable<PageResource> PageResources =>
+			this.resources
+			.Where(r => r?.GetType() == Consts.TypeOfPageResource)
+			.Cast<PageResource>();
+
+		public IEnumerable<NonPageResource> OtherResources =>
+			this.resources
+			.Where(r => r?.GetType() != Consts.TypeOfPageResource)
+			.Cast<NonPageResource>();
 
 		/// <inheritdoc/>
 		/// <remarks>
@@ -41,9 +49,13 @@ namespace AspNetStatic
 		public string[] DefaultFileExclusions => this.exclusions.ToArray();
 		protected readonly List<string> exclusions = new(Consts.DefaultFileExclusions);
 
-		public bool SkipProcessingPageResources { get; protected set; }
+		public bool SkipPageResources { get; init; }
 
-		public bool SkipProcessingOtherResources { get; protected set; }
+		public bool SkipCssResources { get; init; }
+
+		public bool SkipJsResources { get; init; }
+
+		public bool SkipBinResources { get; init; }
 
 
 		protected virtual void SetDefaultFileName(string name) => this.defaultFileName = Throw.IfNullOrWhitespace(name, SR.Err_MissingDefaultFileName);

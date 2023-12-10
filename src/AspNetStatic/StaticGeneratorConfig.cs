@@ -14,19 +14,31 @@ namespace AspNetStatic
 {
 	internal class StaticGeneratorConfig
 	{
-		public List<PageResource> Pages { get; } = new();
+		public List<ResourceInfoBase> Resources { get; } = new();
 
-		public List<NonPageResource> OtherResources { get; } = new();
+		public IEnumerable<PageResource> Pages =>
+			this.Resources
+			.Where(r => r?.GetType() == Consts.TypeOfPageResource)
+			.Cast<PageResource>();
 
-		public bool SkipProcessingPageResources { get; }
+		public IEnumerable<NonPageResource> OtherResources =>
+			this.Resources
+			.Where(r => r?.GetType() != Consts.TypeOfPageResource)
+			.Cast<NonPageResource>();
 
-		public bool SkipProcessingOtherResources { get; }
+		public bool SkipPageResources { get; init; }
+
+		public bool SkipCssResources { get; init; }
+
+		public bool SkipJsResources { get; init; }
+
+		public bool SkipBinResources { get; init; }
 
 		public string DestinationRoot { get; }
 
-		public bool AlwaysCreateDefaultFile { get; }
+		public bool AlwaysCreateDefaultFile { get; init; }
 
-		public bool UpdateLinks { get; }
+		public bool UpdateLinks { get; init; }
 
 		public string DefaultFileName { get; } = Consts.DefaultIndexFile;
 
@@ -42,51 +54,35 @@ namespace AspNetStatic
 
 
 		public StaticGeneratorConfig(
-			IEnumerable<PageResource>? pages,
+			IEnumerable<ResourceInfoBase>? resources,
 			string destinationRoot,
 			bool createDefaultFile,
 			bool fixupHrefValues,
 			bool enableOptimization,
 			IOptimizerSelector? optimizerSelector = default,
-			bool skipProcessingPageResources = default)
+			bool skipPageResources = default,
+			bool skipCssResources = default,
+			bool skipJsResources = default,
+			bool skipBinResources = default)
 		{
 			this.DestinationRoot = Throw.IfNullOrWhitespace(destinationRoot);
 			this.AlwaysCreateDefaultFile = createDefaultFile;
 			this.UpdateLinks = fixupHrefValues;
 			this.OptimizePageContent = enableOptimization;
 			this.OptimizerSelector = Throw.IfNull(optimizerSelector, () => this.OptimizePageContent);
-			this.SkipProcessingPageResources = skipProcessingPageResources;
+			this.SkipPageResources = skipPageResources;
+			this.SkipCssResources = skipCssResources;
+			this.SkipJsResources = skipJsResources;
+			this.SkipBinResources = skipBinResources;
 
-			if ((pages is not null) && pages.Any())
+			if ((resources is not null) && resources.Any())
 			{
-				this.Pages.AddRange(pages);
+				this.Resources.AddRange(resources.Where(r => r is not null));
 			}
 		}
 
 		public StaticGeneratorConfig(
-			IEnumerable<PageResource>? pages,
-			IEnumerable<NonPageResource>? otherResources,
-			string destinationRoot,
-			bool createDefaultFile,
-			bool fixupHrefValues,
-			bool enableOptimization,
-			IOptimizerSelector? optimizerSelector = default,
-			bool skipProcessingPageResources = default,
-			bool skipProcessingOtherResources = default)
-			: this(pages!, destinationRoot, createDefaultFile,
-				  fixupHrefValues, enableOptimization, optimizerSelector,
-				  skipProcessingPageResources)
-		{
-			this.SkipProcessingOtherResources = skipProcessingOtherResources;
-
-			if ((otherResources is not null) && otherResources.Any())
-			{
-				this.OtherResources.AddRange(otherResources);
-			}
-		}
-
-		public StaticGeneratorConfig(
-			IEnumerable<PageResource>? pages,
+			IEnumerable<ResourceInfoBase>? resources,
 			string destinationRoot,
 			bool createDefaultFile,
 			bool fixupHrefValues,
@@ -95,10 +91,14 @@ namespace AspNetStatic
 			IEnumerable<string>? defaultFileExclusions,
 			bool enableOptimization = default,
 			IOptimizerSelector? optimizerSelector = default,
-			bool skipProcessingPageResources = default)
-			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
+			bool skipPageResources = default,
+			bool skipCssResources = default,
+			bool skipJsResources = default,
+			bool skipBinResources = default)
+			: this(resources, destinationRoot, createDefaultFile, fixupHrefValues,
 				  enableOptimization, optimizerSelector,
-				  skipProcessingPageResources)
+				  skipPageResources, skipCssResources,
+				  skipJsResources, skipBinResources)
 		{
 			this.DefaultFileName = Throw.IfNullOrWhitespace(defaultFileName);
 			this.PageFileExtension = Throw.IfNullOrWhitespace(fileExtension);
@@ -107,32 +107,6 @@ namespace AspNetStatic
 			{
 				this.DefaultFileExclusions.Clear();
 				this.DefaultFileExclusions.AddRange(defaultFileExclusions);
-			}
-		}
-
-		public StaticGeneratorConfig(
-			IEnumerable<PageResource>? pages,
-			IEnumerable<NonPageResource>? otherResources,
-			string destinationRoot,
-			bool createDefaultFile,
-			bool fixupHrefValues,
-			string defaultFileName,
-			string fileExtension,
-			IEnumerable<string>? defaultFileExclusions,
-			bool enableOptimization = default,
-			IOptimizerSelector? optimizerSelector = default,
-			bool skipProcessingPageResources = default,
-			bool skipProcessingOtherResources = default)
-			: this(pages, destinationRoot, createDefaultFile, fixupHrefValues,
-				  defaultFileName, fileExtension, defaultFileExclusions, 
-				  enableOptimization, optimizerSelector,
-				  skipProcessingPageResources)
-		{
-			this.SkipProcessingOtherResources = skipProcessingOtherResources;
-
-			if ((otherResources is not null) && otherResources.Any())
-			{
-				this.OtherResources.AddRange(otherResources);
 			}
 		}
 	}

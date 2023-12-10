@@ -14,6 +14,8 @@ namespace AspNetStatic
 {
 	public interface IStaticResourcesInfoProvider
 	{
+		IEnumerable<ResourceInfoBase> Resources { get; }
+
 		IEnumerable<PageResource> PageResources { get; }
 
 		IEnumerable<NonPageResource> OtherResources { get; }
@@ -57,12 +59,24 @@ namespace AspNetStatic
 		///		Gets a value that indicates whether to skip generating static files 
 		///		for entries in the <see cref="PageResources"/> collection.
 		/// </summary>
-		public bool SkipProcessingPageResources { get; }
+		public bool SkipPageResources { get; }
 
 		/// <summary>
-		///		Gets a value that indicates whether to skip generating static files 
-		///		for entries in the <see cref="OtherResources"/> collection.
+		///		Gets a value that indicates whether to skip generating static files for 
+		///		<see cref="CssResource"/> entries in the <see cref="OtherResources"/> collection.
 		/// </summary>
-		public bool SkipProcessingOtherResources { get; }
+		public bool SkipCssResources { get; }
+
+		/// <summary>
+		///		Gets a value that indicates whether to skip generating static files for 
+		///		<see cref="JsResource"/> entries in the <see cref="OtherResources"/> collection.
+		/// </summary>
+		public bool SkipJsResources { get; }
+
+		/// <summary>
+		///		Gets a value that indicates whether to skip generating static files for 
+		///		<see cref="BinResource"/> entries in the <see cref="OtherResources"/> collection.
+		/// </summary>
+		public bool SkipBinResources { get; }
 	}
 }
