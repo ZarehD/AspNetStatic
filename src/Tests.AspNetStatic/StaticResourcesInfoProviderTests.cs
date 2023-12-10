@@ -3,7 +3,7 @@ namespace Tests.AspNetStatic
 	[TestClass]
 	public class StaticResourcesInfoProviderTests
 	{
-		private readonly static List<PageResource> Test_Pages = new(new PageResource[] { new("/segment/page") });
+		private readonly static List<ResourceInfoBase> Test_Pages = new(new PageResource[] { new("/segment/page") });
 		private readonly static List<string> Test_Exclusions = new(new[] { "index", "default", "who-this" });
 		private readonly static string Test_DefaultFileName = "default-file-name";
 		private readonly static string Test_DefaultFileExtension = ".test-extension";
@@ -11,12 +11,11 @@ namespace Tests.AspNetStatic
 		private class TestStaticResourcesInfoProvider : StaticResourcesInfoProvider
 		{
 			public TestStaticResourcesInfoProvider()
-				: base(Test_Pages, null,
+				: base(Test_Pages,
 					  Test_DefaultFileName,
 					  Test_DefaultFileExtension,
 					  Test_Exclusions)
-			{
-			}
+			{ }
 
 			public new void SetDefaultFileName(string name) => base.SetDefaultFileName(name);
 			public new void SetDefaultFileExtension(string extension) => base.SetDefaultFileExtension(extension);
@@ -25,7 +24,7 @@ namespace Tests.AspNetStatic
 
 		private StaticResourcesInfoProvider GetStandardPagesInfoProvider() =>
 			new StaticResourcesInfoProvider(
-				Test_Pages, null,
+				Test_Pages,
 				Test_DefaultFileName,
 				Test_DefaultFileExtension,
 				Test_Exclusions);

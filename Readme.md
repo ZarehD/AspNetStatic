@@ -56,13 +56,17 @@ It's a piece of cake.
    ```c#
    builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
      new StaticResourcesInfoProvider(
-       new PageResource[]
+       new []
        {
-         new("/"),
-         new("/privacy"),
-         new("/blog/articles/posts/1") { OutFile = "blog/post-1.html" },
-         new("/blog/articles/posts/2") { OutFile = "blog/post-2-dark.html", Query = "?theme=dark" }
-       }, null));
+         new PageResource("/"),
+         new PageResource("/privacy"),
+         new PageResource("/blog/articles/posts/1") { OutFile = "blog/post-1.html" },
+         new PageResource("/blog/articles/posts/2") { OutFile = "blog/post-2-dark.html", Query = "?theme=dark" },
+         new CssResource("/bootstrap/bootstrap.min.css") { OptimizerType = OptimizerType.None },
+         new CssResource("/site.css"),
+         new JsResource("/site.js"),
+         new BinResource("/favicon.png")
+       }));
    ```
 1. Add a call to the AspNetStatic module in the app startup
    ```c#

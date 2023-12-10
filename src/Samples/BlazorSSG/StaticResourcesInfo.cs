@@ -1,4 +1,6 @@
-﻿using AspNetStatic;
+﻿using System.Resources;
+using System.Runtime.InteropServices;
+using AspNetStatic;
 
 namespace Sample.BlazorSsg
 {
@@ -6,14 +8,13 @@ namespace Sample.BlazorSsg
 	{
 		public static StaticResourcesInfoProvider GetProvider()
 		{
-			var cssResources = GetCssResources();
-			var binResources = GetBinaryResources();
-			var otherResources = new List<NonPageResource>();
+			var provider = new StaticResourcesInfoProvider(null);
 
-			if (cssResources is not null) otherResources.AddRange(cssResources);
-			if (binResources is not null) otherResources.AddRange(binResources);
+			provider.Add(GetPageResources());
+			provider.Add(GetCssResources());
+			provider.Add(GetBinaryResources());
 
-			return new StaticResourcesInfoProvider(GetPageResources(), otherResources);
+			return provider;
 		}
 
 		public static IEnumerable<PageResource> GetPageResources() =>
