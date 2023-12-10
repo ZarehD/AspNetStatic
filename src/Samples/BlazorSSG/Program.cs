@@ -2,13 +2,6 @@ using AspNetStatic;
 using Sample.BlazorSsg;
 using Sample.BlazorSSG.Components;
 
-var builder = WebApplication.CreateBuilder(args);
-
-if (!builder.Environment.IsDevelopment())
-{
-	builder.WebHost.UseStaticWebAssets();
-}
-
 //----------------------------------------------------
 // To serve only the generated static content, select 
 // the Static-Site launchSettings configuration which 
@@ -18,16 +11,27 @@ var onlyServeStaticContent = "SHOW_STATIC_CONTENT_ONLY".Equals(
 	Environment.GetEnvironmentVariable("CONTENT_MODE"),
 	StringComparison.OrdinalIgnoreCase);
 
-builder.Services.AddRazorComponents();
-
-builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
-	StaticResourcesInfo.GetProvider());
-
 //-----------------------------------------------------------
 // The SSG launchSettings config adds the "ssg" command-line 
 // argument used by the HasExitWhenDoneArg extension method.
 //-----------------------------------------------------------
 var runningInSsgMode = args.HasExitWhenDoneArg();
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+if (!builder.Environment.IsDevelopment())
+{
+	builder.WebHost.UseStaticWebAssets();
+}
+
+builder.Services.AddRazorComponents();
+
+if (!onlyServeStaticContent && runningInSsgMode)
+{
+	builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
+		StaticResourcesInfo.GetProvider());
+}
 
 
 var app = builder.Build();
