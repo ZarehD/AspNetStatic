@@ -13,7 +13,7 @@ And then it occurs to you, I already know how to use ASP.NET Core to create webs
 
 Well, now there is!
 
-### Create a static site from your ASP.NET Core generated content
+### Create a static site using ASP.NET Core
 
 AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator.
 
@@ -21,11 +21,11 @@ But wait, there's more!
 
 AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Scenarios_ section below.
 
-Oh, and one more thing, AspNetStatic also works with Blazor websites.
+Oh, and one more thing!
 
-> Blazor support requires the new SSR capability in ASP.NET Core 8.0.
+AspNetStatic now works with Blazor websites, thanks to the new Blazor SSR capability in ASP.NET Core 8.
 
-> Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. Server mode (SignalR) **may** be okay, but I haven't tested it. Basically, as long as the content has completed rendering by the time **AspNetStatic** receives it (i.e. HttpClient response), you're golden.
+> Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. The rule-of-thumb (for any technology you use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via its HttpClient request), it will work fine.
 
 ### No Frameworks. No Engines. No Opinions!
 
