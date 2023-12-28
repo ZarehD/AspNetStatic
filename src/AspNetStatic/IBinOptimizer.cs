@@ -12,49 +12,34 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	public enum OptimizerType
+	public interface IBinOptimizer
 	{
-		/// <summary>
-		///		Auto-select the optimizer based on the resource type and OutFile pathname.
-		/// </summary>
-		/// <remarks>
-		///		Not used for <see cref="BinResource"/> entry types.
-		/// </remarks>
-		Auto,
+		BinOptimizerResult Execute(byte[] content, BinResource resource, string outFilePathname);
+	}
 
-		/// <summary>
-		///		Perform no optimization on the resource.
-		/// </summary>
-		None,
 
-		/// <summary>
-		///		Use an HTML markup optimizer.
-		/// </summary>
-		Html,
+	public class BinOptimizerResult
+	{
+		public byte[] OptimizedContent { get; }
+		public IEnumerable<string> Errors { get; }
+		public IEnumerable<string> Warnings { get; }
 
-		/// <summary>
-		///		Use an XHTML markup optimizer.
-		/// </summary>
-		Xhtml,
 
-		/// <summary>
-		///		Use an XML markup optimizer.
-		/// </summary>
-		Xml,
+		public BinOptimizerResult(byte[] optimizedContent)
+			: this(optimizedContent,
+				  Enumerable.Empty<string>(),
+				  Enumerable.Empty<string>())
+		{ }
 
-		/// <summary>
-		///		Use a CSS content optimizer.
-		/// </summary>
-		Css,
+		public BinOptimizerResult(byte[] optimizedContent, IEnumerable<string> errors)
+			: this(optimizedContent, errors, Enumerable.Empty<string>())
+		{ }
 
-		/// <summary>
-		///		Use a JS content optimizer.
-		/// </summary>
-		Js,
-
-		/// <summary>
-		///		Optimize using an instance of <see cref="IBinOptimizer" />.
-		/// </summary>
-		Bin
+		public BinOptimizerResult(byte[] optimizedContent, IEnumerable<string> errors, IEnumerable<string> warnings)
+		{
+			this.OptimizedContent = optimizedContent;
+			this.Errors = errors;
+			this.Warnings = warnings;
+		}
 	}
 }

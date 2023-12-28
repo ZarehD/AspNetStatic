@@ -21,5 +21,7 @@ namespace AspNetStatic
 		ICssMinifier SelectFor(CssResource cssResource, string outFilePathname);
 
 		IJsMinifier SelectFor(JsResource jsResource, string outFilePathname);
+
+		IBinOptimizer? SelectFor(BinResource binResource, string outFilePathname);
 	}
 }

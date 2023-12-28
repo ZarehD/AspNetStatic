@@ -50,11 +50,12 @@ namespace AspNetStatic
 	[Serializable]
 	public class BinResource : NonPageResource
 	{
-		public BinResource(string route) : base(route) { }
+		public BinResource(string route) : base(route)
+		{
+			this.OptimizerType = OptimizerType.None;
+		}
 
 
 		public new EncodingType OutputEncoding { get; init; } = EncodingType.Default;
-		public new OptimizerType OptimizerType { get; } = OptimizerType.None;
-		public new bool SkipOptimization => true;
 	}
 }

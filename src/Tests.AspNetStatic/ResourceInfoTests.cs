@@ -150,12 +150,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, EncodingType.UTF8);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(EncodingType.UTF8, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -177,12 +177,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, encoding);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -204,12 +204,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, encoding);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
 
@@ -254,12 +254,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, EncodingType.UTF8);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(EncodingType.UTF8, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -281,12 +281,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, encoding);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -308,12 +308,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, encoding);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
 
@@ -358,12 +358,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, EncodingType.UTF8);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(EncodingType.UTF8, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -385,12 +385,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, encoding);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -412,12 +412,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, optimizerType);
-			Assert.AreEqual(resource.OutputEncoding, encoding);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
 
@@ -461,12 +461,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, OptimizerType.None);
-			Assert.AreEqual(resource.OutputEncoding, EncodingType.Default);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(OptimizerType.None, resource.OptimizerType);
+			Assert.AreEqual(EncodingType.Default, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -484,12 +484,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, OptimizerType.None);
-			Assert.AreEqual(resource.OutputEncoding, EncodingType.Default);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(OptimizerType.None, resource.OptimizerType);
+			Assert.AreEqual(EncodingType.Default, resource.OutputEncoding);
 		}
 
 		[TestMethod]
@@ -507,12 +507,12 @@
 				};
 
 			Assert.IsNotNull(resource);
-			Assert.AreEqual(resource.Route, route);
-			Assert.AreEqual(resource.Query, queryString);
-			Assert.AreEqual(resource.OutFile, outFilePathname);
-			Assert.AreEqual(resource.SkipOptimization, resource.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(resource.OptimizerType, OptimizerType.None);
-			Assert.AreEqual(resource.OutputEncoding, EncodingType.Default);
+			Assert.AreEqual(route, resource.Route);
+			Assert.AreEqual(queryString, resource.Query);
+			Assert.AreEqual(outFilePathname, resource.OutFile);
+			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
+			Assert.AreEqual(OptimizerType.None, resource.OptimizerType);
+			Assert.AreEqual(EncodingType.Default, resource.OutputEncoding);
 		}
 
 

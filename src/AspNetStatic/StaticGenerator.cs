@@ -197,7 +197,7 @@ namespace AspNetStatic
 			if (config.OptimizeOutput && !page.SkipOptimization)
 			{
 				logger?.OptimizingContent(requestUri, outFilePathname);
-				pageContent = OptimizeContent(page, pageContent, config.OptimizerSelector!, outFilePathname, requestUri, logger);
+				pageContent = OptimizeStringContent(page, pageContent, config.OptimizerSelector!, outFilePathname, requestUri, logger);
 
 				#region OBSOLETE
 				//var optimizer = config.OptimizerSelector!.SelectFor(page, outFilePathname);
@@ -267,7 +267,7 @@ namespace AspNetStatic
 			await (resource switch
 			{
 				CssResource or JsResource => processStringResource(),
-				BinResource => processBinaryResource(),
+				BinResource => processBinaryResource((BinResource) resource),
 				_ => Task.CompletedTask
 			});
 
@@ -296,7 +296,7 @@ namespace AspNetStatic
 				{
 					logger?.OptimizingContent(requestUri, outFileShortName);
 
-					resourceContent = OptimizeContent(
+					resourceContent = OptimizeStringContent(
 						resource, resourceContent,
 						config.OptimizerSelector!,
 						outFilePathname, requestUri, logger);
@@ -309,7 +309,7 @@ namespace AspNetStatic
 					.ConfigureAwait(false);
 			}
 
-			async Task processBinaryResource()
+			async Task processBinaryResource(BinResource binResource)
 			{
 				var resourceContent = Array.Empty<byte>();
 
@@ -329,6 +329,32 @@ namespace AspNetStatic
 					return;
 				}
 
+				if (config.OptimizeOutput && !binResource.SkipOptimization)
+				{
+					var optimizer = config.OptimizerSelector?.SelectFor(binResource, outFilePathname);
+
+					if (optimizer is not null)
+					{
+						logger?.OptimizingContent(requestUri, outFileShortName);
+						logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer.GetType().Name);
+
+						var opResult = optimizer.Execute(resourceContent, binResource, outFilePathname);
+
+						if (!opResult.Errors.Any())
+						{
+							resourceContent = opResult.OptimizedContent;
+						}
+						else
+						{
+							logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Errors);
+						}
+						if (opResult.Warnings.Any())
+						{
+							logger?.OptimizationWarnings(requestUri, outFilePathname, opResult.Warnings);
+						}
+					}
+				}
+
 				logger?.WritingContentToFile(requestUri, outFilePathname, resourceContent.Length);
 
 				await config.FileSystem.File
@@ -338,7 +364,7 @@ namespace AspNetStatic
 		}
 
 		[Pure]
-		private static string OptimizeContent(
+		private static string OptimizeStringContent(
 			ResourceInfoBase resource, string content,
 			IOptimizerSelector optimizerSelector,
 			string outFilePathname, string requestUri,
@@ -797,49 +823,8 @@ namespace AspNetStatic
 			string outFilePath);
 
 		#endregion
-		#region 1081 - OptimizationErrors
 
-		public static void OptimizationErrors(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IList<MinificationErrorInfo> errors) =>
-			logger.Imp_OptimizationErrors(
-				resourceUrl,
-				outFilePath,
-				errors);
-
-		[LoggerMessage(EventId = 1081, EventName = "OptimizationErrors", Level = LogLevel.Error,
-			Message = "StaticPageGenerator: Content optimizing Errors > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Errors = {Errors}")]
-		private static partial void Imp_OptimizationErrors(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IList<MinificationErrorInfo> errors);
-
-		#endregion
-		#region 1082 - OptimizationWarnings
-
-		public static void OptimizationWarnings(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IList<MinificationErrorInfo> warnings) =>
-			logger.Imp_OptimizationWarnings(
-				resourceUrl,
-				outFilePath,
-				warnings);
-
-		[LoggerMessage(EventId = 1082, EventName = "OptimizationWarnings", Level = LogLevel.Warning,
-			Message = "StaticPageGenerator: Content optimizing warnings > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Warnings = {Warnings}")]
-		private static partial void Imp_OptimizationWarnings(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IList<MinificationErrorInfo> warnings);
-
-		#endregion
-		#region 1083 - SelectedOptimizer
+		#region 1082 - SelectedOptimizer
 
 		public static void SelectedOptimizer(
 			this ILogger<StaticGenerator> logger,
@@ -851,7 +836,7 @@ namespace AspNetStatic
 				outFilePath,
 				optimizerName);
 
-		[LoggerMessage(EventId = 1083, EventName = "SelectedOptimizer", Level = LogLevel.Debug,
+		[LoggerMessage(EventId = 1082, EventName = "SelectedOptimizer", Level = LogLevel.Debug,
 			Message = "StaticPageGenerator: Selected optimizer > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Optimizer = {Optimizer}")]
 		private static partial void Imp_SelectedOptimizer(
 			this ILogger<StaticGenerator> logger,
@@ -861,7 +846,93 @@ namespace AspNetStatic
 
 		#endregion
 
-		#region 1090 - WritingContentToFile
+		#region 1085 - OptimizationWarnings
+
+		public static void OptimizationWarnings(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IList<MinificationErrorInfo> warnings) =>
+			logger.Imp_OptimizationWarnings(
+				resourceUrl,
+				outFilePath,
+				warnings);
+
+		[LoggerMessage(EventId = 1085, EventName = "OptimizationWarnings", Level = LogLevel.Warning,
+			Message = "StaticPageGenerator: Content optimizing warnings > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Warnings = {Warnings}")]
+		private static partial void Imp_OptimizationWarnings(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IList<MinificationErrorInfo> warnings);
+
+		#endregion
+		#region 1086 - OptimizationErrors
+
+		public static void OptimizationErrors(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IList<MinificationErrorInfo> errors) =>
+			logger.Imp_OptimizationErrors(
+				resourceUrl,
+				outFilePath,
+				errors);
+
+		[LoggerMessage(EventId = 1086, EventName = "OptimizationErrors", Level = LogLevel.Error,
+			Message = "StaticPageGenerator: Content optimizing Errors > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Errors = {Errors}")]
+		private static partial void Imp_OptimizationErrors(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IList<MinificationErrorInfo> errors);
+
+		#endregion
+
+		#region 1088 - OptimizationWarnings
+
+		public static void OptimizationWarnings(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IEnumerable<string> warnings) =>
+			logger.Imp_BinOptimizationWarnings(
+				resourceUrl,
+				outFilePath,
+				warnings);
+
+		[LoggerMessage(EventId = 1088, EventName = "BinOptimizationWarnings", Level = LogLevel.Warning,
+			Message = "StaticPageGenerator: Content optimizing warnings > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Warnings = {Warnings}")]
+		private static partial void Imp_BinOptimizationWarnings(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IEnumerable<string> warnings);
+
+		#endregion
+		#region 1089 - OptimizationErrors
+
+		public static void OptimizationErrors(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IEnumerable<string> errors) =>
+			logger.Imp_BinOptimizationErrors(
+				resourceUrl,
+				outFilePath,
+				errors);
+
+		[LoggerMessage(EventId = 1089, EventName = "BinOptimizationErrors", Level = LogLevel.Error,
+			Message = "StaticPageGenerator: Content optimizing Errors > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Errors = {Errors}")]
+		private static partial void Imp_BinOptimizationErrors(
+			this ILogger<StaticGenerator> logger,
+			string resourceUrl,
+			string outFilePath,
+			IEnumerable<string> errors);
+
+		#endregion
+
+		#region 1095 - WritingContentToFile
 
 		public static void WritingContentToFile(
 			this ILogger<StaticGenerator> logger,
@@ -875,7 +946,7 @@ namespace AspNetStatic
 				contentSize,
 				encoding ?? EncodingType.Default);
 
-		[LoggerMessage(EventId = 1090, EventName = "WritingContentToFile", Level = LogLevel.Information,
+		[LoggerMessage(EventId = 1095, EventName = "WritingContentToFile", Level = LogLevel.Information,
 			Message = "StaticPageGenerator: Writing resource content to file > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, ContentSize = {ContentSize}, Encoding = {Encoding}")]
 		private static partial void Imp_WritingContentToFile(
 			this ILogger<StaticGenerator> logger,

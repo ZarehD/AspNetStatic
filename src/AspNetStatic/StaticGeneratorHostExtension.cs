@@ -664,6 +664,7 @@ namespace AspNetStatic
 				var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
 				var cssMinifier = host.Services.GetService<ICssMinifier>();
 				var jsMinifier = host.Services.GetService<IJsMinifier>();
+				var binOptimizer = host.Services.GetService<IBinOptimizer>();
 
 				result =
 					new OptimizerSelector(
@@ -671,7 +672,8 @@ namespace AspNetStatic
 						new XhtmlMinifier(xhtmlMinifierSettings, cssMinifier, jsMinifier),
 						new XmlMinifier(xmlMinifierSettings),
 						cssMinifier ?? new KristensenCssMinifier(),
-						jsMinifier ?? new CrockfordJsMinifier());
+						jsMinifier ?? new CrockfordJsMinifier(),
+						binOptimizer);
 			}
 
 			return result;

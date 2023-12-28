@@ -16,14 +16,15 @@ namespace AspNetStatic
 {
 	public class OptimizerSelector : IOptimizerSelector
 	{
-		private readonly IMarkupMinifier _nullMarkupMinifier = new NullMarkupMinifier();
-		private readonly ICssMinifier _nullCssMinifier = new NullCssMinifier();
-		private readonly IJsMinifier _nullJsMinifier = new NullJsMinifier();
-		private readonly IMarkupMinifier _htmlMinifier;
-		private readonly IMarkupMinifier _xhtmlMinifier;
-		private readonly IMarkupMinifier _xmlMinifier;
-		private readonly ICssMinifier _cssMinifier;
-		private readonly IJsMinifier _jsMinifier;
+		protected readonly IMarkupMinifier _nullMarkupMinifier = new NullMarkupMinifier();
+		protected readonly ICssMinifier _nullCssMinifier = new NullCssMinifier();
+		protected readonly IJsMinifier _nullJsMinifier = new NullJsMinifier();
+		protected readonly IMarkupMinifier _htmlMinifier;
+		protected readonly IMarkupMinifier _xhtmlMinifier;
+		protected readonly IMarkupMinifier _xmlMinifier;
+		protected readonly ICssMinifier _cssMinifier;
+		protected readonly IJsMinifier _jsMinifier;
+		protected readonly IBinOptimizer? _binOptimizer;
 
 
 		public OptimizerSelector(
@@ -31,17 +32,19 @@ namespace AspNetStatic
 			IMarkupMinifier xhtmlMinifier,
 			IMarkupMinifier xmlMinifier,
 			ICssMinifier cssMinifier,
-			IJsMinifier jsMinifier)
+			IJsMinifier jsMinifier,
+			IBinOptimizer? binOptimizer)
 		{
 			this._htmlMinifier = Throw.IfNull(htmlMinifier);
 			this._xhtmlMinifier = Throw.IfNull(xhtmlMinifier);
 			this._xmlMinifier = Throw.IfNull(xmlMinifier);
 			this._cssMinifier = Throw.IfNull(cssMinifier);
 			this._jsMinifier = Throw.IfNull(jsMinifier);
+			this._binOptimizer = binOptimizer;
 		}
 
 
-		public IMarkupMinifier SelectFor(PageResource page, string outFilePathname) =>
+		public virtual IMarkupMinifier SelectFor(PageResource page, string outFilePathname) =>
 			page.OptimizerType == OptimizerType.None ? this._nullMarkupMinifier :
 			page.OptimizerType == OptimizerType.Auto
 			? Path.GetExtension(outFilePathname).ToLowerInvariant() switch
@@ -59,7 +62,7 @@ namespace AspNetStatic
 				_ => this._htmlMinifier
 			};
 
-		public ICssMinifier SelectFor(CssResource cssResource, string outFilePathname) =>
+		public virtual ICssMinifier SelectFor(CssResource cssResource, string outFilePathname) =>
 			cssResource.OptimizerType == OptimizerType.None ? this._nullCssMinifier :
 			cssResource.OptimizerType == OptimizerType.Auto
 			? Path.GetExtension(outFilePathname).ToLowerInvariant() switch
@@ -73,7 +76,7 @@ namespace AspNetStatic
 				_ => this._nullCssMinifier
 			};
 
-		public IJsMinifier SelectFor(JsResource jsResource, string outFilePathname) =>
+		public virtual IJsMinifier SelectFor(JsResource jsResource, string outFilePathname) =>
 			jsResource.OptimizerType == OptimizerType.None ? this._nullJsMinifier :
 			jsResource.OptimizerType == OptimizerType.Auto
 			? Path.GetExtension(outFilePathname).ToLowerInvariant() switch
@@ -87,5 +90,7 @@ namespace AspNetStatic
 				_ => this._nullJsMinifier
 			};
 
+		public virtual IBinOptimizer? SelectFor(BinResource binResource, string outFilePathname) =>
+			binResource.OptimizerType == OptimizerType.Bin ? this._binOptimizer : null;
 	}
 }

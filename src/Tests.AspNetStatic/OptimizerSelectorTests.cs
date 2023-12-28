@@ -13,27 +13,35 @@ namespace Tests.AspNetStatic
 		private static readonly XmlMinifier _xmlMinifier = new();
 		private static readonly ICssMinifier _cssMinifier = new KristensenCssMinifier();
 		private static readonly IJsMinifier _jsMinifier = new CrockfordJsMinifier();
+		private static readonly IBinOptimizer? _binOptimizer = new TestBinOptimizer();
 
 		private static readonly OptimizerSelector _minifierChooser =
-			new(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier);
+			new(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer);
+
+		//--
+
+		private class TestBinOptimizer : IBinOptimizer
+		{
+			public BinOptimizerResult Execute(byte[] content, BinResource resource, string outFilePathname) => new(content);
+		}
 
 		//--
 
 		[TestMethod]
 		public void Test_Ctor_Good()
 		{
-			var actual = new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier);
+			var actual = new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer);
 			Assert.IsNotNull(actual);
 		}
 
 		[TestMethod]
 		public void Test_Ctor_Bad()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(null!,         _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, null!,          _xmlMinifier, _cssMinifier, _jsMinifier));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, null!,        _cssMinifier, _jsMinifier));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, null!,        _jsMinifier));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, null!));
+			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(null!, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer));
+			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, null!, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer));
+			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, null!, _cssMinifier, _jsMinifier, _binOptimizer));
+			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, null!, _jsMinifier, _binOptimizer));
+			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, null!, _binOptimizer));
 		}
 
 		//--
@@ -200,6 +208,35 @@ namespace Tests.AspNetStatic
 				{
 					OptimizerType.Js => _jsMinifier,
 					_ => _nullJsMinifier
+				};
+
+			var actual = _minifierChooser.SelectFor(resource, outFile);
+
+			Assert.AreSame(expected, actual);
+		}
+
+		//--
+
+		[DataTestMethod]
+		[DataRow("file.img", OptimizerType.Bin)]
+		[DataRow("file.dll", OptimizerType.None)]
+		public void Test_Select_JsMinifier(
+			string outFile, OptimizerType expectedOptimizerType)
+		{
+			var resource =
+				new BinResource(outFile)
+				{
+					OutFile = outFile,
+					OptimizerType = expectedOptimizerType
+				};
+
+			Assert.AreEqual(expectedOptimizerType, resource.OptimizerType);
+
+			IBinOptimizer? expected =
+				expectedOptimizerType switch
+				{
+					OptimizerType.Bin => _binOptimizer,
+					_ => null
 				};
 
 			var actual = _minifierChooser.SelectFor(resource, outFile);

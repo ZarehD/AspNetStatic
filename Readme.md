@@ -102,7 +102,7 @@ Keep the following in mind when specifying routes in the `IStaticResourcesInfoPr
 
 > NOTE: All of the above also applies to routes for CSS, JavaScript, and binary (e.g. image) files specified in the `OtherResources` collection property.
 
-> 1: Content optimization options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details. Also note that no optimization is performed on binary resources (`BinResource` items).
+> 1: Content optimization options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details.
 
 ### Routes vs. Generated Static Files
 
@@ -361,7 +361,7 @@ Content optimization can be customized in one of two ways:
     ```
 
  1. Create and register individual settings objects which internally feed into a default `IOptimizerSelector` implementation.
-    - __HTML__: To configure the HTML minifier, register a configured instance of `HtmlMinificationSettings`:
+    - __HTML__: To configure the HTML minifier, register as a singleton a configured instance of `HtmlMinificationSettings`:
       ```c#
       using WebMarkupMin.Core;
       builder.Services.AddSingleton(
@@ -371,7 +371,7 @@ Content optimization can be customized in one of two ways:
         });
       ```
 
-    - __XHTML__: To configure the XHTML minifier, register a configured instance of `XhtmlMinificationSettings`:
+    - __XHTML__: To configure the XHTML minifier, register as a singleton a configured instance of `XhtmlMinificationSettings`:
       ```c#
       using WebMarkupMin.Core;
       builder.Services.AddSingleton(
@@ -381,7 +381,7 @@ Content optimization can be customized in one of two ways:
         });
       ```
 
-    - __XML__: To configure the XML minifier, register a configured instance of `XmlMinificationSettings`:
+    - __XML__: To configure the XML minifier, register as a singleton a configured instance of `XmlMinificationSettings`:
       ```c#
       using WebMarkupMin.Core;
       builder.Services.AddSingleton(
@@ -391,19 +391,25 @@ Content optimization can be customized in one of two ways:
         });
       ```
 
-    - __CSS__: To configure the CSS minifier, register an object that implements the `ICssMinifier` interface:
+    - __CSS__: To configure the CSS minifier, register as a singleton an object that implements the `ICssMinifier` interface:
       ```c#
       using WebMarkupMin.Core;
       builder.Services.AddSingleton<ICssMinifier>(
         sp => new YuiCssMinifier(...));
       ```
 
-    - __Javascript__: To configure the Javascript minifier, register an object that implements the `IJsMinifier` interface:
+    - __Javascript__: To configure the Javascript minifier, register as a singleton an object that implements the `IJsMinifier` interface:
       ```c#
       using WebMarkupMin.Core;
       builder.Services.AddSingleton<IJsMinifier>(
         sp => new YuiJsMinifier(...));
       ```
+
+    - __Binary Content__ (__BinResource__): To configure a binary resource optimizer, register as a singleton an object that implements the `IBinOptimizer` interface:
+      ```c#
+      builder.Services.AddSingleton<IBinOptimizer, MyBinOptimizer>();
+      ```
+
 
 <br/>
 

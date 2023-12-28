@@ -34,9 +34,10 @@ namespace Tests.AspNetStatic
 		private static readonly XmlMinifier _xmlMinifier = new();
 		private static readonly ICssMinifier _cssMinifier = new KristensenCssMinifier();
 		private static readonly IJsMinifier _jsMinifier = new CrockfordJsMinifier();
+		private static readonly IBinOptimizer? _binOptimizer = null;
 
 		private static readonly OptimizerSelector _minifierChooser =
-			new(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier);
+			new(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer);
 
 
 		static StaticGeneratorConfigTests()
