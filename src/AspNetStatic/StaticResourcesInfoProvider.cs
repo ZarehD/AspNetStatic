@@ -14,11 +14,13 @@ namespace AspNetStatic
 {
 	public class StaticResourcesInfoProvider : StaticResourcesInfoProviderBase
 	{
+		public StaticResourcesInfoProvider() { }
+
 		public StaticResourcesInfoProvider(
 			IEnumerable<ResourceInfoBase>? resources = default,
 			string? defaultFileName = default,
 			string? defaultFileExtension = default,
-			IEnumerable<string>? dffExclusions = default)
+			IEnumerable<string>? defaultFileExclusions = default)
 			: base()
 		{
 			if (resources is not null)
@@ -30,36 +32,72 @@ namespace AspNetStatic
 
 			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);
 			if (defaultFileExtension is not null) SetDefaultFileExtension(defaultFileExtension);
-			if (dffExclusions is not null) SetDefaultFileExclusions(dffExclusions.ToArray());
+			if (defaultFileExclusions is not null) SetDefaultFileExclusions(defaultFileExclusions.ToArray());
 		}
 
 
-		public void Add(PageResource page) => this.resources.Add(Throw.IfNull(page));
-		public void Add(IEnumerable<PageResource> pages)
+		public new StaticResourcesInfoProvider SetDefaultFileName(string name)
+		{
+			base.SetDefaultFileName(name);
+			return this;
+		}
+		public new StaticResourcesInfoProvider SetDefaultFileExtension(string extension)
+		{
+			base.SetDefaultFileExtension(extension);
+			return this;
+		}
+		public new StaticResourcesInfoProvider SetDefaultFileExclusions(string[] newExclusions)
+		{
+			base.SetDefaultFileExclusions(newExclusions);
+			return this;
+		}
+
+		public StaticResourcesInfoProvider Add(PageResource page)
+		{
+			this.resources.Add(Throw.IfNull(page));
+			return this;
+		}
+		public StaticResourcesInfoProvider Add(IEnumerable<PageResource> pages)
 		{
 			Throw.IfNull(pages);
 			this.resources.AddRange(pages.Where(p => p is not null));
+			return this;
 		}
 
-		public void Add(CssResource resource) => this.resources.Add(Throw.IfNull(resource));
-		public void Add(IEnumerable<CssResource> resources)
+		public StaticResourcesInfoProvider Add(CssResource resource)
+		{
+			this.resources.Add(Throw.IfNull(resource));
+			return this;
+		}
+		public StaticResourcesInfoProvider Add(IEnumerable<CssResource> resources)
 		{
 			Throw.IfNull(resources);
 			this.resources.AddRange(resources.Where(p => p is not null));
+			return this;
 		}
 
-		public void Add(JsResource resource) => this.resources.Add(Throw.IfNull(resource));
-		public void Add(IEnumerable<JsResource> resources)
+		public StaticResourcesInfoProvider Add(JsResource resource)
+		{
+			this.resources.Add(Throw.IfNull(resource));
+			return this;
+		}
+		public StaticResourcesInfoProvider Add(IEnumerable<JsResource> resources)
 		{
 			Throw.IfNull(resources);
 			this.resources.AddRange(resources.Where(p => p is not null));
+			return this;
 		}
 
-		public void Add(BinResource resource) => this.resources.Add(Throw.IfNull(resource));
-		public void Add(IEnumerable<BinResource> resources)
+		public StaticResourcesInfoProvider Add(BinResource resource)
+		{
+			this.resources.Add(Throw.IfNull(resource));
+			return this;
+		}
+		public StaticResourcesInfoProvider Add(IEnumerable<BinResource> resources)
 		{
 			Throw.IfNull(resources);
 			this.resources.AddRange(resources.Where(p => p is not null));
+			return this;
 		}
 	}
 }
