@@ -17,7 +17,8 @@ builder.Services.AddRouting(
 builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
-	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection(), null));
+	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection()));
+
 
 #region app.UseStaticPageFallback()
 #if ENABLE_STATIC_PAGE_FALLBACK

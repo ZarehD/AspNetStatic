@@ -16,7 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".sln", ".sln", "{907E4848-A
 		..\Readme.md = ..\Readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.BlazorSSG", "Samples\BlazorSSG\Sample.BlazorSSG.csproj", "{EDD95B43-99CB-4BD8-B58E-FDA4402BEA30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.BlazorSSG", "Samples\BlazorSSG\Sample.BlazorSSG.csproj", "{EDD95B43-99CB-4BD8-B58E-FDA4402BEA30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetStaticContrib", "AspNetStaticContrib\AspNetStaticContrib.csproj", "{69EBC1EF-1936-4D13-842C-DC147D7FF730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +42,10 @@ Global
 		{EDD95B43-99CB-4BD8-B58E-FDA4402BEA30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDD95B43-99CB-4BD8-B58E-FDA4402BEA30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDD95B43-99CB-4BD8-B58E-FDA4402BEA30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

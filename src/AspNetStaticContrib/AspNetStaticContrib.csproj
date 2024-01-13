@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<RepositoryUrl>https://github.com/ZarehD/AspNetStatic</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/ZarehD/AspNetStatic</PackageProjectUrl>
+		<PackageIcon>ProjectIcon.png</PackageIcon>
+		<PackageReadmeFile>Readme.md</PackageReadmeFile>
+
+		<AssemblyName>AspNetStaticContrib</AssemblyName>
+		<RootNamespace>AspNetStaticContrib</RootNamespace>
+		<PackageId>AspNetStaticContrib</PackageId>
+		<Title>AspNetStaticContrib</Title>
+		<PackageTags>asp.net,core,static,site,generator,ssg,website,html,community,contrib</PackageTags>
+
+		<Authors>Zareh DerGevorkian</Authors>
+		<Company>Zareh DerGevorkian</Company>
+		<PublisherName>Zareh DerGevorkian</PublisherName>
+		<Product>AspNetStatic</Product>
+		<Copyright>Copyright 2023-2024 Zareh DerGevorkian and contributors. All rights reserved</Copyright>
+		<Description>AspNetStatic community contributed extensions.</Description>
+		<Version>0.1.0</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ThrowGuard" Version="1.0.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AspNetStatic\AspNetStatic.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\ProjectIcon.png" Link="ProjectIcon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\Readme.md" Link="Readme.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>
