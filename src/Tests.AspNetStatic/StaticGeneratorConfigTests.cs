@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using WebMarkupMin.Core;
+﻿using WebMarkupMin.Core;
 
 namespace Tests.AspNetStatic
 {
