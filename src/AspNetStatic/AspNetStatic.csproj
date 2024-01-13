@@ -36,9 +36,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="TestableIO.System.IO.Abstractions" Version="19.2.87" />
-		<PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="19.2.87" />
-		<PackageReference Include="ThrowGuard" Version="1.0.4" />
+		<PackageReference Include="TestableIO.System.IO.Abstractions" Version="20.0.4" />
+		<PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="20.0.4" />
+		<PackageReference Include="ThrowGuard" Version="1.0.6" />
 		<PackageReference Include="WebMarkupMin.Core" Version="2.14.0" />
 	</ItemGroup>
 
