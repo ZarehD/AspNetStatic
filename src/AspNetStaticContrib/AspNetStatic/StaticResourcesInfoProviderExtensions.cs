@@ -10,7 +10,18 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+/* IMPORTANT NOTE:
+ * 
+ * The methods implemented in this class are not intende to be 
+ * comprehensive or even broadly applicable. Their purpose is 
+ * to provide a starting point for more complex, meaningful, 
+ * and/or broadly applicable implementations contributed by 
+ * the AspNetStatic community.
+ * 
+ */
+
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 
 namespace AspNetStaticContrib.AspNetStatic;
 
@@ -48,15 +59,72 @@ public static class StaticResourcesInfoProviderExtensions
 		var pagesFolderPath = Path.Combine(env.ContentRootPath, "Pages");
 		var razorPageFiles = Directory.GetFiles(pagesFolderPath, $"*{razorExtension}", SearchOption.AllDirectories);
 		var razorPageRoutes = razorPageFiles
-			.Where(p =>
-				!p.Contains($"{Path.DirectorySeparatorChar}_", compMode) &&
-				!p.Contains(sharedFolder, compMode))
-			.Select(p => p
+			.Where(f =>
+				!f.Contains($"{Path.DirectorySeparatorChar}_", compMode) &&
+				!f.Contains(sharedFolder, compMode))
+			.Select(f => f
 				.Replace(pagesFolderPath, string.Empty)
 				.Replace(razorExtension, string.Empty)
 				.Replace(Path.DirectorySeparatorChar, '/'));
 
-		provider.Add(razorPageRoutes.Select(p => new PageResource(p)));
+		provider.Add(razorPageRoutes.Select(route => new PageResource(route)));
+
+		return provider;
+	}
+
+
+	/// <summary>
+	///		Adds all CSS, JS and binary content found in the project wwwroot folder 
+	///		to the <see cref="StaticResourcesInfoProvider"/> instance.
+	/// </summary>
+	/// <remarks>
+	///		Any file that is not considered to be a CSS or JS file is deemed to be 
+	///		a binary resource, and therefore added as a <see cref="BinResource"/>.
+	/// </remarks>
+	/// <param name="provider">The <see cref="StaticResourcesInfoProvider"/> instance.</param>
+	/// <param name="env">An instance of <see cref="IWebHostEnvironment"/>.</param>
+	/// <returns>The object referenced in <paramref name="provider"/>.</returns>
+	public static StaticResourcesInfoProvider AddAllWebRootContent(
+		this StaticResourcesInfoProvider provider,
+		IWebHostEnvironment env)
+	{
+		Throw.IfNull(provider);
+		Throw.IfNull(env);
+
+		var webRootPath = env.WebRootPath;
+		var allWebRootFiles = Directory
+			.GetFiles(webRootPath, "*.*", SearchOption.AllDirectories)
+			.Select(f => f
+				.Replace(webRootPath, string.Empty)
+				.Replace(Path.DirectorySeparatorChar, '/'))
+			;
+
+#if NET8_0_OR_GREATER
+		string[] cssExts = [".css", ".scss"];
+		string[] jsExts = [".js", ".json"];
+#else
+		string[] cssExts = new[] { ".css", ".scss" };
+		string[] jsExts = new[] { ".js", ".json" };
+#endif
+		var comparer = StringComparer.OrdinalIgnoreCase;
+
+		provider.Add(allWebRootFiles
+			.Where(r => cssExts.Contains(Path.GetExtension(r), comparer))
+			.Select(r => new CssResource(r)))
+			;
+
+		provider.Add(allWebRootFiles
+			.Where(r => jsExts.Contains(Path.GetExtension(r), comparer))
+			.Select(r => new JsResource(r)))
+			;
+
+		provider.Add(allWebRootFiles
+			.Where(r =>
+				!cssExts.Contains(Path.GetExtension(r), comparer) &&
+				!jsExts.Contains(Path.GetExtension(r), comparer)
+				)
+			.Select(r => new BinResource(r)))
+			;
 
 		return provider;
 	}
