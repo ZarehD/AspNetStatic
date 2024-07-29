@@ -1,6 +1,7 @@
 #define ENABLE_STATIC_PAGE_FALLBACK
 
 using AspNetStatic;
+using Microsoft.Extensions.Hosting;
 using PartialStaticSite;
 
 
@@ -19,15 +20,28 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
 	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection()));
 
+// Use the "no-ssg" arg to omit static file generation
+// during development (hot-reload, etc.)
+var allowSSG = !args.HasOmitSsgArg();
+
+var exitWhenDone = args.HasExitWhenDoneArg();
+
+TimeSpan? regenInterval =
+	!exitWhenDone &&
+	TimeSpan.TryParse(builder.Configuration["AspNetStatic:RegenTimer"], out var ts)
+	? ts : null;
 
 #region app.UseStaticPageFallback()
 #if ENABLE_STATIC_PAGE_FALLBACK
 
-builder.Services.AddStaticPageFallback(
-	cfg =>
-	{
-		cfg.AlwaysDefaultFile = false;
-	});
+if (allowSSG)
+{
+	builder.Services.AddStaticPageFallback(
+		cfg =>
+		{
+			cfg.AlwaysDefaultFile = false;
+		});
+}
 
 #endif
 #endregion
@@ -35,11 +49,6 @@ builder.Services.AddStaticPageFallback(
 
 var app = builder.Build();
 
-var exitWhenDone = args.HasExitWhenDoneArg();
-TimeSpan? regenInterval =
-	!exitWhenDone &&
-	TimeSpan.TryParse(app.Configuration["AspNetStatic:RegenTimer"], out var ts)
-	? ts : null;
 
 if (!app.Environment.IsDevelopment())
 {
@@ -51,7 +60,10 @@ app.UseHttpsRedirection();
 #region app.UseStaticPageFallback()
 #if ENABLE_STATIC_PAGE_FALLBACK
 
-app.UseStaticPageFallback();
+if (allowSSG)
+{
+	app.UseStaticPageFallback();
+}
 
 #endif
 #endregion
@@ -64,13 +76,16 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-app.GenerateStaticContent(
+if (allowSSG)
+{
+	app.GenerateStaticContent(
 	app.Environment.WebRootPath,
 	exitWhenDone: exitWhenDone,
 	alwaysDefaultFile: false,
 	dontUpdateLinks: false,
 	dontOptimizeContent: false,
 	regenerationInterval: regenInterval);
+}
 
 app.Run();
 
@@ -81,3 +96,5 @@ if (!exitWhenDone)
 	Console.ReadKey();
 }
 #endif
+
+return 0;

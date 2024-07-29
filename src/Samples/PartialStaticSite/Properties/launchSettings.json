@@ -8,9 +8,9 @@
     }
   },
   "profiles": {
-    "SSG": {
+    "SSG-ONLY": {
       "commandName": "Project",
-      "commandLineArgs": "ssg",
+      "commandLineArgs": "ssg-only",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "applicationUrl": "https://localhost:5095",
@@ -29,6 +29,16 @@
     },
     "https": {
       "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7090;http://localhost:5095",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "https-no-static": {
+      "commandName": "Project",
+      "commandLineArgs": "no-ssg",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7090;http://localhost:5095",
