@@ -18,11 +18,20 @@ namespace AspNetStatic
 			(args is not null) && args.Any(
 				a =>
 				a.HasSameText(SSG) ||
+				a.HasSameText(SSG_ONLY) ||
 				a.HasSameText(STATIC_ONLY) ||
 				a.HasSameText(EXIT_WHEN_DONE));
 
+		public static bool HasOmitSsgArg(this string[] args) =>
+			(args is not null) && args.Any(
+				a =>
+				a.HasSameText(NO_SSG));
+
 		private const string SSG = "ssg";
+		private const string SSG_ONLY = "ssg-only";
 		private const string STATIC_ONLY = "static-only";
 		private const string EXIT_WHEN_DONE = "exit-when-done";
+
+		private const string NO_SSG = "no-ssg";
 	}
 }
