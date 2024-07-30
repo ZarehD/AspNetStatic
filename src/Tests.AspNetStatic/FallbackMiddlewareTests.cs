@@ -237,7 +237,7 @@ namespace Tests.AspNetStatic
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
 			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
 			httpContextMoq.Setup(x => x.Request.QueryString).Returns(new QueryString(query.EnsureStartsWith('?', true)));
-			//httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
+			httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
 			var httpContext = httpContextMoq.Object;
 
 			var sut = new StaticPageFallbackMiddleware(
