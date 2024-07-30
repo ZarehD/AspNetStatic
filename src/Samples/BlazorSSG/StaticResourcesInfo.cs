@@ -18,25 +18,22 @@ namespace Sample.BlazorSsg
 		}
 
 		public static IEnumerable<PageResource> GetPageResources() =>
-			new PageResource[]
-			{
+			[
 				new("/") { OutFile = "Index.html" },
 				new("/Weather"),
-			};
+			];
 
 		public static IEnumerable<CssResource> GetCssResources() =>
-			new CssResource[]
-			{
+			[
 				new("/bootstrap/bootstrap.min.css"),
 				new("/app.css"),
 				new("/Sample.BlazorSSG.styles.css")
-			};
+			];
 
 		public static IEnumerable<BinResource> GetBinaryResources() =>
-			new BinResource[]
-			{
+			[
 				new("/favicon.png"),
-			};
+			];
 
 	}
 }
