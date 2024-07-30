@@ -10,11 +10,17 @@ namespace Tests.AspNetStatic
 	[TestClass]
 	public class FallbackMiddlewareTests
 	{
-		private static readonly string File_Doc_P1 = "doc/page1.htm".ToFileSysPath();
-		private static readonly string File_Doc_P2_123 = @"doc\page2-123.htm".ToFileSysPath();
-		private static readonly string File_Doc_P3 = "doc/page3-p1v1-p2v2.htm".ToFileSysPath();
-		private static readonly string File_Doc_P4_567_P1V1 = "doc/page4-567-p1v1.htm".ToFileSysPath();
-		private static readonly string File_Doc_P4_789_P1V1 = "doc/page4-789-p1v1.htm".ToFileSysPath();
+		private const string C_File_Doc_P1 = "doc/page1.html";
+		private const string C_File_Doc_P2_123 = @"doc\page2-123.htm";
+		private const string C_File_Doc_P3 = "doc/page3-p1v1-p2v2.htm";
+		private const string C_File_Doc_P4_567_P1V1 = "doc/page4-567-p1v1.htm";
+		private const string C_File_Doc_P4_789_P1V1 = "doc/page4-789-p1v1.html";
+
+		private static readonly string File_Doc_P1 = C_File_Doc_P1.ToFileSysPath();
+		private static readonly string File_Doc_P2_123 = C_File_Doc_P2_123.ToFileSysPath();
+		private static readonly string File_Doc_P3 = C_File_Doc_P3.ToFileSysPath();
+		private static readonly string File_Doc_P4_567_P1V1 = C_File_Doc_P4_567_P1V1.ToFileSysPath();
+		private static readonly string File_Doc_P4_789_P1V1 = C_File_Doc_P4_789_P1V1.ToFileSysPath();
 
 		private static readonly List<PageResource> _pages =
 			new(new PageResource[]
@@ -22,6 +28,8 @@ namespace Tests.AspNetStatic
 				new("/"),
 				new("/blog/"),
 				new("/blog/article1"),
+				new("/doc/page-a"),
+				new("/doc/page-b") { OutFile = "/doc/page-b/index.html" },
 				new("/doc/p1") { OutFile = File_Doc_P1 },
 				new("/doc/p2/123") { OutFile = File_Doc_P2_123 },
 				new("/doc/p3") { Query = "?p1=v1&p2=v2", OutFile = File_Doc_P3 },
@@ -31,7 +39,7 @@ namespace Tests.AspNetStatic
 
 		private class PageInfoProvider : StaticResourcesInfoProvider
 		{
-			public PageInfoProvider() : base(_pages, null) { }
+			public PageInfoProvider() : base(_pages, defaultFileExtension: ".html") { }
 		}
 
 		private static ILogger<StaticPageFallbackMiddleware> GetMiddlewareLogger() =>
@@ -70,7 +78,7 @@ namespace Tests.AspNetStatic
 		{
 			// Setup...
 			//
-			var parts = requestPath.Split('?');
+			var parts = requestPath.EnsureStartsWith(Consts.FwdSlash).Split('?');
 			var path = parts[0];
 			var query = parts.Length > 1 ? parts[1] : null;
 
@@ -87,6 +95,7 @@ namespace Tests.AspNetStatic
 			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(true);
 			var fileSystem = fileSystemMoq.Object;
 
+			expectedPath = expectedPath.EnsureStartsWith(Consts.FwdSlash);
 			var httpContextMoq = new Mock<HttpContext>();
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
 			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
@@ -126,14 +135,14 @@ namespace Tests.AspNetStatic
 
 
 		[DataTestMethod]
-		[DataRow("/doc/p1", "/doc/page1.htm", false)]
 		[DataRow("/doc/", "/doc/index.html", true)]
+		[DataRow("/doc/p1", C_File_Doc_P1, false)]
 		[DataRow("/doc/p1", "/doc/p1.html", true)]
 		[DataRow("/doc/p2/123", "/doc/page2-123.htm", false)]
 		[DataRow("/doc/p3?p1=v1&p2=v2", "/doc/page3-p1v1-p2v2.htm", false)]
 		[DataRow("/doc/p4/567/?p1=v1", "/doc/page4-567-p1v1.htm", false)]
 		[DataRow("/doc/p4/567?p1=v1", "/doc/p4/567.html", true)]
-		[DataRow("/doc/p4/789/?p1=v1", "/doc/page4-789-p1v1.htm", false)]
+		[DataRow("/doc/p4/789/?p1=v1", "/doc/page4-789-p1v1.html", false)]
 		[DataRow("/doc/p4/789/?p1=v1", "/doc/p4/789/index.html", true)]
 		public async Task Test_Fallback_OutFilePathname(
 			string requestPath, string expectedPath,
@@ -141,7 +150,7 @@ namespace Tests.AspNetStatic
 		{
 			// Setup...
 			//
-			var parts = requestPath.Split('?');
+			var parts = requestPath.EnsureStartsWith(Consts.FwdSlash).Split('?');
 			var path = parts[0];
 			var query = parts.Length > 1 ? parts[1] : null;
 
@@ -158,6 +167,7 @@ namespace Tests.AspNetStatic
 			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(true);
 			var fileSystem = fileSystemMoq.Object;
 
+			expectedPath = expectedPath.EnsureStartsWith(Consts.FwdSlash);
 			var httpContextMoq = new Mock<HttpContext>();
 			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
 			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
@@ -193,6 +203,65 @@ namespace Tests.AspNetStatic
 			{
 				httpContextMoq.VerifySet(x => x.Request.Path = It.IsAny<PathString>(), Times.Never);
 			}
+		}
+
+
+		[DataTestMethod]
+		[DataRow("/doc/page-a.html", "/doc/page-a", false)]
+		[DataRow("/doc/page-b/index.html", "/doc/page-b", true)]
+		[DataRow(C_File_Doc_P1, "/doc/p1", false)]
+		[DataRow(C_File_Doc_P2_123, "/doc/p2/123", false)]
+		[DataRow($"{C_File_Doc_P3}?p1=v1&p2=v2", "/doc/p3", false)]
+		[DataRow($"{C_File_Doc_P4_567_P1V1}?p1=v1", "/doc/p4/567", false)]
+		[DataRow($"{C_File_Doc_P4_789_P1V1}?p1=v1", "/doc/p4/789/", false)]
+		public async Task Test_Reverse_Fallback_AutoPath(
+			string requestPath, string expectedPath,
+			bool alwaysDefaultFile)
+		{
+			// Setup...
+			//
+			var parts = requestPath.EnsureStartsWith(Consts.FwdSlash).Split('?');
+			var path = parts[0];
+			var query = parts.Length > 1 ? parts[1] : null;
+
+			var pageInfoProvider = GetPageInfoProvider();
+
+			var diskFilePathname = GetOutFileFullPath(path);
+
+			var fileSystemMoq = new Mock<IFileSystem>();
+			fileSystemMoq.Setup(x => x.File.Exists(diskFilePathname)).Returns(false);
+			var fileSystem = fileSystemMoq.Object;
+
+			expectedPath = expectedPath.EnsureStartsWith(Consts.FwdSlash);
+			var httpContextMoq = new Mock<HttpContext>();
+			httpContextMoq.Setup(x => x.Request.Headers).Returns(new HeaderDictionary());
+			httpContextMoq.Setup(x => x.Request.Path).Returns(new PathString(path));
+			httpContextMoq.Setup(x => x.Request.QueryString).Returns(new QueryString(query.EnsureStartsWith('?', true)));
+			//httpContextMoq.SetupSet(x => x.Request.Path = new PathString(expectedPath)).Verifiable();
+			var httpContext = httpContextMoq.Object;
+
+			var sut = new StaticPageFallbackMiddleware(
+				GetMiddlewareLogger(),
+				fileSystem,
+				GetNextMiddleware(),
+				pageInfoProvider,
+				GetWebHostEnvironment(),
+				Options.Create<StaticPageFallbackMiddlewareOptions>(
+					new()
+					{
+						AlwaysDefaultFile = alwaysDefaultFile
+					}));
+
+
+			// Act...
+			//
+			await sut.InvokeAsync(httpContext);
+
+
+			// Assess...
+			//
+			var expectedQuery = $"{expectedPath}{query.EnsureStartsWith("?", true)}";
+			httpContextMoq.VerifySet(x => x.Request.Path = new PathString(expectedQuery)); //new PathString(expectedPath)
 		}
 	}
 }

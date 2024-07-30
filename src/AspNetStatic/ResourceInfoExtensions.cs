@@ -54,6 +54,33 @@ namespace AspNetStatic
 					: StringComparison.OrdinalIgnoreCase));
 
 
+		public static PageResource? GetPageResourceForStaticPage(
+			this IEnumerable<PageResource> resources,
+			PageResourceFinderConfig config,
+			string staticPageRoute) =>
+			(resources is null) || !resources.Any() ? default :
+			resources.FirstOrDefault(
+				p =>
+				staticPageRoute.ToFileSysPath().HasSameText(
+					string.IsNullOrWhiteSpace(p.OutFile)
+					? p.GetOutFilePathname(
+						Consts.BSlash,
+						alwaysCreateDefaultFile: config.AlwaysDefaultFile,
+						indexFileName: config.IndexFileName,
+						pageFileExtension: config.PageFileExtension,
+						exclusions: config.DefaultFileExclusions)
+					: p.OutFile.ToFileSysPath().EnsureStartsWith(Consts.BakSlash)
+				));
+
+		public record PageResourceFinderConfig(
+			bool AlwaysDefaultFile,
+			string IndexFileName,
+			string PageFileExtension,
+			string[] DefaultFileExclusions
+		);
+
+
+
 		private static string NormalizeRoute(this string? route) =>
 			string.IsNullOrEmpty(route) ? string.Empty :
 			route.EnsureStartsWith(Consts.FSlash).EnsureEndsWith(Consts.FSlash);

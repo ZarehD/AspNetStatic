@@ -72,72 +72,90 @@ namespace AspNetStatic
 
 		public async Task InvokeAsync(HttpContext ctx)
 		{
-			if (this._haveStaticPages)
+			if (!this._haveStaticPages || ctx.Request.IsAspNetStaticRequest())
 			{
-				if (!ctx.Request.IsAspNetStaticRequest())
+				await this._next(ctx).ConfigureAwait(false);
+				return;
+			}
+
+			var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
+			var query = ctx.Request.QueryString.Value.EnsureStartsWith('?', true);
+			var page = this._pageInfoProvider.PageResources.GetResourceForUrl($"{path}{query}");
+
+			if (page is not null)
+			{
+				if (!this._ignoreOutFilePathname && !string.IsNullOrWhiteSpace(page.OutFile))
 				{
-					var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
-					var query = ctx.Request.QueryString.Value.EnsureStartsWith('?', true);
-					var page = this._pageInfoProvider.PageResources.GetResourceForUrl($"{path}{query}");
+					var outFile = page.OutFile.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
+					var physicalPath = Path.Combine(this._webRoot, outFile);
 
-					if (page is not null)
+					if (this._fileSystem.File.Exists(physicalPath))
 					{
-						if (!this._ignoreOutFilePathname &&
-							!string.IsNullOrWhiteSpace(page.OutFile))
+						var newPath = outFile
+							.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
+							.EnsureStartsWith(Consts.FwdSlash);
+
+						this._logger?.ProcessedRoute(path, newPath);
+
+						ctx.Request.Path = newPath;
+					}
+					else
+					{
+						this._logger?.NoFileAtProposedRoute(path, "N/A", physicalPath);
+					}
+				}
+				else
+				{
+					var hasExtension = Path.HasExtension(path);
+					var endsWithSlash = path.EndsWith(Consts.FwdSlash);
+					var alwaysDefault = this._alwaysDefaultFile;
+
+					this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
+
+					var newPath =
+						(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
+						? path.ToDefaultFileFallback(this._exclusions, this._defaultFileName, this._pageFileExtension)
+						: (!endsWithSlash && !hasExtension && !alwaysDefault)
+						? path + this._pageFileExtension
+						: string.Empty
+						;
+
+					if (!string.IsNullOrEmpty(newPath))
+					{
+						var physicalPath =
+							Path.Combine(
+								this._webRoot, newPath.ToFileSysPath()
+								.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+
+						if (this._fileSystem.File.Exists(physicalPath))
 						{
-							var outFile = page.OutFile.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
-							var physicalPath = Path.Combine(this._webRoot, outFile);
-
-							if (this._fileSystem.File.Exists(physicalPath))
-							{
-								var newPath = outFile
-									.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
-									.EnsureStartsWith(Consts.FwdSlash);
-
-								this._logger?.ProcessedRoute(path, newPath);
-
-								ctx.Request.Path = newPath;
-							}
-							else
-							{
-								this._logger?.NoFileAtProposedRoute(path, "N/A", physicalPath);
-							}
+							this._logger?.ProcessedRoute(path, newPath);
+							ctx.Request.Path = newPath;
 						}
 						else
 						{
-							var hasExtension = Path.HasExtension(path);
-							var endsWithSlash = path.EndsWith(Consts.FwdSlash);
-							var alwaysDefault = this._alwaysDefaultFile;
-
-							this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
-
-							var newPath =
-								(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
-								? path.ToDefaultFileFallback(this._exclusions, this._defaultFileName, this._pageFileExtension)
-								: (!endsWithSlash && !hasExtension && !alwaysDefault)
-								? path + this._pageFileExtension
-								: string.Empty
-								;
-
-							if (!string.IsNullOrEmpty(newPath))
-							{
-								var physicalPath =
-									Path.Combine(
-										this._webRoot, newPath.ToFileSysPath()
-										.EnsureNotStartsWith(Path.DirectorySeparatorChar));
-
-								if (this._fileSystem.File.Exists(physicalPath))
-								{
-									this._logger?.ProcessedRoute(path, newPath);
-									ctx.Request.Path = newPath;
-								}
-								else
-								{
-									this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
-								}
-							}
+							this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
 						}
 					}
+				}
+			}
+			else if (!this._fileSystem.File.Exists(path) &&
+				(path.EndsWith(this._pageFileExtension)
+				|| path.EndsWith(".htm") || path.EndsWith(".html")))
+			{ // reverse fallback: static page not foud. fallback to source url...
+
+				page = this._pageInfoProvider.PageResources
+					.GetPageResourceForStaticPage(
+						new(this._alwaysDefaultFile,
+						this._defaultFileName,
+						this._pageFileExtension,
+						this._exclusions),
+						path);
+
+				if (page is not null)
+				{
+					ctx.Request.Path = page.Url;
+					this._logger?.RouteToReverseFallback(path, ctx.Request.Path);
 				}
 			}
 
@@ -307,6 +325,27 @@ namespace AspNetStatic
 			string origRoute,
 			string newRoute,
 			string physicalPath);
+
+		#endregion
+
+
+		#region 1010 - RouteToReverseFallback
+
+		public static void RouteToReverseFallback(
+			this ILogger<StaticPageFallbackMiddleware> logger,
+			string origRoute,
+			string newRoute) =>
+			logger.Imp_RouteToReverseFallback(
+				origRoute,
+				newRoute);
+
+		[LoggerMessage(
+			EventId = 1010, EventName = "RouteToReverseFallback", Level = LogLevel.Warning,
+			Message = "StaticPageFallbackMiddleware: Static page not found. Falling back to source route > OrigRoute = {OrigRoute}, NewRoute = {NewRoute}")]
+		private static partial void Imp_RouteToReverseFallback(
+			this ILogger<StaticPageFallbackMiddleware> logger,
+			string origRoute,
+			string newRoute);
 
 		#endregion
 	}
