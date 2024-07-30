@@ -55,6 +55,13 @@ It's a piece of cake.
    - Register it in the DI container
    ```c#
    builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
+	  new StaticResourcesInfoProvider()
+	    .AddAllProjectRazorPages(builder.Environment) // from AspNetStaticContrib project
+	    .AddAllWebRootContent(builder.Environment));  // from AspNetStaticContrib project
+
+   -- OR --
+
+   builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
      new StaticResourcesInfoProvider(
        new []
        {
