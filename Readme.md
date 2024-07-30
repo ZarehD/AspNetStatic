@@ -104,7 +104,7 @@ Keep the following in mind when specifying routes in the `IStaticResourcesInfoPr
 
 > 1: Content optimization options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details.
 
-### Routes vs. Generated Static Files
+### Routes vs. Generated Static Files (page resources)
 
 > Assumes the following:
 >  - Resource Type: PageResource
@@ -125,11 +125,13 @@ Url<br/>(route + query) | Always Default<br/>false | Always Default<br/>true
 /blog/articles/      | C:\MySite\blog\articles/index.html    | C:\MySite\blog\articles\index.html
 /blog/articles/post1 | C:\MySite\blog\articles\post1.html | C:\MySite\blog\articles\post1\index.html
 
+### Routes vs. Generated Static Files (non-page resources)
+
 > Assumes the following:
 >  - Resource Type: __CssResource__, __JsResource__, or __BinResource__
 >  - Destination root: "__C:\MySite__"
 >  - OutFile: __null, empty, or whitespace__
->  - __AlwaysDefaultFile__ setting not applicable.
+>  - __AlwaysDefaultFile__ not applicable.
 
 Url<br/>(route + query) | Generated File
 ---|---
@@ -138,7 +140,7 @@ Url<br/>(route + query) | Generated File
 /file.css?v=123   | C:\MySite\file.css
 /file             | C:\MySite\file.css (__CssResource__)
 /file/            | C:\MySite\file.css (__CssResource__)
-/file.js          | C:\MySite\file.css
+/file.js          | C:\MySite\file.js
 /folder/file.js   | C:\MySite\folder\file.js
 /file.js?v=123    | C:\MySite\file.js
 /file             | C:\MySite\file.js (__JsResource__)
