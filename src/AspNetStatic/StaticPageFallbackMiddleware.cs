@@ -20,7 +20,7 @@ using Microsoft.Extensions.Options;
 
 namespace AspNetStatic
 {
-	public class StaticPageFallbackMiddleware
+	internal sealed class StaticPageFallbackMiddleware
 	{
 		private readonly ILogger<StaticPageFallbackMiddleware>? _logger;
 		private readonly IFileSystem _fileSystem;
@@ -222,7 +222,7 @@ namespace AspNetStatic
 
 	#region Logger Messages...
 
-	public static partial class StaticPageFallbackMiddlewareLoggerExtensions
+	internal static partial class StaticPageFallbackMiddlewareLoggerExtensions
 	{
 		#region 1001 - Configuration
 

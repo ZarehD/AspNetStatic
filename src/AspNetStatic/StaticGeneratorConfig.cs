@@ -12,7 +12,7 @@ the specific language governing permissions and limitations under the License.
 
 namespace AspNetStatic
 {
-	internal class StaticGeneratorConfig
+	internal sealed class StaticGeneratorConfig
 	{
 		public List<ResourceInfoBase> Resources { get; } = new();
 

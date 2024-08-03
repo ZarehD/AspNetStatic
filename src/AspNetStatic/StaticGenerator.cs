@@ -18,7 +18,7 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic
 {
-	internal class StaticGenerator
+	internal sealed class StaticGenerator
 	{
 		public static async Task Execute(
 			StaticGeneratorConfig config,
