@@ -25,7 +25,7 @@ namespace AspNetStatic
 		private readonly ILogger<StaticPageFallbackMiddleware>? _logger;
 		private readonly IFileSystem _fileSystem;
 		private readonly RequestDelegate _next;
-		private readonly IStaticResourcesInfoProvider _pageInfoProvider;
+		private readonly IStaticResourcesInfoProvider _resourceInfoProvider;
 		private readonly bool _haveStaticPages;
 		private readonly bool _alwaysDefaultFile;
 		private readonly bool _ignoreOutFilePathname;
@@ -38,7 +38,7 @@ namespace AspNetStatic
 			ILogger<StaticPageFallbackMiddleware>? logger,
 			IFileSystem fileSystem,
 			RequestDelegate next,
-			IStaticResourcesInfoProvider pageInfoProvider,
+			IStaticResourcesInfoProvider resourceInfoProvider,
 			IWebHostEnvironment environment,
 			IOptions<StaticPageFallbackMiddlewareOptions>? optionsAccessor)
 		{
@@ -46,14 +46,14 @@ namespace AspNetStatic
 
 			this._fileSystem = Throw.IfNull(fileSystem);
 			this._next = Throw.IfNull(next);
-			this._pageInfoProvider = Throw.IfNull(pageInfoProvider);
+			this._resourceInfoProvider = Throw.IfNull(resourceInfoProvider);
 			Throw.IfNull(environment);
 			var options = optionsAccessor?.Value ?? new StaticPageFallbackMiddlewareOptions();
 
-			this._haveStaticPages = this._pageInfoProvider.PageResources.Any();
-			this._pageFileExtension = this._pageInfoProvider.PageFileExtension.EnsureStartsWith(".");
-			this._defaultFileName = $"{this._pageInfoProvider.DefaultFileName}{this._pageFileExtension}";
-			this._exclusions = this._pageInfoProvider.DefaultFileExclusions;
+			this._haveStaticPages = this._resourceInfoProvider.PageResources.Any();
+			this._pageFileExtension = this._resourceInfoProvider.PageFileExtension.EnsureStartsWith(".");
+			this._defaultFileName = $"{this._resourceInfoProvider.DefaultFileName}{this._pageFileExtension}";
+			this._exclusions = this._resourceInfoProvider.DefaultFileExclusions;
 
 			this._alwaysDefaultFile = options.AlwaysDefaultFile;
 			this._ignoreOutFilePathname = options.IgnoreOutFilePathname;
@@ -61,7 +61,7 @@ namespace AspNetStatic
 			this._webRoot = environment.WebRootPath;
 
 			this._logger?.Configuration(
-				this._pageInfoProvider.PageResources.Count(),
+				this._resourceInfoProvider.PageResources.Count(),
 				this._alwaysDefaultFile,
 				this._ignoreOutFilePathname,
 				this._webRoot,
@@ -80,82 +80,134 @@ namespace AspNetStatic
 
 			var path = ctx.Request.Path.Value.EnsureStartsWith(Consts.FwdSlash);
 			var query = ctx.Request.QueryString.Value.EnsureStartsWith('?', true);
-			var page = this._pageInfoProvider.PageResources.GetResourceForUrl($"{path}{query}");
+			var page = (PageResource?) this._resourceInfoProvider.PageResources.GetResourceForUrl($"{path}{query}");
+
+			var hasExtension = Path.HasExtension(path);
+			var endsWithFSlash = path.EndsWith(Consts.FwdSlash);
+			var alwaysDefault = this._alwaysDefaultFile;
+
+			this._logger?.ProcessingRoute(path, hasExtension, endsWithFSlash, alwaysDefault, page is not null);
 
 			if (page is not null)
 			{
-				if (!this._ignoreOutFilePathname && !string.IsNullOrWhiteSpace(page.OutFile))
+				var isLeaf = !endsWithFSlash && !hasExtension;
+				var newPath =
+					!this._ignoreOutFilePathname && !string.IsNullOrWhiteSpace(page.OutFile)
+					? page.OutFile
+						.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
+						.EnsureStartsWith(Consts.FwdSlash)
+					: (endsWithFSlash || (isLeaf && alwaysDefault))
+						? path.ToDefaultFileFallback(this._exclusions, this._defaultFileName, this._pageFileExtension)
+						: isLeaf && !alwaysDefault
+							? path + this._pageFileExtension
+							: string.Empty
+					;
+
+				var filePath =
+					Path.Combine(
+						this._webRoot, newPath.ToFileSysPath()
+						.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+
+				if (this._fileSystem.File.Exists(filePath))
 				{
-					var outFile = page.OutFile.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
-					var physicalPath = Path.Combine(this._webRoot, outFile);
-
-					if (this._fileSystem.File.Exists(physicalPath))
-					{
-						var newPath = outFile
-							.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
-							.EnsureStartsWith(Consts.FwdSlash);
-
-						this._logger?.ProcessedRoute(path, newPath);
-
-						ctx.Request.Path = newPath;
-					}
-					else
-					{
-						this._logger?.NoFileAtProposedRoute(path, "N/A", physicalPath);
-					}
+					this._logger?.ProcessedRoute(path, newPath);
+					ctx.Request.Path = newPath;
 				}
 				else
 				{
-					var hasExtension = Path.HasExtension(path);
-					var endsWithSlash = path.EndsWith(Consts.FwdSlash);
-					var alwaysDefault = this._alwaysDefaultFile;
+					this._logger?.NoStaticFileAtProposedRoute(path, newPath, filePath);
+				}
 
-					this._logger?.ProcessingRoute(path, hasExtension, endsWithSlash, alwaysDefault);
+				#region OBSOLETE
 
-					var newPath =
-						(endsWithSlash || (!endsWithSlash && !hasExtension && alwaysDefault))
-						? path.ToDefaultFileFallback(this._exclusions, this._defaultFileName, this._pageFileExtension)
-						: (!endsWithSlash && !hasExtension && !alwaysDefault)
-						? path + this._pageFileExtension
-						: string.Empty
-						;
+				//if (!this._ignoreOutFilePathname && !string.IsNullOrWhiteSpace(page.OutFile))
+				//{ // user specified outfile...
+				//	var outFile = page.OutFile.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
+				//	var physicalPath = Path.Combine(this._webRoot, outFile);
 
-					if (!string.IsNullOrEmpty(newPath))
+				//	if (this._fileSystem.File.Exists(physicalPath))
+				//	{
+				//		var newPath = outFile
+				//			.Replace(Path.DirectorySeparatorChar, Consts.FwdSlash)
+				//			.EnsureStartsWith(Consts.FwdSlash);
+
+				//		this._logger?.ProcessedRoute(RouteHandledBy.UserOutfile, path, newPath);
+
+				//		ctx.Request.Path = newPath;
+				//	}
+				//	else
+				//	{
+				//		this._logger?.NoStaticFileAtProposedRoute(path, "N/A", physicalPath);
+				//	}
+				//}
+				//else
+				//{ // generated outfile pathname...
+				//	var newPath =
+				//		(endsWithFSlash || (!endsWithFSlash && !hasExtension && alwaysDefault))
+				//		? path.ToDefaultFileFallback(this._exclusions, this._defaultFileName, this._pageFileExtension)
+				//		: (!endsWithFSlash && !hasExtension && !alwaysDefault)
+				//		? path + this._pageFileExtension
+				//		: string.Empty
+				//		;
+
+				//	if (!string.IsNullOrEmpty(newPath))
+				//	{
+				//		var physicalPath =
+				//			Path.Combine(
+				//				this._webRoot, newPath.ToFileSysPath()
+				//				.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+
+				//		if (this._fileSystem.File.Exists(physicalPath))
+				//		{
+				//			this._logger?.ProcessedRoute(RouteHandledBy.GeneratedOutfile, path, newPath);
+				//			ctx.Request.Path = newPath;
+				//		}
+				//		else
+				//		{
+				//			this._logger?.NoStaticFileAtProposedRoute(path, newPath, physicalPath);
+				//		}
+				//	}
+				//}
+
+				#endregion
+			}
+			else
+			{
+				var isForStaticPage = hasExtension && path.EndsWith(
+					this._pageFileExtension) || path.EndsWith(".htm") || path.EndsWith(".html");
+
+				if (isForStaticPage)
+				{
+					this._logger?.CheckingForReverseFallback(path);
+
+					var filePath =
+						Path.Combine(
+							this._webRoot, path.ToFileSysPath()
+							.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+
+					this._logger?.ReverseFallbackDebug(filePath);
+
+					if (!this._fileSystem.File.Exists(filePath))
 					{
-						var physicalPath =
-							Path.Combine(
-								this._webRoot, newPath.ToFileSysPath()
-								.EnsureNotStartsWith(Path.DirectorySeparatorChar));
+						page = this._resourceInfoProvider.PageResources
+							.GetPageResourceForStaticPage(
+								new(this._alwaysDefaultFile,
+								this._defaultFileName,
+								this._pageFileExtension,
+								this._exclusions),
+								path);
 
-						if (this._fileSystem.File.Exists(physicalPath))
+						if (page is not null)
 						{
+							var newPath = page.Url.EnsureStartsWith(Consts.FwdSlash);
 							this._logger?.ProcessedRoute(path, newPath);
 							ctx.Request.Path = newPath;
 						}
 						else
 						{
-							this._logger?.NoFileAtProposedRoute(path, newPath, physicalPath);
+							this._logger?.NoPageResourceForRequestedFile(path);
 						}
 					}
-				}
-			}
-			else if (!this._fileSystem.File.Exists(path) &&
-				(path.EndsWith(this._pageFileExtension)
-				|| path.EndsWith(".htm") || path.EndsWith(".html")))
-			{ // reverse fallback: static page not foud. fallback to source url...
-
-				page = this._pageInfoProvider.PageResources
-					.GetPageResourceForStaticPage(
-						new(this._alwaysDefaultFile,
-						this._defaultFileName,
-						this._pageFileExtension,
-						this._exclusions),
-						path);
-
-				if (page is not null)
-				{
-					ctx.Request.Path = page.Url;
-					this._logger?.RouteToReverseFallback(path, ctx.Request.Path);
 				}
 			}
 
@@ -266,22 +318,25 @@ namespace AspNetStatic
 			string route,
 			bool hasExtension,
 			bool endsWithSlash,
-			bool alwaysDefault) =>
+			bool alwaysDefault,
+			bool foundPageResource) =>
 			logger.Imp_ProcessingRoute(
 				route,
 				hasExtension,
 				endsWithSlash,
-				alwaysDefault);
+				alwaysDefault,
+				foundPageResource);
 
 		[LoggerMessage(
 			EventId = 1002, EventName = "ProcessingRoute", Level = LogLevel.Trace,
-			Message = "StaticPageFallbackMiddleware: Processing route > Route = {Route}, HasExtension = {HasExtension}, EndsWithSlash = {EndsWithSlash}, AlwaysDefault = {AlwaysDefault}")]
+			Message = "StaticPageFallbackMiddleware: Processing route > Route = {Route}, HasExtension = {HasExtension}, EndsWithSlash = {EndsWithSlash}, AlwaysDefault = {AlwaysDefault}, FoundPageResource = {FoundPageResource}")]
 		private static partial void Imp_ProcessingRoute(
 			this ILogger<StaticPageFallbackMiddleware> logger,
 			string route,
 			bool hasExtension,
 			bool endsWithSlash,
-			bool alwaysDefault);
+			bool alwaysDefault,
+			bool foundPageResource);
 
 		#endregion
 
@@ -305,22 +360,22 @@ namespace AspNetStatic
 
 		#endregion
 
-		#region 1004 - NoFileAtProposedRoute
+		#region 1004 - NoStaticFileAtProposedRoute
 
-		public static void NoFileAtProposedRoute(
+		public static void NoStaticFileAtProposedRoute(
 			this ILogger<StaticPageFallbackMiddleware> logger,
 			string origRoute,
 			string newRoute,
 			string physicalPath) =>
-			logger.Imp_NoFileAtProposedRoute(
+			logger.Imp_NoStaticFileAtProposedRoute(
 				origRoute,
 				newRoute,
 				physicalPath);
 
 		[LoggerMessage(
-			EventId = 1004, EventName = "NoFileAtProposedRoute", Level = LogLevel.Warning,
-			Message = "StaticPageFallbackMiddleware: No such file at proposed route > OrigRoute = {OrigRoute}, NewRoute = {NewRoute}, PhysicalPath = {PhysicalPath}")]
-		private static partial void Imp_NoFileAtProposedRoute(
+			EventId = 1004, EventName = "NoStaticFileAtProposedRoute", Level = LogLevel.Warning,
+			Message = "StaticPageFallbackMiddleware: No static file at proposed route > OrigRoute = {OrigRoute}, NewRoute = {NewRoute}, PhysicalPath = {PhysicalPath}")]
+		private static partial void Imp_NoStaticFileAtProposedRoute(
 			this ILogger<StaticPageFallbackMiddleware> logger,
 			string origRoute,
 			string newRoute,
@@ -328,24 +383,54 @@ namespace AspNetStatic
 
 		#endregion
 
+		#region 1008 - CheckingForReverseFallback
 
-		#region 1010 - RouteToReverseFallback
-
-		public static void RouteToReverseFallback(
+		public static void CheckingForReverseFallback(
 			this ILogger<StaticPageFallbackMiddleware> logger,
-			string origRoute,
-			string newRoute) =>
-			logger.Imp_RouteToReverseFallback(
-				origRoute,
-				newRoute);
+			string origRoute) =>
+			logger.Imp_CheckingForReverseFallback(
+				origRoute);
 
 		[LoggerMessage(
-			EventId = 1010, EventName = "RouteToReverseFallback", Level = LogLevel.Warning,
-			Message = "StaticPageFallbackMiddleware: Static page not found. Falling back to source route > OrigRoute = {OrigRoute}, NewRoute = {NewRoute}")]
-		private static partial void Imp_RouteToReverseFallback(
+			EventId = 1008, EventName = "CheckingForReverseFallback", Level = LogLevel.Trace,
+			Message = "StaticPageFallbackMiddleware: Checking need for reverse fallback > Route = {Route}")]
+		private static partial void Imp_CheckingForReverseFallback(
 			this ILogger<StaticPageFallbackMiddleware> logger,
-			string origRoute,
-			string newRoute);
+			string route);
+
+		#endregion
+
+		#region 1009 - ReverseFallbackDebug
+
+		public static void ReverseFallbackDebug(
+			this ILogger<StaticPageFallbackMiddleware> logger,
+			string filePath) =>
+			logger.Imp_ReverseFallbackDebug(
+				filePath);
+
+		[LoggerMessage(
+			EventId = 1009, EventName = "ReverseFallbackDebug", Level = LogLevel.Debug,
+			Message = "StaticPageFallbackMiddleware: Reverse fallback criteria > FilePath = {FilePath}")]
+		private static partial void Imp_ReverseFallbackDebug(
+			this ILogger<StaticPageFallbackMiddleware> logger,
+			string filePath);
+
+		#endregion
+
+		#region 1012 - NoPageResourceForRequestedFile
+
+		public static void NoPageResourceForRequestedFile(
+			this ILogger<StaticPageFallbackMiddleware> logger,
+			string route) =>
+			logger.Imp_NoPageResourceForRequestedFile(
+				route);
+
+		[LoggerMessage(
+			EventId = 1012, EventName = "NoPageResourceForRequestedFile", Level = LogLevel.Trace,
+			Message = "StaticPageFallbackMiddleware: Static page not found and no fallback page resource > Route = {Route}")]
+		private static partial void Imp_NoPageResourceForRequestedFile(
+			this ILogger<StaticPageFallbackMiddleware> logger,
+			string route);
 
 		#endregion
 	}
