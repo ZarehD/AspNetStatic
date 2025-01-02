@@ -26,7 +26,7 @@
 		<Company>Zareh DerGevorkian</Company>
 		<PublisherName>Zareh DerGevorkian</PublisherName>
 		<Product>AspNetStatic</Product>
-		<Copyright>Copyright 2023-2024 Zareh DerGevorkian. All rights reserved</Copyright>
+		<Copyright>Copyright 2023-2025 Zareh DerGevorkian. All rights reserved</Copyright>
 		<Description>Transforms ASP.NET Core into a static site generator.</Description>
 		<Version>0.24.0</Version>
 	</PropertyGroup>
