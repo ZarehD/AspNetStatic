@@ -113,7 +113,7 @@ namespace AspNetStatic
 				return;
 			}
 
-			var optimizerSelector = GetOptimizerSelector(host, dontOptimizeContent);
+			var optimizerSelector = GetOptimizerSelector(host.Services, dontOptimizeContent);
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
 
@@ -310,7 +310,7 @@ namespace AspNetStatic
 				return false;
 			}
 
-			var optimizerSelector = GetOptimizerSelector(host, dontOptimizeContent);
+			var optimizerSelector = GetOptimizerSelector(host.Services, dontOptimizeContent);
 
 			var httpClient = GetHttpClient(host, httpClientName, httpTimeoutSeconds);
 
@@ -561,7 +561,7 @@ namespace AspNetStatic
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
-			var optimizerSelector = GetOptimizerSelector(host, dontOptimizeContent);
+			var optimizerSelector = GetOptimizerSelector(host.Services, dontOptimizeContent);
 			var httpClient = GetHttpClient(host, httpClientName, httpTimeoutSeconds);
 
 			try
@@ -654,31 +654,37 @@ namespace AspNetStatic
 			return httpClient;
 		}
 
-		private static IOptimizerSelector? GetOptimizerSelector(IHost host, bool dontOptimizeContent)
+		private static IOptimizerSelector? GetOptimizerSelector(IServiceProvider services, bool dontOptimizeContent)
 		{
-			var result = host.Services.GetService<IOptimizerSelector>();
+			if (dontOptimizeContent) return null;
 
-			if (!dontOptimizeContent && (result is null))
+			var result = services.GetService<IOptimizerSelector>();
+
+			if (result is null)
 			{
-				var markupOptimizer = host.Services.GetService<IMarkupOptimizer>();
-				var cssOptimizer = host.Services.GetService<ICssOptimizer>();
-				var jsOptimizer = host.Services.GetService<IJsOptimizer>();
-				var binOptimizer = host.Services.GetService<IBinOptimizer>();
+				var markupOptimizer = services.GetService<IMarkupOptimizer>();
+				var cssOptimizer = services.GetService<ICssOptimizer>();
+				var jsOptimizer = services.GetService<IJsOptimizer>();
+				var binOptimizer = services.GetService<IBinOptimizer>() ?? new NullBinOptimizer();
 
-				if (markupOptimizer is null)
+				var cssMinifier = services.GetService<ICssMinifier>();
+				var jsMinifier = services.GetService<IJsMinifier>();
+
+				if ((markupOptimizer is null) ||
+					(cssOptimizer is null) ||
+					(jsOptimizer is null))
 				{
-					var cssMinifier = host.Services.GetService<ICssMinifier>() ?? new KristensenCssMinifier();
-					var jsMinifier = host.Services.GetService<IJsMinifier>() ?? new CrockfordJsMinifier();
-					var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
-					var xhtmlMinifierSettings = host.Services.GetService<XhtmlMinificationSettings>();
-					var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
-
-					markupOptimizer = new DefaultMarkupOptimizer(
-						htmlMinifierSettings,
-						xhtmlMinifierSettings,
-						xmlMinifierSettings,
-						cssMinifier, jsMinifier);
+					cssMinifier ??= new KristensenCssMinifier();
+					jsMinifier ??= new CrockfordJsMinifier();
 				}
+
+				markupOptimizer ??= new DefaultMarkupOptimizer(
+						services.GetService<HtmlMinificationSettings>(),
+						services.GetService<XhtmlMinificationSettings>(),
+						services.GetService<XmlMinificationSettings>(),
+						cssMinifier, jsMinifier);
+				cssOptimizer ??= new DefaultCssOptimizer(cssMinifier!);
+				jsOptimizer ??= new DefaultJsOptimizer(jsMinifier!);
 
 				result =
 					new DefaultOptimizerSelector(
