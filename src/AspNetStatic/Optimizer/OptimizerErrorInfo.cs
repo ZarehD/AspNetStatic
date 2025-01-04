@@ -10,9 +10,6 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
-using System.Runtime.CompilerServices;
-using System.Text;
-using Microsoft.AspNetCore.Server.IIS.Core;
 using WebMarkupMin.Core;
 
 namespace AspNetStatic.Optimizer;
