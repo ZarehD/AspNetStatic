@@ -25,6 +25,7 @@ public class CssOptimizerResult : OptimizerResult<string>
 	public CssOptimizerResult(string optimizedContent) : base(optimizedContent) { }
 	public CssOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors) : base(optimizedContent, errors) { }
 	public CssOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors, OptimizerErrorInfo[] warnings) : base(optimizedContent, errors, warnings) { }
+	public CssOptimizerResult(OptimizerErrorInfo[] errors) : base(errors) { }
 
 	public static implicit operator CssOptimizerResult(MinificationResultBase webMinResult) =>
 		new(webMinResult.MinifiedContent,

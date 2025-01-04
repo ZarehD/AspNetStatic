@@ -25,6 +25,7 @@ public class JsOptimizerResult : OptimizerResult<string>
 	public JsOptimizerResult(string optimizedContent) : base(optimizedContent) { }
 	public JsOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors) : base(optimizedContent, errors) { }
 	public JsOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors, OptimizerErrorInfo[] warnings) : base(optimizedContent, errors, warnings) { }
+	public JsOptimizerResult(OptimizerErrorInfo[] errors) : base(errors) { }
 
 	public static implicit operator JsOptimizerResult(MinificationResultBase webMinResult) =>
 		new(webMinResult.MinifiedContent,

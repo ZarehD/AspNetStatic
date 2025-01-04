@@ -23,4 +23,5 @@ public class BinOptimizerResult : OptimizerResult<byte[]>
 	public BinOptimizerResult(byte[] optimizedContent) : base(optimizedContent) { }
 	public BinOptimizerResult(byte[] optimizedContent, OptimizerErrorInfo[] errors) : base(optimizedContent, errors) { }
 	public BinOptimizerResult(byte[] optimizedContent, OptimizerErrorInfo[] errors, OptimizerErrorInfo[] warnings) : base(optimizedContent, errors, warnings) { }
+	public BinOptimizerResult(OptimizerErrorInfo[] errors) : base(errors) { }
 }

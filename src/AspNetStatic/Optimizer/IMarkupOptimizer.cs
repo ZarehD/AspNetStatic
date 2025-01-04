@@ -25,6 +25,7 @@ public class MarkupOptimizerResult : OptimizerResult<string>
 	public MarkupOptimizerResult(string optimizedContent) : base(optimizedContent) { }
 	public MarkupOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors) : base(optimizedContent, errors) { }
 	public MarkupOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors, OptimizerErrorInfo[] warnings) : base(optimizedContent, errors, warnings) { }
+	public MarkupOptimizerResult(OptimizerErrorInfo[] errors) : base(errors) { }
 
 	public static implicit operator MarkupOptimizerResult(MinificationResultBase webMinResult) =>
 		new(webMinResult.MinifiedContent,

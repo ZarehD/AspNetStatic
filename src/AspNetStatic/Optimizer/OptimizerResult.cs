@@ -41,4 +41,9 @@ public class OptimizerResult<TContent> where TContent : notnull
 		this.Errors = errors;
 		this.Warnings = warnings;
 	}
+	public OptimizerResult(OptimizerErrorInfo[] errors)
+	{
+		this.OptimizedContent = default!;
+		this.Errors = errors;
+	}
 }
