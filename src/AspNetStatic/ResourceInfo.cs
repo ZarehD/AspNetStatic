@@ -12,52 +12,40 @@ the specific language governing permissions and limitations under the License.
 
 using AspNetStatic.Optimizer;
 
-namespace AspNetStatic
+namespace AspNetStatic;
+
+[Serializable]
+public class PageResource(string route) :
+	ResourceInfoBase(route)
 {
-	[Serializable]
-	public class PageResource : ResourceInfoBase
+	public ChangeFrequency ChangeFrequency { get; init; } = ChangeFrequency.Never;
+
+	public DateTime LastModified { get; init; } = DateTime.MinValue;
+
+	public double IndexPriority { get; init; }
+}
+
+
+[Serializable]
+public class NonPageResource(string route) : ResourceInfoBase(route) { }
+
+
+[Serializable]
+public class CssResource(string route) : NonPageResource(route) { }
+
+
+[Serializable]
+public class JsResource(string route) : NonPageResource(route) { }
+
+
+[Serializable]
+public class BinResource : NonPageResource
+{
+	public BinResource(string route) : base(route)
 	{
-		public ChangeFrequency ChangeFrequency { get; init; } = ChangeFrequency.Never;
-
-		public DateTime LastModified { get; init; } = DateTime.MinValue;
-
-		public double IndexPriority { get; init; }
-
-
-		public PageResource(string route) : base(route) { }
+		this.OptimizationType = OptimizationType.None;
 	}
 
 
-	[Serializable]
-	public class NonPageResource : ResourceInfoBase
-	{
-		public NonPageResource(string route) : base(route) { }
-	}
-
-
-	[Serializable]
-	public class CssResource : NonPageResource
-	{
-		public CssResource(string route) : base(route) { }
-	}
-
-
-	[Serializable]
-	public class JsResource : NonPageResource
-	{
-		public JsResource(string route) : base(route) { }
-	}
-
-
-	[Serializable]
-	public class BinResource : NonPageResource
-	{
-		public BinResource(string route) : base(route)
-		{
-			this.OptimizationType = OptimizationType.None;
-		}
-
-
-		public new EncodingType OutputEncoding { get; init; } = EncodingType.Default;
-	}
+	public new EncodingType OutputEncoding { get; init; } = EncodingType.Default;
 }

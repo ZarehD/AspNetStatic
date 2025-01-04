@@ -14,13 +14,16 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic.Optimizer;
 
-public class OptimizerErrorInfo
+public class OptimizerErrorInfo(
+	string category, string message,
+	int lineNumber, int columnNumber,
+	string sourceFragment)
 {
-	public string Category { get; }
-	public string Message { get; }
-	public int LineNumber { get; }
-	public int ColumnNumber { get; }
-	public string SourceFragment { get; }
+	public string Category { get; } = category;
+	public string Message { get; } = message;
+	public int LineNumber { get; } = lineNumber;
+	public int ColumnNumber { get; } = columnNumber;
+	public string SourceFragment { get; } = sourceFragment;
 
 
 	public OptimizerErrorInfo(string message)
@@ -32,14 +35,6 @@ public class OptimizerErrorInfo
 	public OptimizerErrorInfo(string message, int lineNumber, int columnNumber, string sourceFragment)
 		: this(string.Empty, message, lineNumber, columnNumber, sourceFragment)
 	{ }
-	public OptimizerErrorInfo(string category, string message, int lineNumber, int columnNumber, string sourceFragment)
-	{
-		this.Category = category;
-		this.Message = message;
-		this.LineNumber = lineNumber;
-		this.ColumnNumber = columnNumber;
-		this.SourceFragment = sourceFragment;
-	}
 
 	public override string ToString() =>
 		$"{(string.IsNullOrWhiteSpace(this.Category) ? null : $"{this.Category}: ")}" +
@@ -47,8 +42,7 @@ public class OptimizerErrorInfo
 
 
 	public static implicit operator OptimizerErrorInfo(MinificationErrorInfo webMinErr) =>
-		new OptimizerErrorInfo(
-			webMinErr.Category,
+		new(webMinErr.Category,
 			webMinErr.Message,
 			webMinErr.LineNumber,
 			webMinErr.ColumnNumber,

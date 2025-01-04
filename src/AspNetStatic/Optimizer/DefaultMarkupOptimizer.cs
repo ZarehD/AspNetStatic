@@ -14,23 +14,18 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic.Optimizer;
 
-public class DefaultMarkupOptimizer : IMarkupOptimizer
+public class DefaultMarkupOptimizer(
+	HtmlMinificationSettings? htmlMinifierSettings,
+	XhtmlMinificationSettings? xhtmlMinifierSettings,
+	XmlMinificationSettings? xmlMinifierSettings,
+	ICssMinifier? cssMinifier,
+	IJsMinifier? jsMinifier) : 
+	IMarkupOptimizer
 {
-	protected readonly IMarkupMinifier _htmlMinifier;
-	protected readonly IMarkupMinifier _xhtmlMinifier;
-	protected readonly IMarkupMinifier _xmlMinifier;
+	protected readonly IMarkupMinifier _htmlMinifier = new HtmlMinifier(htmlMinifierSettings, cssMinifier, jsMinifier);
+	protected readonly IMarkupMinifier _xhtmlMinifier = new XhtmlMinifier(xhtmlMinifierSettings, cssMinifier, jsMinifier);
+	protected readonly IMarkupMinifier _xmlMinifier = new XmlMinifier(xmlMinifierSettings);
 
-	public DefaultMarkupOptimizer(
-		HtmlMinificationSettings? htmlMinifierSettings,
-		XhtmlMinificationSettings? xhtmlMinifierSettings,
-		XmlMinificationSettings? xmlMinifierSettings,
-		ICssMinifier? cssMinifier,
-		IJsMinifier? jsMinifier)
-	{
-		this._htmlMinifier = new HtmlMinifier(htmlMinifierSettings, cssMinifier, jsMinifier);
-		this._xhtmlMinifier = new XhtmlMinifier(xhtmlMinifierSettings, cssMinifier, jsMinifier);
-		this._xmlMinifier = new XmlMinifier(xmlMinifierSettings);
-	}
 
 	public virtual MarkupOptimizerResult Execute(string content, PageResource resource, string outFilePathname)
 	{

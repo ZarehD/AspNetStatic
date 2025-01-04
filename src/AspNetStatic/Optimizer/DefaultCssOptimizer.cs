@@ -14,14 +14,11 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic.Optimizer;
 
-public class DefaultCssOptimizer : ICssOptimizer
+public class DefaultCssOptimizer(
+	ICssMinifier cssMinifier) :
+	ICssOptimizer
 {
-	protected readonly ICssMinifier _cssMinifier;
-
-	public DefaultCssOptimizer(ICssMinifier cssMinifier)
-	{
-		this._cssMinifier = cssMinifier;
-	}
+	protected readonly ICssMinifier _cssMinifier = cssMinifier;
 
 	public virtual CssOptimizerResult Execute(string content, CssResource resource, string outFilePathname) =>
 		resource.OptimizationType == OptimizationType.None

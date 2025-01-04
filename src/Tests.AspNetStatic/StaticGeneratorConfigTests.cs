@@ -10,24 +10,24 @@ public class StaticGeneratorConfigTests
 	private static readonly string _testFileName = "test";
 	private static readonly string _testFileExt = ".ext";
 	private static readonly string _testIndexFile = _testFileName + _testFileExt;
-	private static readonly string[] _testFileExclusions = { "test" };
+	private static readonly string[] _testFileExclusions = ["test"];
 
 	private static readonly string _defaultFileName = Consts.DefaultIndexFile;
 	private static readonly string _defaultFileExt = Consts.Ext_Htm;
 	private static readonly string _defaultIndexFile = Consts.DefaultIndexFileFullName;
 	private static readonly string[] _defaultFileExclusions = Consts.DefaultFileExclusions;
 
-	private static readonly PageResource[] _pageArray = new PageResource[] { new("/") };
-	private static readonly NonPageResource[] _cssFileArray = new CssResource[] { new("/file.css") };
-	private static readonly NonPageResource[] _jsFileArray = new JsResource[] { new("/file.js") };
-	private static readonly NonPageResource[] _binFileArray = new BinResource[] { new("/file.bin") };
+	private static readonly PageResource[] _pageArray = [new("/")];
+	private static readonly NonPageResource[] _cssFileArray = [new("/file.css")];
+	private static readonly NonPageResource[] _jsFileArray = [new("/file.js")];
+	private static readonly NonPageResource[] _binFileArray = [new("/file.bin")];
 
 	private static readonly List<PageResource> _pages = new(_pageArray);
 	private static readonly List<NonPageResource> _otherResources =
 		new(_cssFileArray.Concat(_jsFileArray).Concat(_binFileArray));
 	private static readonly List<ResourceInfoBase> _hasPagesNoOther = new(_pageArray);
 	private static readonly List<ResourceInfoBase> _noPagesHasOther = new(_otherResources);
-	private static readonly List<ResourceInfoBase> _hasPagesHasOther = new();
+	private static readonly List<ResourceInfoBase> _hasPagesHasOther = [];
 
 	private static readonly ICssMinifier _cssMinifier = new KristensenCssMinifier();
 	private static readonly IJsMinifier _jsMinifier = new CrockfordJsMinifier();
@@ -191,7 +191,7 @@ public class StaticGeneratorConfigTests
 		var actual = new StaticGeneratorConfig(
 			_pages, _destRoot, true, true,
 			_testFileName, _testFileExt,
-			Enumerable.Empty<string>());
+			[]);
 
 		Assert.AreEqual(_testFileName, actual.DefaultFileName, true);
 		Assert.AreEqual(_testFileExt, actual.PageFileExtension, true);
@@ -227,7 +227,7 @@ public class StaticGeneratorConfigTests
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				null!, _testFileExt,
-				Enumerable.Empty<string>()));
+				[]));
 	}
 
 	[TestMethod]
@@ -237,7 +237,7 @@ public class StaticGeneratorConfigTests
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				string.Empty, _testFileExt,
-				Enumerable.Empty<string>()));
+				[]));
 	}
 
 	[TestMethod]
@@ -247,7 +247,7 @@ public class StaticGeneratorConfigTests
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				" ", _testFileExt,
-				Enumerable.Empty<string>()));
+				[]));
 	}
 
 	//--
@@ -259,7 +259,7 @@ public class StaticGeneratorConfigTests
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				_testFileName, null!,
-				Enumerable.Empty<string>()));
+				[]));
 	}
 
 	[TestMethod]
@@ -269,7 +269,7 @@ public class StaticGeneratorConfigTests
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				_testFileName, string.Empty,
-				Enumerable.Empty<string>()));
+				[]));
 	}
 
 	[TestMethod]
@@ -279,7 +279,7 @@ public class StaticGeneratorConfigTests
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				_testFileName, " ",
-				Enumerable.Empty<string>()));
+				[]));
 	}
 
 	//--

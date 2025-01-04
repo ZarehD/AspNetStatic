@@ -12,204 +12,203 @@ the specific language governing permissions and limitations under the License.
 
 using System.Text.RegularExpressions;
 
-namespace AspNetStatic
+namespace AspNetStatic;
+
+internal static class Helpers
 {
-	internal static class Helpers
+	public static string ToDefaultFileFallback(
+		this string route, string[] exclusions,
+		string defaultFileName, string pageFileExtension)
 	{
-		public static string ToDefaultFileFallback(
-			this string route, string[] exclusions,
-			string defaultFileName, string pageFileExtension)
+		Throw.IfNullOrWhitespace(route);
+		Throw.IfNullOrWhitespace(defaultFileName);
+		Throw.IfNullOrWhitespace(pageFileExtension);
+
+		return
+			((exclusions is null) || !exclusions.Any(
+				x => route.EnsureNotEndsWith(Consts.FwdSlash)?
+				.EndsWith(x, StringComparison.OrdinalIgnoreCase) ?? false))
+			? route.EnsureEndsWith(Consts.FwdSlash) + defaultFileName
+			: route.EnsureNotEndsWith(Consts.FwdSlash) + pageFileExtension
+			;
+	}
+
+	public static string ToFileSysPath(this string path) =>
+		path is null ? string.Empty : path
+		.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
+		.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
+		;
+
+	public static string StripQueryString(this string url)
+	{
+		//Throw.IfNullOrWhitespace(url);
+
+		if (string.IsNullOrWhiteSpace(url)) return url;
+
+		var idx = url.IndexOf('?');
+		return idx > -1 ? url[0..idx] : url;
+	}
+
+
+	public static string GetOutFilePathname(
+		this PageResource page,
+		string rootFolder,
+		bool alwaysCreateDefaultFile,
+		string indexFileName,
+		string pageFileExtension,
+		string[] exclusions)
+	{
+		Throw.IfNull(page);
+		Throw.IfNullOrWhitespace(rootFolder);
+
+		var pagePath = string.Empty;
+
+		if (!string.IsNullOrWhiteSpace(page.OutFile))
 		{
-			Throw.IfNullOrWhitespace(route);
-			Throw.IfNullOrWhitespace(defaultFileName);
+			pagePath = page.OutFile;
+		}
+		else
+		{
+			Throw.IfNullOrWhitespace(indexFileName);
 			Throw.IfNullOrWhitespace(pageFileExtension);
 
-			return
-				((exclusions is null) || !exclusions.Any(
-					x => route.EnsureNotEndsWith(Consts.FwdSlash)?
-					.EndsWith(x, StringComparison.OrdinalIgnoreCase) ?? false))
-				? route.EnsureEndsWith(Consts.FwdSlash) + defaultFileName
-				: route.EnsureNotEndsWith(Consts.FwdSlash) + pageFileExtension
-				;
-		}
+			exclusions ??= [];
 
-		public static string ToFileSysPath(this string path) =>
-			path is null ? string.Empty : path
-			.Replace(Consts.BakSlash, Path.DirectorySeparatorChar)
-			.Replace(Consts.FwdSlash, Path.DirectorySeparatorChar)
-			;
+			var pageRoute = page.Route.StripQueryString();
+			var uriKind = UriKind.Relative;
 
-		public static string StripQueryString(this string url)
-		{
-			//Throw.IfNullOrWhitespace(url);
+			Throw.InvalidOpWhen(
+				() => !Uri.IsWellFormedUriString(pageRoute, uriKind),
+				SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
 
-			if (string.IsNullOrWhiteSpace(url)) return url;
+			pagePath = pageRoute;
 
-			var idx = url.IndexOf('?');
-			return idx > -1 ? url[0..idx] : url;
-		}
-
-
-		public static string GetOutFilePathname(
-			this PageResource page,
-			string rootFolder,
-			bool alwaysCreateDefaultFile,
-			string indexFileName,
-			string pageFileExtension,
-			string[] exclusions)
-		{
-			Throw.IfNull(page);
-			Throw.IfNullOrWhitespace(rootFolder);
-
-			var pagePath = string.Empty;
-
-			if (!string.IsNullOrWhiteSpace(page.OutFile))
+			if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
 			{
-				pagePath = page.OutFile;
+				pagePath += indexFileName;
 			}
-			else
+			else if (!Path.HasExtension(pagePath)) //(string.IsNullOrEmpty(Path.GetExtension(pagePath)))
 			{
-				Throw.IfNullOrWhitespace(indexFileName);
-				Throw.IfNullOrWhitespace(pageFileExtension);
+				var generateDefaultFile =
+					alwaysCreateDefaultFile &&
+					!exclusions.Any(x => pagePath.EndsWith(
+						x, StringComparison.OrdinalIgnoreCase));
 
-				exclusions ??= Array.Empty<string>();
-
-				var pageRoute = page.Route.StripQueryString();
-				var uriKind = UriKind.Relative;
-
-				Throw.InvalidOpWhen(
-					() => !Uri.IsWellFormedUriString(pageRoute, uriKind),
-					SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
-
-				pagePath = pageRoute;
-
-				if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
-				{
-					pagePath += indexFileName;
-				}
-				else if (!Path.HasExtension(pagePath)) //(string.IsNullOrEmpty(Path.GetExtension(pagePath)))
-				{
-					var generateDefaultFile =
-						alwaysCreateDefaultFile &&
-						!exclusions.Any(x => pagePath.EndsWith(
-							x, StringComparison.OrdinalIgnoreCase));
-
-					pagePath +=
-						generateDefaultFile
-						? $"{Path.DirectorySeparatorChar}{indexFileName}"
-						: pageFileExtension;
-				}
+				pagePath +=
+					generateDefaultFile
+					? $"{Path.DirectorySeparatorChar}{indexFileName}"
+					: pageFileExtension;
 			}
-
-			pagePath = pagePath.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
-
-			return Path.Combine(rootFolder.ToFileSysPath(), pagePath);
 		}
 
-		public static string GetOutFilePathname(
-			this NonPageResource resource,
-			string rootFolder)
-		{
-			Throw.IfNull(resource);
-			Throw.IfNullOrWhitespace(rootFolder);
+		pagePath = pagePath.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
 
-			var resourcePath = string.Empty;
-
-			if (!string.IsNullOrWhiteSpace(resource.OutFile))
-			{
-				resourcePath = resource.OutFile;
-			}
-			else
-			{
-				var resourceRoute = resource.Route.StripQueryString();
-				var uriKind = UriKind.Relative;
-
-				Throw.InvalidOpWhen(
-					() => !Uri.IsWellFormedUriString(resourceRoute, uriKind),
-					SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
-
-				resourcePath = resourceRoute;
-
-				if (resourcePath.EndsWith(Consts.FwdSlash) ||
-					resourcePath.EndsWith(Consts.BakSlash) ||
-					!Path.HasExtension(resourcePath))
-				{
-					var derivedExtension = resource switch
-					{
-						CssResource => Consts.Ext_Css,
-						JsResource => Consts.Ext_Js,
-						BinResource => Consts.Ext_Bin,
-						_ => Consts.Ext_Unk
-					};
-
-					resourcePath =
-						resourcePath
-						.EnsureNotEndsWith(Consts.BakSlash)
-						.EnsureNotEndsWith(Consts.FwdSlash) +
-						$"{resourcePath}{derivedExtension}";
-				}
-			}
-
-			resourcePath = resourcePath.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
-
-			return Path.Combine(rootFolder.ToFileSysPath(), resourcePath);
-		}
-
-
-		public static string FixupHrefValues(
-			this string htmlContent,
-			IEnumerable<PageResource> pages,
-			string defaultFileName,
-			string pageFileExtension,
-			bool alwaysDefaultFile = default,
-			bool routesAreCaseSensitive = default)
-		{
-			Throw.IfNull(htmlContent);
-			Throw.IfNull(pages);
-
-			if (string.IsNullOrWhiteSpace(htmlContent)) return htmlContent;
-			if (!pages.Any()) return htmlContent;
-
-			var pattern = string.Format(_regex, string.Join('|',
-				pages.Select(
-					p => p.Url.Equals(Consts.FSlash) ? p.Url :
-					p.Url.EnsureNotStartsWith(Consts.FwdSlash)
-					.EnsureNotEndsWith(Consts.FwdSlash)
-					.Replace("?", "\\?"))));
-
-			htmlContent = Regex.Replace(
-				htmlContent, pattern, m =>
-				{
-					var href = m.Groups[1].Value;
-
-					var page = pages.GetResourceForUrl(href, routesAreCaseSensitive);
-
-					if (page is null) return m.Value;
-
-					var newHref =
-						!string.IsNullOrWhiteSpace(page.OutFile)
-						? page.OutFile.Replace(Consts.BakSlash, Consts.FwdSlash).EnsureStartsWith(Consts.FSlash)
-						: (page.Route.EndsWith(Consts.FwdSlash) || alwaysDefaultFile)
-						? $"{page.Route.EnsureEndsWith(Consts.FSlash)}{defaultFileName}"
-						: $"{page.Route.EnsureNotEndsWith(Consts.FSlash)}{pageFileExtension}"
-						;
-
-					newHref = href.StartsWith(Consts.FwdSlash)
-						? newHref.EnsureStartsWith(Consts.FSlash)
-						: newHref.EnsureNotStartsWith(Consts.FSlash);
-
-					return m.Value.Replace(href, newHref);
-				},
-				RegexOptions.Compiled
-				| RegexOptions.CultureInvariant
-				| RegexOptions.IgnoreCase
-				| RegexOptions.Multiline
-				| RegexOptions.IgnorePatternWhitespace);
-
-
-			return htmlContent;
-		}
-
-		private static readonly string _regex = @"(?:<a|<area) (?:\s|\w|-|_|=|""|')* (?:\n|\r|\f|\r\n|\n\r|\n\f|\f\n)* (?:\s|\w|-|_|=|""|')* href=[""|']([/]?(?:{0})[/]?)[""|']";
+		return Path.Combine(rootFolder.ToFileSysPath(), pagePath);
 	}
+
+	public static string GetOutFilePathname(
+		this NonPageResource resource,
+		string rootFolder)
+	{
+		Throw.IfNull(resource);
+		Throw.IfNullOrWhitespace(rootFolder);
+
+		var resourcePath = string.Empty;
+
+		if (!string.IsNullOrWhiteSpace(resource.OutFile))
+		{
+			resourcePath = resource.OutFile;
+		}
+		else
+		{
+			var resourceRoute = resource.Route.StripQueryString();
+			var uriKind = UriKind.Relative;
+
+			Throw.InvalidOpWhen(
+				() => !Uri.IsWellFormedUriString(resourceRoute, uriKind),
+				SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
+
+			resourcePath = resourceRoute;
+
+			if (resourcePath.EndsWith(Consts.FwdSlash) ||
+				resourcePath.EndsWith(Consts.BakSlash) ||
+				!Path.HasExtension(resourcePath))
+			{
+				var derivedExtension = resource switch
+				{
+					CssResource => Consts.Ext_Css,
+					JsResource => Consts.Ext_Js,
+					BinResource => Consts.Ext_Bin,
+					_ => Consts.Ext_Unk
+				};
+
+				resourcePath =
+					resourcePath
+					.EnsureNotEndsWith(Consts.BakSlash)
+					.EnsureNotEndsWith(Consts.FwdSlash) +
+					$"{resourcePath}{derivedExtension}";
+			}
+		}
+
+		resourcePath = resourcePath.ToFileSysPath().EnsureNotStartsWith(Path.DirectorySeparatorChar);
+
+		return Path.Combine(rootFolder.ToFileSysPath(), resourcePath);
+	}
+
+
+	public static string FixupHrefValues(
+		this string htmlContent,
+		IEnumerable<PageResource> pages,
+		string defaultFileName,
+		string pageFileExtension,
+		bool alwaysDefaultFile = default,
+		bool routesAreCaseSensitive = default)
+	{
+		Throw.IfNull(htmlContent);
+		Throw.IfNull(pages);
+
+		if (string.IsNullOrWhiteSpace(htmlContent)) return htmlContent;
+		if (!pages.Any()) return htmlContent;
+
+		var pattern = string.Format(_regex, string.Join('|',
+			pages.Select(
+				p => p.Url.Equals(Consts.FSlash) ? p.Url :
+				p.Url.EnsureNotStartsWith(Consts.FwdSlash)
+				.EnsureNotEndsWith(Consts.FwdSlash)
+				.Replace("?", "\\?"))));
+
+		htmlContent = Regex.Replace(
+			htmlContent, pattern, m =>
+			{
+				var href = m.Groups[1].Value;
+
+				var page = pages.GetResourceForUrl(href, routesAreCaseSensitive);
+
+				if (page is null) return m.Value;
+
+				var newHref =
+					!string.IsNullOrWhiteSpace(page.OutFile)
+					? page.OutFile.Replace(Consts.BakSlash, Consts.FwdSlash).EnsureStartsWith(Consts.FSlash)
+					: (page.Route.EndsWith(Consts.FwdSlash) || alwaysDefaultFile)
+					? $"{page.Route.EnsureEndsWith(Consts.FSlash)}{defaultFileName}"
+					: $"{page.Route.EnsureNotEndsWith(Consts.FSlash)}{pageFileExtension}"
+					;
+
+				newHref = href.StartsWith(Consts.FwdSlash)
+					? newHref.EnsureStartsWith(Consts.FSlash)
+					: newHref.EnsureNotStartsWith(Consts.FSlash);
+
+				return m.Value.Replace(href, newHref);
+			},
+			RegexOptions.Compiled
+			| RegexOptions.CultureInvariant
+			| RegexOptions.IgnoreCase
+			| RegexOptions.Multiline
+			| RegexOptions.IgnorePatternWhitespace);
+
+
+		return htmlContent;
+	}
+
+	private static readonly string _regex = @"(?:<a|<area) (?:\s|\w|-|_|=|""|')* (?:\n|\r|\f|\r\n|\n\r|\n\f|\f\n)* (?:\s|\w|-|_|=|""|')* href=[""|']([/]?(?:{0})[/]?)[""|']";
 }

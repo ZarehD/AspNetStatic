@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using AspNetStatic.Optimizer;
+﻿using AspNetStatic.Optimizer;
 using WebMarkupMin.Core;
 
 namespace Tests.AspNetStatic;
@@ -54,11 +53,7 @@ public class OptimizerResultTests
 	[TestMethod]
 	public void OptimizerResult_w_Errors_HasErrors()
 	{
-		var result = new OptimizerResult<string>(
-			new List<OptimizerErrorInfo>()
-			{
-				new("error message")
-			}.ToArray());
+		var result = new OptimizerResult<string>([new("error message")]);
 
 		Assert.IsTrue(result.HasErrors);
 		Assert.IsNull(result.OptimizedContent);
@@ -67,8 +62,7 @@ public class OptimizerResultTests
 	[TestMethod]
 	public void OptimizerResult_w_No_Errors_Not_HasErrors()
 	{
-		var result = new OptimizerResult<string>(
-			Array.Empty<OptimizerErrorInfo>());
+		var result = new OptimizerResult<string>([]);
 
 		Assert.IsFalse(result.HasErrors);
 		Assert.IsNull(result.OptimizedContent);
@@ -78,13 +72,10 @@ public class OptimizerResultTests
 	[TestMethod]
 	public void OptimizerResult_w_Warnings_HasWarnings()
 	{
-		var result = new OptimizerResult<string>(
-			"",
-			Array.Empty<OptimizerErrorInfo>(),
-			new List<OptimizerErrorInfo>()
-			{
-				new("warning message")
-			}.ToArray());
+		var result =
+			new OptimizerResult<string>(
+				"", [],
+				[new("warning message")]);
 
 		Assert.IsTrue(result.HasWarnings);
 	}
@@ -92,10 +83,7 @@ public class OptimizerResultTests
 	[TestMethod]
 	public void OptimizerResult_w_No_Warnings_Not_HasWarnings()
 	{
-		var result = new OptimizerResult<string>(
-			"",
-			Array.Empty<OptimizerErrorInfo>(),
-			Array.Empty<OptimizerErrorInfo>());
+		var result = new OptimizerResult<string>("", [], []);
 
 		Assert.IsFalse(result.HasWarnings);
 	}

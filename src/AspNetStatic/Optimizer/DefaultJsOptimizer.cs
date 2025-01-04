@@ -14,14 +14,11 @@ using WebMarkupMin.Core;
 
 namespace AspNetStatic.Optimizer;
 
-public class DefaultJsOptimizer : IJsOptimizer
+public class DefaultJsOptimizer(
+	IJsMinifier jsMinifier) : 
+	IJsOptimizer
 {
-	protected readonly IJsMinifier _jsMinifier;
-
-	public DefaultJsOptimizer(IJsMinifier jsMinifier)
-	{
-		this._jsMinifier = jsMinifier;
-	}
+	protected readonly IJsMinifier _jsMinifier = jsMinifier;
 
 	public virtual JsOptimizerResult Execute(string content, JsResource resource, string outFilePathname) =>
 		resource.OptimizationType == OptimizationType.None
