@@ -1,4 +1,6 @@
-﻿namespace Tests.AspNetStatic
+﻿using AspNetStatic.Optimizer;
+
+namespace Tests.AspNetStatic
 {
 	[TestClass]
 	public class ResourceInfoTests
@@ -12,7 +14,7 @@
 			var changeFrequency = ChangeFrequency.Daily;
 			var indexPriority = 1.0;
 			var lastModified = DateTime.UtcNow;
-			var optimizerType = OptimizerType.Auto;
+			var optimizerType = OptimizationType.Auto;
 
 			var page =
 				new PageResource(route)
@@ -31,8 +33,8 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.SkipOptimization, page.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(page.OptimizerType, optimizerType);
+			Assert.AreEqual(page.SkipOptimization, page.OptimizationType == OptimizationType.None);
+			Assert.AreEqual(page.OptimizationType, optimizerType);
 			Assert.AreEqual(page.OutputEncoding, EncodingType.UTF8);
 		}
 
@@ -45,7 +47,7 @@
 			var changeFrequency = ChangeFrequency.Never;
 			var indexPriority = 0;
 			var lastModified = DateTime.MinValue;
-			var optimizerType = OptimizerType.Html;
+			var optimizerType = OptimizationType.Html;
 			var encoding = EncodingType.ASCII;
 
 			var page =
@@ -53,7 +55,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -64,8 +66,8 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.SkipOptimization, page.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(page.OptimizerType, optimizerType);
+			Assert.AreEqual(page.SkipOptimization, page.OptimizationType == OptimizationType.None);
+			Assert.AreEqual(page.OptimizationType, optimizerType);
 			Assert.AreEqual(page.OutputEncoding, encoding);
 		}
 
@@ -78,7 +80,7 @@
 			var changeFrequency = ChangeFrequency.Never;
 			var indexPriority = 0;
 			var lastModified = DateTime.MinValue;
-			var optimizerType = OptimizerType.None;
+			var optimizerType = OptimizationType.None;
 			var encoding = EncodingType.UTF32;
 
 			var page =
@@ -86,7 +88,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -97,8 +99,8 @@
 			Assert.AreEqual(page.ChangeFrequency, changeFrequency);
 			Assert.AreEqual(page.IndexPriority, indexPriority);
 			Assert.AreEqual(page.LastModified, lastModified);
-			Assert.AreEqual(page.SkipOptimization, page.OptimizerType == OptimizerType.None);
-			Assert.AreEqual(page.OptimizerType, optimizerType);
+			Assert.AreEqual(page.SkipOptimization, page.OptimizationType == OptimizationType.None);
+			Assert.AreEqual(page.OptimizationType, optimizerType);
 			Assert.AreEqual(page.OutputEncoding, encoding);
 		}
 
@@ -114,7 +116,7 @@
 					ChangeFrequency = ChangeFrequency.Daily,
 					IndexPriority = 1.0,
 					LastModified = DateTime.UtcNow,
-					OptimizerType = OptimizerType.Xml,
+					OptimizationType = OptimizationType.Xml,
 					OutputEncoding = EncodingType.BigEndianUnicode,
 				};
 
@@ -128,7 +130,7 @@
 			Assert.AreEqual(expected.IndexPriority, actual?.IndexPriority);
 			Assert.AreEqual(expected.LastModified, actual?.LastModified);
 			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
-			Assert.AreEqual(expected.OptimizerType, actual?.OptimizerType);
+			Assert.AreEqual(expected.OptimizationType, actual?.OptimizationType);
 			Assert.AreEqual(expected.OutputEncoding, actual?.OutputEncoding);
 		}
 
@@ -140,7 +142,7 @@
 			var route = "/route/file.xyz";
 			var queryString = "?parm=value";
 			var outFilePathname = "\\route\\file.xyz";
-			var optimizerType = OptimizerType.Auto;
+			var optimizerType = OptimizationType.Auto;
 
 			var resource =
 				new PageResource(route)
@@ -153,8 +155,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(EncodingType.UTF8, resource.OutputEncoding);
 		}
 
@@ -164,7 +166,7 @@
 			var route = "/route/file.xyz";
 			var queryString = "x=y";
 			var outFilePathname = "\\route\\file.xyz";
-			var optimizerType = OptimizerType.Css;
+			var optimizerType = OptimizationType.Css;
 			var encoding = EncodingType.ASCII;
 
 			var resource =
@@ -172,7 +174,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -180,8 +182,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
@@ -191,7 +193,7 @@
 			var route = "/route/file.xyz";
 			var queryString = "x=y";
 			var outFilePathname = "\\route\\file.xyz";
-			var optimizerType = OptimizerType.None;
+			var optimizerType = OptimizationType.None;
 			var encoding = EncodingType.UTF32;
 
 			var resource =
@@ -199,7 +201,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -207,8 +209,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
@@ -221,7 +223,7 @@
 				{
 					Query = "parm=value",
 					OutFile = "\\route\\file.xyz",
-					OptimizerType = OptimizerType.Js,
+					OptimizationType = OptimizationType.Js,
 					OutputEncoding = EncodingType.BigEndianUnicode,
 				};
 
@@ -232,7 +234,7 @@
 			Assert.AreEqual(expected.Query, actual?.Query);
 			Assert.AreEqual(expected.OutFile, actual?.OutFile);
 			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
-			Assert.AreEqual(expected.OptimizerType, actual?.OptimizerType);
+			Assert.AreEqual(expected.OptimizationType, actual?.OptimizationType);
 			Assert.AreEqual(expected.OutputEncoding, actual?.OutputEncoding);
 		}
 
@@ -244,7 +246,7 @@
 			var route = "/route/file.css";
 			var queryString = "?parm=value";
 			var outFilePathname = "\\route\\file.css";
-			var optimizerType = OptimizerType.Auto;
+			var optimizerType = OptimizationType.Auto;
 
 			var resource =
 				new CssResource(route)
@@ -257,8 +259,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(EncodingType.UTF8, resource.OutputEncoding);
 		}
 
@@ -268,7 +270,7 @@
 			var route = "/route/file.css";
 			var queryString = "x=y";
 			var outFilePathname = "\\route\\file.css";
-			var optimizerType = OptimizerType.Css;
+			var optimizerType = OptimizationType.Css;
 			var encoding = EncodingType.ASCII;
 
 			var resource =
@@ -276,7 +278,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -284,8 +286,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
@@ -295,7 +297,7 @@
 			var route = "/route/file.css";
 			var queryString = "x=y";
 			var outFilePathname = "\\route\\file.css";
-			var optimizerType = OptimizerType.None;
+			var optimizerType = OptimizationType.None;
 			var encoding = EncodingType.UTF32;
 
 			var resource =
@@ -303,7 +305,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -311,8 +313,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
@@ -325,7 +327,7 @@
 				{
 					Query = "parm=value",
 					OutFile = "\\route\\file.css",
-					OptimizerType = OptimizerType.Css,
+					OptimizationType = OptimizationType.Css,
 					OutputEncoding = EncodingType.BigEndianUnicode,
 				};
 
@@ -336,7 +338,7 @@
 			Assert.AreEqual(expected.Query, actual?.Query);
 			Assert.AreEqual(expected.OutFile, actual?.OutFile);
 			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
-			Assert.AreEqual(expected.OptimizerType, actual?.OptimizerType);
+			Assert.AreEqual(expected.OptimizationType, actual?.OptimizationType);
 			Assert.AreEqual(expected.OutputEncoding, actual?.OutputEncoding);
 		}
 
@@ -348,7 +350,7 @@
 			var route = "/route/file.js";
 			var queryString = "?parm=value";
 			var outFilePathname = "\\route\\file.js";
-			var optimizerType = OptimizerType.Auto;
+			var optimizerType = OptimizationType.Auto;
 
 			var resource =
 				new JsResource(route)
@@ -361,8 +363,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(EncodingType.UTF8, resource.OutputEncoding);
 		}
 
@@ -372,7 +374,7 @@
 			var route = "/route/file.js";
 			var queryString = "x=y";
 			var outFilePathname = "\\route\\file.js";
-			var optimizerType = OptimizerType.Js;
+			var optimizerType = OptimizationType.Js;
 			var encoding = EncodingType.ASCII;
 
 			var resource =
@@ -380,7 +382,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -388,8 +390,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
@@ -399,7 +401,7 @@
 			var route = "/route/file.js";
 			var queryString = "x=y";
 			var outFilePathname = "\\route\\file.js";
-			var optimizerType = OptimizerType.None;
+			var optimizerType = OptimizationType.None;
 			var encoding = EncodingType.UTF32;
 
 			var resource =
@@ -407,7 +409,7 @@
 				{
 					Query = queryString,
 					OutFile = outFilePathname,
-					OptimizerType = optimizerType,
+					OptimizationType = optimizerType,
 					OutputEncoding = encoding,
 				};
 
@@ -415,8 +417,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(optimizerType, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(optimizerType, resource.OptimizationType);
 			Assert.AreEqual(encoding, resource.OutputEncoding);
 		}
 
@@ -429,7 +431,7 @@
 				{
 					Query = "parm=value",
 					OutFile = "\\route\\file.js",
-					OptimizerType = OptimizerType.Js,
+					OptimizationType = OptimizationType.Js,
 					OutputEncoding = EncodingType.BigEndianUnicode,
 				};
 
@@ -440,7 +442,7 @@
 			Assert.AreEqual(expected.Query, actual?.Query);
 			Assert.AreEqual(expected.OutFile, actual?.OutFile);
 			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
-			Assert.AreEqual(expected.OptimizerType, actual?.OptimizerType);
+			Assert.AreEqual(expected.OptimizationType, actual?.OptimizationType);
 			Assert.AreEqual(expected.OutputEncoding, actual?.OutputEncoding);
 		}
 
@@ -464,8 +466,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(OptimizerType.None, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(OptimizationType.None, resource.OptimizationType);
 			Assert.AreEqual(EncodingType.Default, resource.OutputEncoding);
 		}
 
@@ -487,8 +489,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(OptimizerType.None, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(OptimizationType.None, resource.OptimizationType);
 			Assert.AreEqual(EncodingType.Default, resource.OutputEncoding);
 		}
 
@@ -510,8 +512,8 @@
 			Assert.AreEqual(route, resource.Route);
 			Assert.AreEqual(queryString, resource.Query);
 			Assert.AreEqual(outFilePathname, resource.OutFile);
-			Assert.AreEqual(resource.OptimizerType == OptimizerType.None, resource.SkipOptimization);
-			Assert.AreEqual(OptimizerType.None, resource.OptimizerType);
+			Assert.AreEqual(resource.OptimizationType == OptimizationType.None, resource.SkipOptimization);
+			Assert.AreEqual(OptimizationType.None, resource.OptimizationType);
 			Assert.AreEqual(EncodingType.Default, resource.OutputEncoding);
 		}
 
@@ -533,7 +535,7 @@
 			Assert.AreEqual(expected.Query, actual?.Query);
 			Assert.AreEqual(expected.OutFile, actual?.OutFile);
 			Assert.AreEqual(expected.SkipOptimization, actual?.SkipOptimization);
-			Assert.AreEqual(expected.OptimizerType, actual?.OptimizerType);
+			Assert.AreEqual(expected.OptimizationType, actual?.OptimizationType);
 			Assert.AreEqual(expected.OutputEncoding, actual?.OutputEncoding);
 		}
 	}

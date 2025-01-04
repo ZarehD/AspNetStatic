@@ -1,247 +1,123 @@
-﻿using WebMarkupMin.Core;
+﻿using AspNetStatic.Optimizer;
+using WebMarkupMin.Core;
 
-namespace Tests.AspNetStatic
+namespace Tests.AspNetStatic;
+
+[TestClass]
+public class OptimizerSelectorTests
 {
-	[TestClass]
-	public class OptimizerSelectorTests
+	private static readonly ICssMinifier _cssMinifier = new KristensenCssMinifier();
+	private static readonly IJsMinifier _jsMinifier = new CrockfordJsMinifier();
+
+	private static readonly IMarkupOptimizer _markupOptimizer = new DefaultMarkupOptimizer(null, null, null, _cssMinifier, _jsMinifier);
+	private static readonly ICssOptimizer _cssOptimizer = new DefaultCssOptimizer(_cssMinifier);
+	private static readonly IJsOptimizer _jsOptimizer = new DefaultJsOptimizer(_jsMinifier);
+	private static readonly IBinOptimizer _binOptimizer = new NullBinOptimizer();
+
+	private static readonly DefaultOptimizerSelector _optimizerSelector = new(_markupOptimizer, _cssOptimizer, _jsOptimizer, _binOptimizer);
+
+	//-
+
+	[DataTestMethod]
+	[DataRow(OptimizationType.Auto)]
+	[DataRow(OptimizationType.Html)]
+	[DataRow(OptimizationType.None)]
+	public void Selects_Correct_Page_Optimizer(OptimizationType optimizationType)
 	{
-		private static readonly ICssMinifier _nullCssMinifier = new NullCssMinifier();
-		private static readonly IJsMinifier _nullJsMinifier = new NullJsMinifier();
+		const string outFile = "file.html";
+		var res =
+			new PageResource("/")
+			{
+				OutFile = outFile,
+				OptimizationType = optimizationType
+			};
+		var expectedType =
+			optimizationType switch
+			{
+				OptimizationType.None => typeof(NullMarkupOptimizer).Name,
+				_ => _markupOptimizer.GetType().Name
+			};
 
-		private static readonly HtmlMinifier _htmlMinifier = new();
-		private static readonly XhtmlMinifier _xhtmlMinifier = new();
-		private static readonly XmlMinifier _xmlMinifier = new();
-		private static readonly ICssMinifier _cssMinifier = new KristensenCssMinifier();
-		private static readonly IJsMinifier _jsMinifier = new CrockfordJsMinifier();
-		private static readonly IBinOptimizer? _binOptimizer = new TestBinOptimizer();
+		var actual = _optimizerSelector.SelectFor(res, outFile);
 
-		private static readonly OptimizerSelector _minifierChooser =
-			new(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer);
+		Assert.AreEqual(expectedType, actual.GetType().Name, true);
+	}
 
-		//--
 
-		private class TestBinOptimizer : IBinOptimizer
-		{
-			public BinOptimizerResult Execute(byte[] content, BinResource resource, string outFilePathname) => new(content);
-		}
+	[DataTestMethod]
+	[DataRow(OptimizationType.Auto)]
+	[DataRow(OptimizationType.Css)]
+	[DataRow(OptimizationType.None)]
+	public void Selects_Correct_Css_Optimizer(OptimizationType optimizationType)
+	{
+		const string outFile = "file.css";
+		var res =
+			new CssResource("/")
+			{
+				OutFile = outFile,
+				OptimizationType = optimizationType
+			};
+		var expectedType =
+			optimizationType switch
+			{
+				OptimizationType.None => typeof(NullCssOptimizer).Name,
+				_ => _cssOptimizer.GetType().Name
+			};
 
-		//--
+		var actual = _optimizerSelector.SelectFor(res, outFile);
 
-		[TestMethod]
-		public void Test_Ctor_Good()
-		{
-			var actual = new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer);
-			Assert.IsNotNull(actual);
-		}
+		Assert.AreEqual(expectedType, actual.GetType().Name, true);
+	}
 
-		[TestMethod]
-		public void Test_Ctor_Bad()
-		{
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(null!, _xhtmlMinifier, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, null!, _xmlMinifier, _cssMinifier, _jsMinifier, _binOptimizer));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, null!, _cssMinifier, _jsMinifier, _binOptimizer));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, null!, _jsMinifier, _binOptimizer));
-			Assert.ThrowsException<ArgumentNullException>(() => new OptimizerSelector(_htmlMinifier, _xhtmlMinifier, _xmlMinifier, _cssMinifier, null!, _binOptimizer));
-		}
 
-		//--
+	[DataTestMethod]
+	[DataRow(OptimizationType.Auto)]
+	[DataRow(OptimizationType.Js)]
+	[DataRow(OptimizationType.None)]
+	public void Selects_Correct_JsRes_Optimizer(OptimizationType optimizationType)
+	{
+		const string outFile = "file.js";
+		var res =
+			new JsResource("/")
+			{
+				OutFile = outFile,
+				OptimizationType = optimizationType
+			};
+		var expectedType =
+			optimizationType switch
+			{
+				OptimizationType.None => typeof(NullJsOptimizer).Name,
+				_ => _jsOptimizer.GetType().Name
+			};
 
-		[DataTestMethod]
-		[DataRow("file.htm", OptimizerType.Html)]
-		[DataRow("file.html", OptimizerType.Html)]
-		[DataRow("file.xhtm", OptimizerType.Xhtml)]
-		[DataRow("file.xhtml", OptimizerType.Xhtml)]
-		[DataRow("file.xml", OptimizerType.Xml)]
-		public void Test_Select_MarkupMinifier_Auto(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var page =
-				new PageResource("/")
-				{
-					OutFile = outFile
-				};
+		var actual = _optimizerSelector.SelectFor(res, outFile);
 
-			Assert.AreEqual(OptimizerType.Auto, page.OptimizerType);
+		Assert.AreEqual(expectedType, actual.GetType().Name, true);
+	}
 
-			IMarkupMinifier expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Html => _htmlMinifier,
-					OptimizerType.Xhtml => _xhtmlMinifier,
-					OptimizerType.Xml => _xmlMinifier,
-					_ => _htmlMinifier
-				};
 
-			var actual = _minifierChooser.SelectFor(page, outFile);
+	[DataTestMethod]
+	[DataRow(OptimizationType.Auto)]
+	[DataRow(OptimizationType.Bin)]
+	[DataRow(OptimizationType.None)]
+	public void Selects_Correct_BinRes_Optimizer(OptimizationType optimizationType)
+	{
+		const string outFile = "file.js";
+		var res =
+			new BinResource("/")
+			{
+				OutFile = outFile,
+				OptimizationType = optimizationType
+			};
+		var expectedType =
+			optimizationType switch
+			{
+				OptimizationType.None => typeof(NullBinOptimizer).Name,
+				_ => _binOptimizer.GetType().Name
+			};
 
-			Assert.AreSame(expected, actual);
-		}
+		var actual = _optimizerSelector.SelectFor(res, outFile);
 
-		[DataTestMethod]
-		[DataRow("file.htm", OptimizerType.Html)]
-		[DataRow("file.html", OptimizerType.Html)]
-		[DataRow("file.xhtm", OptimizerType.Xhtml)]
-		[DataRow("file.xhtml", OptimizerType.Xhtml)]
-		[DataRow("file.xml", OptimizerType.Xml)]
-		public void Test_Select_MarkupMinifier_Specific(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var page =
-				new PageResource("/")
-				{
-					OutFile = outFile,
-					OptimizerType = expectedOptimizerType
-				};
-
-			Assert.AreEqual(expectedOptimizerType, page.OptimizerType);
-
-			IMarkupMinifier expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Html => _htmlMinifier,
-					OptimizerType.Xhtml => _xhtmlMinifier,
-					OptimizerType.Xml => _xmlMinifier,
-					_ => _htmlMinifier
-				};
-
-			var actual = _minifierChooser.SelectFor(page, outFile);
-
-			Assert.AreSame(expected, actual);
-		}
-
-		//--
-
-		[DataTestMethod]
-		[DataRow("file.css", OptimizerType.Css)]
-		public void Test_Select_CssMinifier_Auto(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var resource =
-				new CssResource(outFile)
-				{
-					OutFile = outFile
-				};
-
-			Assert.AreEqual(OptimizerType.Auto, resource.OptimizerType);
-
-			ICssMinifier expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Css => _cssMinifier,
-					_ => _nullCssMinifier
-				};
-
-			var actual = _minifierChooser.SelectFor(resource, outFile);
-
-			Assert.AreSame(expected, actual);
-		}
-
-		[DataTestMethod]
-		[DataRow("file.css", OptimizerType.Css)]
-		public void Test_Select_CssMinifier_Specific(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var resource =
-				new CssResource(outFile)
-				{
-					OutFile = outFile,
-					OptimizerType = expectedOptimizerType
-				};
-
-			Assert.AreEqual(expectedOptimizerType, resource.OptimizerType);
-
-			ICssMinifier expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Css => _cssMinifier,
-					_ => _nullCssMinifier
-				};
-
-			var actual = _minifierChooser.SelectFor(resource, outFile);
-
-			Assert.AreSame(expected, actual);
-		}
-
-		//--
-
-		[DataTestMethod]
-		[DataRow("file.js", OptimizerType.Js)]
-		public void Test_Select_JsMinifier_Auto(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var resource =
-				new JsResource(outFile)
-				{
-					OutFile = outFile
-				};
-
-			Assert.AreEqual(OptimizerType.Auto, resource.OptimizerType);
-
-			IJsMinifier expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Js => _jsMinifier,
-					_ => _nullJsMinifier
-				};
-
-			var actual = _minifierChooser.SelectFor(resource, outFile);
-
-			Assert.AreSame(expected, actual);
-		}
-
-		[DataTestMethod]
-		[DataRow("file.js", OptimizerType.Js)]
-		public void Test_Select_JsMinifier_Specific(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var resource =
-				new JsResource(outFile)
-				{
-					OutFile = outFile,
-					OptimizerType = expectedOptimizerType
-				};
-
-			Assert.AreEqual(expectedOptimizerType, resource.OptimizerType);
-
-			IJsMinifier expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Js => _jsMinifier,
-					_ => _nullJsMinifier
-				};
-
-			var actual = _minifierChooser.SelectFor(resource, outFile);
-
-			Assert.AreSame(expected, actual);
-		}
-
-		//--
-
-		[DataTestMethod]
-		[DataRow("file.img", OptimizerType.Bin)]
-		[DataRow("file.dll", OptimizerType.None)]
-		public void Test_Select_JsMinifier(
-			string outFile, OptimizerType expectedOptimizerType)
-		{
-			var resource =
-				new BinResource(outFile)
-				{
-					OutFile = outFile,
-					OptimizerType = expectedOptimizerType
-				};
-
-			Assert.AreEqual(expectedOptimizerType, resource.OptimizerType);
-
-			IBinOptimizer? expected =
-				expectedOptimizerType switch
-				{
-					OptimizerType.Bin => _binOptimizer,
-					_ => null
-				};
-
-			var actual = _minifierChooser.SelectFor(resource, outFile);
-
-			Assert.AreSame(expected, actual);
-		}
+		Assert.AreEqual(expectedType, actual.GetType().Name, true);
 	}
 }

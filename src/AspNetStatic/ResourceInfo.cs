@@ -10,6 +10,8 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+using AspNetStatic.Optimizer;
+
 namespace AspNetStatic
 {
 	[Serializable]
@@ -52,7 +54,7 @@ namespace AspNetStatic
 	{
 		public BinResource(string route) : base(route)
 		{
-			this.OptimizerType = OptimizerType.None;
+			this.OptimizationType = OptimizationType.None;
 		}
 
 

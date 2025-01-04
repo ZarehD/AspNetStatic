@@ -12,16 +12,22 @@ the specific language governing permissions and limitations under the License.
 
 using WebMarkupMin.Core;
 
-namespace AspNetStatic
+namespace AspNetStatic.Optimizer;
+
+public interface IJsOptimizer
 {
-	public interface IOptimizerSelector
-	{
-		IMarkupMinifier SelectFor(PageResource page, string outFilePathname);
+	JsOptimizerResult Execute(string content, JsResource resource, string outFilePathname);
+}
 
-		ICssMinifier SelectFor(CssResource cssResource, string outFilePathname);
 
-		IJsMinifier SelectFor(JsResource jsResource, string outFilePathname);
+public class JsOptimizerResult : OptimizerResult<string>
+{
+	public JsOptimizerResult(string optimizedContent) : base(optimizedContent) { }
+	public JsOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors) : base(optimizedContent, errors) { }
+	public JsOptimizerResult(string optimizedContent, OptimizerErrorInfo[] errors, OptimizerErrorInfo[] warnings) : base(optimizedContent, errors, warnings) { }
 
-		IBinOptimizer? SelectFor(BinResource binResource, string outFilePathname);
-	}
+	public static implicit operator JsOptimizerResult(MinificationResultBase webMinResult) =>
+		new(webMinResult.MinifiedContent,
+			webMinResult.Errors.Select(x => (OptimizerErrorInfo) x).ToArray(),
+			webMinResult.Warnings.Select(x => (OptimizerErrorInfo) x).ToArray());
 }

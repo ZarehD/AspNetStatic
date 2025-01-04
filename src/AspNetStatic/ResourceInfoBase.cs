@@ -10,6 +10,8 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+using AspNetStatic.Optimizer;
+
 namespace AspNetStatic
 {
 	[Serializable]
@@ -66,9 +68,9 @@ namespace AspNetStatic
 		/// </summary>
 		public EncodingType OutputEncoding { get; init; } = EncodingType.UTF8;
 
-		public bool SkipOptimization => this.OptimizerType == OptimizerType.None;
+		public bool SkipOptimization => this.OptimizationType == OptimizationType.None;
 
-		public OptimizerType OptimizerType { get; init; } = OptimizerType.Auto;
+		public OptimizationType OptimizationType { get; init; } = OptimizationType.Auto;
 
 
 		public ResourceInfoBase(string route)

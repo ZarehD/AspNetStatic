@@ -10,17 +10,9 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
-using System.Text;
-using WebMarkupMin.Core;
+namespace AspNetStatic.Optimizer;
 
-namespace AspNetStatic
+public class NullCssOptimizer : ICssOptimizer
 {
-	public class NullMarkupMinifier : IMarkupMinifier
-	{
-		public MarkupMinificationResult Minify(string content) => new(content);
-		public MarkupMinificationResult Minify(string content, string fileContext) => new(content);
-		public MarkupMinificationResult Minify(string content, bool generateStatistics) => new(content);
-		public MarkupMinificationResult Minify(string content, Encoding encoding) => new(content);
-		public MarkupMinificationResult Minify(string content, string fileContext, Encoding encoding, bool generateStatistics) => new(content);
-	}
+	public CssOptimizerResult Execute(string content, CssResource resource, string outFilePathname) => new(content);
 }

@@ -13,6 +13,7 @@ the specific language governing permissions and limitations under the License.
 #define USE_PERIODIC_TIMER
 
 using System.IO.Abstractions;
+using AspNetStatic.Optimizer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -659,20 +660,31 @@ namespace AspNetStatic
 
 			if (!dontOptimizeContent && (result is null))
 			{
-				var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
-				var xhtmlMinifierSettings = host.Services.GetService<XhtmlMinificationSettings>();
-				var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
-				var cssMinifier = host.Services.GetService<ICssMinifier>();
-				var jsMinifier = host.Services.GetService<IJsMinifier>();
+				var markupOptimizer = host.Services.GetService<IMarkupOptimizer>();
+				var cssOptimizer = host.Services.GetService<ICssOptimizer>();
+				var jsOptimizer = host.Services.GetService<IJsOptimizer>();
 				var binOptimizer = host.Services.GetService<IBinOptimizer>();
 
+				if (markupOptimizer is null)
+				{
+					var cssMinifier = host.Services.GetService<ICssMinifier>() ?? new KristensenCssMinifier();
+					var jsMinifier = host.Services.GetService<IJsMinifier>() ?? new CrockfordJsMinifier();
+					var htmlMinifierSettings = host.Services.GetService<HtmlMinificationSettings>();
+					var xhtmlMinifierSettings = host.Services.GetService<XhtmlMinificationSettings>();
+					var xmlMinifierSettings = host.Services.GetService<XmlMinificationSettings>();
+
+					markupOptimizer = new DefaultMarkupOptimizer(
+						htmlMinifierSettings,
+						xhtmlMinifierSettings,
+						xmlMinifierSettings,
+						cssMinifier, jsMinifier);
+				}
+
 				result =
-					new OptimizerSelector(
-						new HtmlMinifier(htmlMinifierSettings, cssMinifier, jsMinifier),
-						new XhtmlMinifier(xhtmlMinifierSettings, cssMinifier, jsMinifier),
-						new XmlMinifier(xmlMinifierSettings),
-						cssMinifier ?? new KristensenCssMinifier(),
-						jsMinifier ?? new CrockfordJsMinifier(),
+					new DefaultOptimizerSelector(
+						markupOptimizer,
+						cssOptimizer,
+						jsOptimizer,
 						binOptimizer);
 			}
 

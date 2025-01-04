@@ -10,6 +10,8 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expres
 the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
+using AspNetStatic.Optimizer;
+
 namespace AspNetStatic
 {
 	internal sealed class StaticGeneratorConfig

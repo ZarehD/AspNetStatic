@@ -13,6 +13,7 @@ the specific language governing permissions and limitations under the License.
 using System.Diagnostics.Contracts;
 using System.IO.Abstractions;
 using System.Runtime.CompilerServices;
+using AspNetStatic.Optimizer;
 using Microsoft.Extensions.Logging;
 using WebMarkupMin.Core;
 
@@ -233,6 +234,9 @@ namespace AspNetStatic
 		{
 			Throw.IfNull(resource);
 			Throw.IfNull(config);
+			Throw.InvalidOpWhen(
+				() => config.OptimizeOutput && (config.OptimizerSelector is null),
+				$"Resource optimization requested but no {nameof(IOptimizerSelector)} registered.");
 
 			var logger = config.Logger;
 
@@ -323,7 +327,7 @@ namespace AspNetStatic
 					logger?.Exception(ex);
 				}
 
-				if (!resourceContent.Any())
+				if (0 == resourceContent.Length)
 				{
 					logger?.NoContentForResource(requestUri);
 					return;
@@ -331,27 +335,24 @@ namespace AspNetStatic
 
 				if (config.OptimizeOutput && !binResource.SkipOptimization)
 				{
-					var optimizer = config.OptimizerSelector?.SelectFor(binResource, outFilePathname);
+					var optimizer = config.OptimizerSelector!.SelectFor(binResource, outFilePathname);
 
-					if (optimizer is not null)
+					logger?.OptimizingContent(requestUri, outFileShortName);
+					logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer.GetType().Name);
+
+					var opResult = optimizer.Execute(resourceContent, binResource, outFilePathname);
+
+					if (!opResult.HasErrors)
 					{
-						logger?.OptimizingContent(requestUri, outFileShortName);
-						logger?.SelectedOptimizer(requestUri, outFileShortName, optimizer.GetType().Name);
-
-						var opResult = optimizer.Execute(resourceContent, binResource, outFilePathname);
-
-						if (!opResult.Errors.Any())
-						{
-							resourceContent = opResult.OptimizedContent;
-						}
-						else
-						{
-							logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Errors);
-						}
-						if (opResult.Warnings.Any())
-						{
-							logger?.OptimizationWarnings(requestUri, outFilePathname, opResult.Warnings);
-						}
+						resourceContent = opResult.OptimizedContent;
+					}
+					else
+					{
+						logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Errors.ToArray());
+					}
+					if (opResult.HasWarnings)
+					{
+						logger?.OptimizationWarnings(requestUri, outFilePathname, opResult.Warnings.ToArray());
 					}
 				}
 
@@ -390,8 +391,8 @@ namespace AspNetStatic
 				logger?.SelectedOptimizer(requestUri, outFilePathname, optimizer.GetType().Name);
 
 				return
-					getOptimizerResult(
-						optimizer.Minify(content, resource.OutputEncoding.ToSystemEncoding()),
+					getStringOptimizerResult(
+						optimizer.Execute(content, resource, outFilePathname),
 						outFilePathname, requestUri, logger) ?? content;
 			}
 
@@ -406,8 +407,8 @@ namespace AspNetStatic
 				logger?.SelectedOptimizer(requestUri, outFilePathname, optimizer.GetType().Name);
 
 				return
-					getOptimizerResult(
-						optimizer.Minify(content, false, resource.OutputEncoding.ToSystemEncoding()),
+					getStringOptimizerResult(
+						optimizer.Execute(content, resource, outFilePathname),
 						outFilePathname, requestUri, logger) ?? content;
 			}
 
@@ -422,30 +423,30 @@ namespace AspNetStatic
 				logger?.SelectedOptimizer(requestUri, outFilePathname, optimizer.GetType().Name);
 
 				return
-					getOptimizerResult(
-						optimizer.Minify(content, false, resource.OutputEncoding.ToSystemEncoding()),
+					getStringOptimizerResult(
+						optimizer.Execute(content, resource, outFilePathname),
 						outFilePathname, requestUri, logger) ?? content;
 			}
 
 
-			static string? getOptimizerResult(
-				MinificationResultBase opResult,
+			static string? getStringOptimizerResult(
+				OptimizerResult<string> opResult,
 				string outFilePathname, string requestUri,
 				ILogger<StaticGenerator>? logger)
 			{
 				string? result = null;
 
-				if (!opResult.Errors.Any())
+				if (!opResult.HasErrors)
 				{
-					result = opResult.MinifiedContent;
+					result = opResult.OptimizedContent;
 				}
 				else
 				{
-					logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Errors);
+					logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Errors.ToArray());
 				}
-				if (opResult.Warnings.Any())
+				if (opResult.HasWarnings)
 				{
-					logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Warnings);
+					logger?.OptimizationErrors(requestUri, outFilePathname, opResult.Warnings.ToArray());
 				}
 
 				return result;
@@ -852,7 +853,7 @@ namespace AspNetStatic
 			this ILogger<StaticGenerator> logger,
 			string resourceUrl,
 			string outFilePath,
-			IList<MinificationErrorInfo> warnings) =>
+			OptimizerErrorInfo[] warnings) =>
 			logger.Imp_OptimizationWarnings(
 				resourceUrl,
 				outFilePath,
@@ -864,7 +865,7 @@ namespace AspNetStatic
 			this ILogger<StaticGenerator> logger,
 			string resourceUrl,
 			string outFilePath,
-			IList<MinificationErrorInfo> warnings);
+			OptimizerErrorInfo[] warnings);
 
 		#endregion
 		#region 1086 - OptimizationErrors
@@ -873,7 +874,7 @@ namespace AspNetStatic
 			this ILogger<StaticGenerator> logger,
 			string resourceUrl,
 			string outFilePath,
-			IList<MinificationErrorInfo> errors) =>
+			OptimizerErrorInfo[] errors) =>
 			logger.Imp_OptimizationErrors(
 				resourceUrl,
 				outFilePath,
@@ -885,50 +886,50 @@ namespace AspNetStatic
 			this ILogger<StaticGenerator> logger,
 			string resourceUrl,
 			string outFilePath,
-			IList<MinificationErrorInfo> errors);
+			OptimizerErrorInfo[] errors);
 
 		#endregion
 
-		#region 1088 - OptimizationWarnings
+		#region 1088 - BinOptimizationWarnings
 
-		public static void OptimizationWarnings(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IEnumerable<string> warnings) =>
-			logger.Imp_BinOptimizationWarnings(
-				resourceUrl,
-				outFilePath,
-				warnings);
+		//public static void BinOptimizationWarnings(
+		//	this ILogger<StaticGenerator> logger,
+		//	string resourceUrl,
+		//	string outFilePath,
+		//	OptimizerErrorInfo[] warnings) =>
+		//	logger.Imp_BinOptimizationWarnings(
+		//		resourceUrl,
+		//		outFilePath,
+		//		warnings);
 
-		[LoggerMessage(EventId = 1088, EventName = "BinOptimizationWarnings", Level = LogLevel.Warning,
-			Message = "StaticPageGenerator: Content optimizing warnings > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Warnings = {Warnings}")]
-		private static partial void Imp_BinOptimizationWarnings(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IEnumerable<string> warnings);
+		//[LoggerMessage(EventId = 1088, EventName = "BinOptimizationWarnings", Level = LogLevel.Warning,
+		//	Message = "StaticPageGenerator: Content optimizing warnings > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Warnings = {Warnings}")]
+		//private static partial void Imp_BinOptimizationWarnings(
+		//	this ILogger<StaticGenerator> logger,
+		//	string resourceUrl,
+		//	string outFilePath,
+		//	OptimizerErrorInfo[] warnings);
 
 		#endregion
-		#region 1089 - OptimizationErrors
+		#region 1089 - BinOptimizationErrors
 
-		public static void OptimizationErrors(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IEnumerable<string> errors) =>
-			logger.Imp_BinOptimizationErrors(
-				resourceUrl,
-				outFilePath,
-				errors);
+		//public static void BinOptimizationErrors(
+		//	this ILogger<StaticGenerator> logger,
+		//	string resourceUrl,
+		//	string outFilePath,
+		//	OptimizerErrorInfo[] errors) =>
+		//	logger.Imp_BinOptimizationErrors(
+		//		resourceUrl,
+		//		outFilePath,
+		//		errors);
 
-		[LoggerMessage(EventId = 1089, EventName = "BinOptimizationErrors", Level = LogLevel.Error,
-			Message = "StaticPageGenerator: Content optimizing Errors > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Errors = {Errors}")]
-		private static partial void Imp_BinOptimizationErrors(
-			this ILogger<StaticGenerator> logger,
-			string resourceUrl,
-			string outFilePath,
-			IEnumerable<string> errors);
+		//[LoggerMessage(EventId = 1089, EventName = "BinOptimizationErrors", Level = LogLevel.Error,
+		//	Message = "StaticPageGenerator: Content optimizing Errors > ResourceUrl = {ResourceUrl}, OutFilePath = {OutFilePath}, Errors = {Errors}")]
+		//private static partial void Imp_BinOptimizationErrors(
+		//	this ILogger<StaticGenerator> logger,
+		//	string resourceUrl,
+		//	string outFilePath,
+		//	OptimizerErrorInfo[] errors);
 
 		#endregion
 
