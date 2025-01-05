@@ -11,21 +11,50 @@ the specific language governing permissions and limitations under the License.
 --------------------------------------------------------------------------------------------------------------------------------*/
 
 using Microsoft.Extensions.DependencyInjection;
+using WebMarkupMin.Core;
 
 namespace AspNetStatic.Optimizer;
 
 public static class RegisterDefaultOptimizers
 {
+	public static IServiceCollection AddDefaultOptimizerSelector(
+		this IServiceCollection services)
+	{
+		Throw.IfNull(services);
+
+		services
+			.AddSingleton<IOptimizerSelector, DefaultOptimizerSelector>()
+			.AddDefaultOptimizers()
+			;
+
+		return services;
+	}
+
 	public static IServiceCollection AddDefaultOptimizers(
 		this IServiceCollection services)
 	{
 		Throw.IfNull(services);
 
 		services
-			.AddTransient<IMarkupOptimizer, DefaultMarkupOptimizer>()
-			.AddTransient<ICssOptimizer, DefaultCssOptimizer>()
-			.AddTransient<IJsOptimizer, DefaultJsOptimizer>()
-			.AddTransient<IBinOptimizer, NullBinOptimizer>()
+			.AddSingleton<IMarkupOptimizer, DefaultMarkupOptimizer>()
+			.AddSingleton<ICssOptimizer, DefaultCssOptimizer>()
+			.AddSingleton<IJsOptimizer, DefaultJsOptimizer>()
+			.AddSingleton<IBinOptimizer, NullBinOptimizer>()
+			;
+
+		services.AddDefaultMinifiers();
+
+		return services;
+	}
+
+	public static IServiceCollection AddDefaultMinifiers(
+		this IServiceCollection services)
+	{
+		Throw.IfNull(services);
+
+		services
+			.AddSingleton<ICssMinifier, KristensenCssMinifier>()
+			.AddSingleton<IJsMinifier, CrockfordJsMinifier>()
 			;
 
 		return services;
