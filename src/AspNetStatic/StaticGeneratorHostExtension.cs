@@ -658,41 +658,10 @@ namespace AspNetStatic
 		{
 			if (dontOptimizeContent) return null;
 
-			var result = services.GetService<IOptimizerSelector>();
-
-			if (result is null)
-			{
-				var markupOptimizer = services.GetService<IMarkupOptimizer>();
-				var cssOptimizer = services.GetService<ICssOptimizer>();
-				var jsOptimizer = services.GetService<IJsOptimizer>();
-				var binOptimizer = services.GetService<IBinOptimizer>() ?? new NullBinOptimizer();
-
-				var cssMinifier = services.GetService<ICssMinifier>();
-				var jsMinifier = services.GetService<IJsMinifier>();
-
-				if ((markupOptimizer is null) ||
-					(cssOptimizer is null) ||
-					(jsOptimizer is null))
-				{
-					cssMinifier ??= new KristensenCssMinifier();
-					jsMinifier ??= new CrockfordJsMinifier();
-				}
-
-				markupOptimizer ??= new DefaultMarkupOptimizer(
-						services.GetService<HtmlMinificationSettings>(),
-						services.GetService<XhtmlMinificationSettings>(),
-						services.GetService<XmlMinificationSettings>(),
-						cssMinifier, jsMinifier);
-				cssOptimizer ??= new DefaultCssOptimizer(cssMinifier!);
-				jsOptimizer ??= new DefaultJsOptimizer(jsMinifier!);
-
-				result =
-					new DefaultOptimizerSelector(
-						markupOptimizer,
-						cssOptimizer,
-						jsOptimizer,
-						binOptimizer);
-			}
+			var result = 
+				services.GetService<IOptimizerSelector>() ??
+				DefaultOptimizerSelectorFactory.Create(services)
+				;
 
 			return result;
 		}
