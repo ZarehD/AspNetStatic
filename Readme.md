@@ -1,6 +1,6 @@
 ﻿# AspNetStatic
 
-![Platform Support: ASP.NET Core 6.0+](https://img.shields.io/static/v1?label=ASP.NET+Core&message=6.0%20-%209.0&color=blue&style=for-the-badge)
+![Platform Support: ASP.NET Core 6.0+](https://img.shields.io/static/v1?label=ASP.NET+Core&message=8.0%20-%209.0&color=blue&style=for-the-badge)
 ![License: Apache 2](https://img.shields.io/badge/license-Apache%202.0-blue?style=for-the-badge)
 &nbsp;&nbsp;&nbsp;
 [![Build-And-Test](https://github.com/ZarehD/AspNetStatic/actions/workflows/Build-and-Test.yml/badge.svg?branch=master)](https://github.com/ZarehD/AspNetStatic/actions/workflows/Build-and-Test.yml)
