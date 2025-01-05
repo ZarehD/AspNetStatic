@@ -36,6 +36,12 @@ public static class RegisterDefaultOptimizers
 		Throw.IfNull(services);
 
 		services
+			.AddSingleton<DefaultMarkupOptimizer>()
+			.AddSingleton<DefaultCssOptimizer>()
+			.AddSingleton<DefaultJsOptimizer>()
+			;
+
+		services
 			.AddSingleton<IMarkupOptimizer, DefaultMarkupOptimizer>()
 			.AddSingleton<ICssOptimizer, DefaultCssOptimizer>()
 			.AddSingleton<IJsOptimizer, DefaultJsOptimizer>()
