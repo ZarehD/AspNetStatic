@@ -15,11 +15,11 @@ using WebMarkupMin.Core;
 namespace AspNetStatic.Optimizer;
 
 public class DefaultMarkupOptimizer(
-	HtmlMinificationSettings? htmlMinifierSettings,
-	XhtmlMinificationSettings? xhtmlMinifierSettings,
-	XmlMinificationSettings? xmlMinifierSettings,
-	ICssMinifier? cssMinifier,
-	IJsMinifier? jsMinifier) : 
+	HtmlMinificationSettings? htmlMinifierSettings = default,
+	XhtmlMinificationSettings? xhtmlMinifierSettings = default,
+	XmlMinificationSettings? xmlMinifierSettings = default,
+	ICssMinifier? cssMinifier = default,
+	IJsMinifier? jsMinifier = default) : 
 	IMarkupOptimizer
 {
 	protected readonly IMarkupMinifier _htmlMinifier = new HtmlMinifier(htmlMinifierSettings, cssMinifier, jsMinifier);

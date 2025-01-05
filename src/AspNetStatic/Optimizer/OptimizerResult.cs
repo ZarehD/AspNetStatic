@@ -18,7 +18,7 @@ namespace AspNetStatic.Optimizer;
 /// <typeparam name="TContent">The type of the optimized content.</typeparam>
 public class OptimizerResult<TContent> where TContent : notnull
 {
-	public TContent OptimizedContent { get; }
+	public TContent OptimizedContent { get; set; }
 	public IList<OptimizerErrorInfo> Errors { get; set; } = Array.Empty<OptimizerErrorInfo>();
 	public IList<OptimizerErrorInfo> Warnings { get; set; } = Array.Empty<OptimizerErrorInfo>();
 

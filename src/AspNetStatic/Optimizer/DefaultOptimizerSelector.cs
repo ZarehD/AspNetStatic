@@ -25,10 +25,10 @@ public class DefaultOptimizerSelector : IOptimizerSelector
 	protected readonly IBinOptimizer _binOptimizer;
 
 	public DefaultOptimizerSelector(
-		IMarkupOptimizer? markupOptimizer,
-		ICssOptimizer? cssOptimizer,
-		IJsOptimizer? jsOptimizer,
-		IBinOptimizer? binOptimizer)
+		IMarkupOptimizer? markupOptimizer = default,
+		ICssOptimizer? cssOptimizer = default,
+		IJsOptimizer? jsOptimizer = default,
+		IBinOptimizer? binOptimizer = default)
 	{
 		this._markupOptimizer = markupOptimizer ?? this._nullMarkupOptimizer;
 		this._cssOptimizer = cssOptimizer ?? this._nullCssOptimizer;
