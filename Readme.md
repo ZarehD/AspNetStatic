@@ -25,7 +25,7 @@ Oh, and one more thing!
 
 AspNetStatic now works with Blazor websites, thanks to the new Blazor SSR capability in ASP.NET Core 8.
 
-> Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. The rule-of-thumb (for any technology you use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via its HttpClient request), it will work fine.
+> :bulb: Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. The rule-of-thumb (for any technology you use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via its HttpClient request), it will work fine.
 
 ### No Frameworks. No Engines. No Opinions!
 
@@ -69,7 +69,7 @@ It's a piece of cake.
          new PageResource("/privacy"),
          new PageResource("/blog/articles/posts/1") { OutFile = "blog/post-1.html" },
          new PageResource("/blog/articles/posts/2") { OutFile = "blog/post-2-dark.html", Query = "?theme=dark" },
-         new CssResource("/bootstrap/bootstrap.min.css") { OptimizerType = OptimizerType.None },
+         new CssResource("/bootstrap/bootstrap.min.css") { OptimizationType = OptimizationType.None },
          new CssResource("/site.css"),
          new JsResource("/site.js"),
          new BinResource("/favicon.png")
@@ -104,16 +104,16 @@ Keep the following in mind when specifying routes in the `IStaticResourcesInfoPr
 - You can directly specify the pathname of the file to be generated for routes you add to the `PageResources` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify route parameters for routes you add to the `PageResources` collection. The route parameters are treated as part of the route, and are used in constructing the output file pathname.
 - You can specify a query string for routes you add to the `PageResources` collection (see `Query` property). You can specify the same `Route` with different `Query` values, but you will need to specify a unique `OutFile` value for each instance of that route.
-- You can skip content optimization<sup>1</sup> or choose a specific optimizer type for routes you add to the `PageResources` collection (see `OptimizerType` property). The default optimizer type setting, `OptimizerType.Auto`, automatically selects the appropriate optimizer.
+- You can skip content optimization<sup>1</sup> or choose a specific optimizer type for routes you add to the `PageResources` collection (see `OptimizationType` property). The default optimizer type setting, `OptimizationType.Auto`, automatically selects the appropriate optimizer.
 - You can set the encoding for content written to output files for routes you add to the `PageResources` collection (see `OutputEncoding` property). Default is UTF8.
 
-> NOTE: All of the above also applies to routes for CSS, JavaScript, and binary (e.g. image) files specified in the `OtherResources` collection property.
+> :bulb: All of the above also applies to routes for CSS, JavaScript, and binary (e.g. image) files specified in the `OtherResources` collection property.
 
 > 1: Content optimization options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details.
 
 ### Routes vs. Generated Static Files (page resources)
 
-> Assumes the following:
+> #### Assumes the following:
 >  - Resource Type: PageResource
 >  - Destination root: "__C:\MySite__"
 >  - OutFile: __null, empty, or whitespace__
@@ -134,7 +134,7 @@ Url<br/>(route + query) | Always Default<br/>false | Always Default<br/>true
 
 ### Routes vs. Generated Static Files (non-page resources)
 
-> Assumes the following:
+> #### Assumes the following:
 >  - Resource Type: __CssResource__, __JsResource__, or __BinResource__
 >  - Destination root: "__C:\MySite__"
 >  - OutFile: __null, empty, or whitespace__
@@ -161,7 +161,7 @@ Url<br/>(route + query) | Generated File
 
 ### Fallback Middleware: Routes vs. Served Content
 
-> Assumes the following:
+> #### Assumes the following:
 >  - OutFile: __null, empty, or whitespace__
 >  - Applicable only to __PageResource__ items.
 
@@ -180,7 +180,7 @@ Url<br/>(route + query) | Is Static Route: false<br/><br/> | Is Static Route: tr
 /blog/articles/post1 | /blog/articles/post1.cshtml | /blog/articles/post1.html | /blog/articles/post1/index..html
 
 
-> #### The same rules apply when links in static files are updated to refer to other generated static pages.
+> :bulb: The same rules apply when links in static files are updated to refer to other generated static pages.
 
 
 __IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link URIs based on the routing configuration of your app, so if you're using them, be sure to specify an appropriate value for `alwaysDefaultFile`, as shown below. (NOTE: Specify the same value if/when configuring the fallback middleware).
@@ -232,7 +232,7 @@ app.GenerateStaticContent(
 
 ## Scenarios
 
-> #### In all scenarios, ensure that routes for static content are unincumbered by authentication or authorization requirements.
+> :bulb: In all scenarios, ensure that routes for static content are unincumbered by authentication or authorization requirements.
 
 ### Static Site Generation (Standalone SSG)
 
@@ -296,7 +296,7 @@ Now you can use the SSG profile to launch your app in SSG mode (to generate stat
 
 In this scenario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request (e.g. pages/views, JSON API's, etc.). When the app runs, static (.html) files will be generated for routes you specify. The website will then serve these static files for the specified routes, and dynamic content (as usual) for others.
 
-> While static files are being generated, requests to routes for which a static file has not yet been generated will be served as dynamicly generated content (using the source .cshtml page). Once the static file for that route has been generated, it will be used to satisfy subsequent requests.
+> :bulb: While static files are being generated, requests to routes for which a static file has not yet been generated will be served as dynamicly generated content (using the source .cshtml page). Once the static file for that route has been generated, it will be used to satisfy subsequent requests.
 
 The configuration options are generally the same as for a standalone static site, except the following differences:
  - The destination root folder must be `app.Environment.WebRoot` (i.e. wwwroot).
@@ -326,7 +326,7 @@ app.GenerateStaticContent(
 app.Run();
 ```
 
-> #### NOTE: The fallback middleware only re-routes requests for routes that match entries in the `PageResources` collection, and only if a generated static file exists for that route.
+> :bulb: The fallback middleware only re-routes requests for routes that match entries in the `PageResources` collection, and only if a generated static file exists for that route.
 
 
 #### Periodic Regeneration
@@ -345,79 +345,157 @@ app.GenerateStaticContent(
 
 ## Content Optimization
 
-AspNetStatic automatically minifies HTML content (and any embedded CSS or Javascript) in generated static files; configuration is not required.
-To disable this feature, however, you can specify `true` for the `dontOptimizeContent` parameter.
+Before proceeding, let's clarify what an "_optimizer_" is in AspNetStatic. An optimizer is simply a component that performs some sort of processing on the content retrieved for a static resource (_i.e. page, css, js, image, etc._) An optimizer is called by AspNetStatic after the content of a resource is retrieved, but just before that content is written to the destination file.
+
+
+### Enabling Optimization
+
+The "optimizer" feature in AspNetStatic is enabled by default and requires no configuration to use.
+To disable the feature, pass `true` as the argument for the `dontOptimizeContent` parameter in the `GenerateStaticContent` call.
 ```c#
 app.GenerateStaticContent(
   ...
   dontOptimizeContent: true);
 ```
+This will prevent the `IOptimizerSelector` and any optimizers from being called.
 
-> Content optimization does not apply to binary resource types (`BinResource` entries), but is enabled by default (`OptimizerType.Auto`) for all other resource types (`PageResource`, `CssResource`, and `JsResource` entries).
 
-### Configuration
+### Optimizer Selector
 
-To override the default minification settings used by AspNetStatic, register the appropriate objects in the DI container, as shown below.
+The optimizer to be executed by AspNetStatic for a given resource (_page, css, etc._) is determined by the registered `IOptimizerSelector` component, which by default is `DefaultOptimizerSelector`.
 
-> AspNetStatic uses the excellent WebMarkupMin package to implement the minification feature. For details about the configuration settings, please consult the WebMarkupMin [documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
+An `IOptimizerSelector` implementation can select an optimizer based on the attributes of the resource (e.g. the resource type, its stated `OptimizationType`, the source or destination file extension or path). `DefaultOptimizerSelector`, for instance, uses the resource type and `OptimizationType` information to select an optimizer.
 
-Content optimization can be customized in one of two ways:
- 1. Create and register an object that implements `IOptimizerSelector`. In addition to specifying custom optimizer configurations, this option allows you to implement your own custom logic for selecting the optimizer to use for a resource.
-    ```c#
-    public class MyOptimizerSelector : IOptimizerSelector { ... }
+To use your own custom selector, implement the `IOptimizerSelector` interface and register it in the DI container. You can derive from `DefaultOptimizerSelector` and override it's methods, to expedite this task.
+ 
+```C#
+public class MyCustomOptimizerSelector : IOptimizerSelector
+{
+  ...
+}
+...
+builder.Services.AddSingleton<IOptimizerSelector, MyCustomOptimizerSelector>();
+builder.Services.AddDefaultOptimizers(); // do this if MyCustomOptimizerSelector uses them 
+```
+> :bulb: If your custom `IOptimizerSelector` implementation injects one or more of the default optimizers provided by AspNetStatic, you must register them by calling `AddDefaultOptimizers()`.
+
+
+### Optimizers
+
+AspNetStatic supports the following optimizer types: 
+- `IMarkupOptimizer`: Called when processing PageResource objects
+- `ICssOptimizer`: Called when processing CssResource objects
+- `IJsOptimizer`: Called when processing JsResource objects
+- `IBinOptimizer`: Called when processing BinResource objects
+
+AspNetStatic provides the following "default" implementations for these interfaces: `DefaultMarkupOptimizer`, `DefaultCssOptimizer`, and `DefaultJsOptimizer`. There is no default `IBinOptimizer`.
+
+To use a custom optimizer, implement (_and register in DI_) the relevant interface. You can derive and extend the "default" implementation, if you wish.
+For instance, if you want to perform some pre and post processing operations on CSS resources (_in addition to the built-in minification_), derive and extend the DefaultCssOptimizer, like so:
+
+```C#
+// OPTION 1: Implement from scratch
+
+public MyCustomCssOptimizer : ICssOptimizer
+{
+  public CssOptimizerResult Execute(string content, ...)
+  {
+    // your custom processing here...
+  }
+}
+
+// OPTION 2: inherit from DefaultCssOptimizer
+
+public MyCustomCssOptimizer : DefaultCssOptimizer
+{
+  public override CssOptimizerResult Execute(string content, ...)
+  {
+    content = DoPreProcessing(content);
+    var result = base.Execute(content, ...); // do usual minification
+    result.OptimizedContent = DoPostProcessing(result.OptimizedContent);
+    return result;
+  }
+  private string DoPreProcessing(string css) { ... }
+  private string DoPostProcessing(string css) { ... }
+}
+
+// -- OPTION 3: create decorator over DefaultCssOptimizer
+
+public MyCustomCssOptimizer(
+  DefaultCssOptimizer defaultCssOptimizer) : 
+  ICssOptimizer
+{
+  public CssOptimizerResult Execute(string content, ...)
+  {
+    content = DoPreProcessing(content);
+    var result = defaultCssOptimizer.Execute(content, ...); // do usual minification
+    result.OptimizedContent = DoPostProcessing(result.OptimizedContent);
+    return result;
+  }
+  private string DoPreProcessing(string css) { ... }
+  private string DoPostProcessing(string css) { ... }
+}
+
+...
+
+// Register your custom implementation...
+builder.Services.AddSingleton<ICssOptimizer, MyCustomCssOptimizer>();
+
+// Call following method if you want DefaultCssOptimizer to use 
+// the AspNetStatic defaults for these services, otherwise it will 
+// use the WebMarkupMin internal defaults.
+builder.Services.AddDefaultMinifiers(); 
+```
+
+
+### Configuring Default Optimizers
+
+The default optimizers provided by AspNetStatic (`DefaultMarkupOptimizer`, `DefaultCssOptimizer`, and `DefaultJsOptimizer`) use the `WebMarkupMin` package to minify HTML, CSS and JS content.
+To override the default minification settings used by AspNetStatic, register the appropriate objects as described below.
+
+> :flashlight: For details about WebMarkupMin configuration settings, please consult the [WebMarkupMin documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
+
+AspNetStatic uses the default `WebMarkupMin` configuration settings (_determined internally by WebMarkupMin_) for minifying HTML, XHTML, and XML content. To override this behavior, register one or more of the following configuration objects:
+
+```c#
+using WebMarkupMin.Core;
+
+// HTML minifier settings
+builder.Services.AddSingleton(
+  sp => new HtmlMinificationSettings()
+  {
     ...
-    builder.Services.AddSingleton(sp => new MyOptimizerSelector( ... ));
-    ```
+  });
 
- 1. Create and register individual settings objects which internally feed into a default `IOptimizerSelector` implementation.
-    - __HTML__: To configure the HTML minifier, register as a singleton a configured instance of `HtmlMinificationSettings`:
-      ```c#
-      using WebMarkupMin.Core;
-      builder.Services.AddSingleton(
-        sp => new HtmlMinificationSettings()
-        {
-          ...
-        });
-      ```
+// XHTML minifier settings
+builder.Services.AddSingleton(
+  sp => new XhtmlMinificationSettings()
+  {
+    ...
+  });
 
-    - __XHTML__: To configure the XHTML minifier, register as a singleton a configured instance of `XhtmlMinificationSettings`:
-      ```c#
-      using WebMarkupMin.Core;
-      builder.Services.AddSingleton(
-        sp => new XhtmlMinificationSettings()
-        {
-          ...
-        });
-      ```
+// XML minifier settings
+builder.Services.AddSingleton(
+  sp => new XmlMinificationSettings()
+  {
+    ...
+  });
+```
 
-    - __XML__: To configure the XML minifier, register as a singleton a configured instance of `XmlMinificationSettings`:
-      ```c#
-      using WebMarkupMin.Core;
-      builder.Services.AddSingleton(
-        sp => new XmlMinificationSettings()
-        {
-          ...
-        });
-      ```
 
-    - __CSS__: To configure the CSS minifier, register as a singleton an object that implements the `ICssMinifier` interface:
-      ```c#
-      using WebMarkupMin.Core;
-      builder.Services.AddSingleton<ICssMinifier>(
-        sp => new YuiCssMinifier(...));
-      ```
+AspNetStatic uses `KristensenCssMinifier` for `ICssMinifier`, and `CrockfordJsMinifier` for `IJsMinifier` by default. To override this behavior, register alternative implementations:
 
-    - __Javascript__: To configure the Javascript minifier, register as a singleton an object that implements the `IJsMinifier` interface:
-      ```c#
-      using WebMarkupMin.Core;
-      builder.Services.AddSingleton<IJsMinifier>(
-        sp => new YuiJsMinifier(...));
-      ```
+```c#
+using WebMarkupMin.Core;
 
-    - __Binary Content__ (__BinResource__): To configure a binary resource optimizer, register as a singleton an object that implements the `IBinOptimizer` interface:
-      ```c#
-      builder.Services.AddSingleton<IBinOptimizer, MyBinOptimizer>();
-      ```
+// ICssMinifier
+builder.Services.AddSingleton<ICssMinifier>(
+  sp => new YuiCssMinifier(...));
+
+// IJsMinifier
+builder.Services.AddSingleton<IJsMinifier>(
+  sp => new YuiJsMinifier(...));
+```
 
 
 <br/>
