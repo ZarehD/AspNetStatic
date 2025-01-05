@@ -364,14 +364,21 @@ This will prevent the `IOptimizerSelector` and any optimizers from being called.
 
 The optimizer to be executed by AspNetStatic for a given resource (_page, css, etc._) is determined by the registered `IOptimizerSelector` component, which by default is `DefaultOptimizerSelector`.
 
-An `IOptimizerSelector` implementation can select an optimizer based on the attributes of the resource (e.g. the resource type, its stated `OptimizationType`, the source or destination file extension or path). `DefaultOptimizerSelector`, for instance, uses the resource type and `OptimizationType` information to select an optimizer.
+An `IOptimizerSelector` implementation can select an optimizer based on the attributes of the resource (e.g. the resource type, its stated `OptimizationType`, the source or destination file extension or path).
 
-To use your own custom selector, implement the `IOptimizerSelector` interface and register it in the DI container. You can derive from `DefaultOptimizerSelector` and override it's methods, to expedite this task.
- 
+`DefaultOptimizerSelector` uses the resource type and `OptimizationType` information to select an optimizer.
+
+> :bulb: If a given resource requests no optimization (`OptimizationType.None`), or an optimizer implementation is not available for that resource type, `DefaultOptimizerSelector` will return one of the built-in "null" optimizers (`NullMarkupOptimizer`, `NullCssOptimizer`, `NullJsOptimizer`, and `NullBinOptimizer`).
+
+To use your own custom selector, implement the `IOptimizerSelector` interface and register it in the DI container.
+
 ```C#
 public class MyCustomOptimizerSelector : IOptimizerSelector
 {
-  ...
+  public IMarkupOptimizer SelectFor(PageResource pageResource, string outFilePathname) { ... }
+  public ICssOptimizer SelectFor(CssResource cssResource, string outFilePathname) { ... }
+  public IJsOptimizer SelectFor(JsResource jsResource, string outFilePathname) { ... }
+  public IBinOptimizer SelectFor(BinResource binResource, string outFilePathname) { ... }
 }
 ...
 builder.Services.AddSingleton<IOptimizerSelector, MyCustomOptimizerSelector>();
@@ -388,7 +395,7 @@ AspNetStatic supports the following optimizer types:
 - `IJsOptimizer`: Called when processing JsResource objects
 - `IBinOptimizer`: Called when processing BinResource objects
 
-AspNetStatic provides the following "default" implementations for these interfaces: `DefaultMarkupOptimizer`, `DefaultCssOptimizer`, and `DefaultJsOptimizer`. There is no default `IBinOptimizer`.
+AspNetStatic provides "default" implementations for these interfaces: `DefaultMarkupOptimizer`, `DefaultCssOptimizer`, and `DefaultJsOptimizer`. There is no default `IBinOptimizer` implementation.
 
 To use a custom optimizer, implement (_and register in DI_) the relevant interface. You can derive and extend the "default" implementation, if you wish.
 For instance, if you want to perform some pre and post processing operations on CSS resources (_in addition to the built-in minification_), derive and extend the DefaultCssOptimizer, like so:
