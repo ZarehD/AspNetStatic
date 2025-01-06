@@ -99,7 +99,7 @@ You can use AspNetStatic in traditional SSG mode (*generate files and exit the a
 
 Keep the following in mind when specifying routes in the `IStaticResourcesInfoProvider.PageResources` collection.
 
-- Routes must exclude the site's base URI (e.g. __http:<span>://</span>localhost:5000__, __https<span>://www</span>.example.com__)
+- Routes must exclude the site's base URI (e.g. __http:<span>//</span>localhost:5000__, __https:<span>//www</span>.example.com__)
 - As a rule, don't specify an 'index' page name; instead, opt for a route with a terminating slash (/ instead of /index).
 - You can directly specify the pathname of the file to be generated for routes you add to the `PageResources` collection (see `OutFile` property). The only requirement is that the specified path be relative to the destination root folder. If you do not specify a value for `OutFile`, the pathname for the generated file will be determined as demonstrated below.
 - You can specify route parameters for routes you add to the `PageResources` collection. The route parameters are treated as part of the route, and are used in constructing the output file pathname.
