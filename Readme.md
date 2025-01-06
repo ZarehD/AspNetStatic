@@ -448,6 +448,9 @@ public MyCustomCssOptimizer(
 
 ...
 
+// register default optimizers & minifiers
+builder.Services.AddDefaultOptimizers(); 
+
 // Register your custom implementation...
 builder.Services.AddSingleton<ICssOptimizer, MyCustomCssOptimizer>();
 
