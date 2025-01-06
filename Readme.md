@@ -382,7 +382,10 @@ public class MyCustomOptimizerSelector : IOptimizerSelector
 }
 ...
 builder.Services.AddSingleton<IOptimizerSelector, MyCustomOptimizerSelector>();
-builder.Services.AddDefaultOptimizers(); // do this if MyCustomOptimizerSelector uses them 
+
+builder.Services.AddDefaultOptimizers(); // register default optimizers & minifiers
+builder.Services.AddSingleton<IJsMinifier, YuiJsMinifier>(); // override default minifier
+builder.Services.AddSingleton<IMarkupOPtimizer, MyCustomMarkupOptimizer>()); // override default optimizer
 ```
 > :bulb: If your custom `IOptimizerSelector` implementation injects one or more of the default optimizers provided by AspNetStatic, you must register them by calling `AddDefaultOptimizers()`.
 
@@ -451,6 +454,7 @@ builder.Services.AddSingleton<ICssOptimizer, MyCustomCssOptimizer>();
 // Call following method if you want DefaultCssOptimizer to use 
 // the AspNetStatic defaults for these services, otherwise it will 
 // use the WebMarkupMin internal defaults.
+// This call is not needed if you've already called AddDefaultOptimizers.
 builder.Services.AddDefaultMinifiers(); 
 ```
 
