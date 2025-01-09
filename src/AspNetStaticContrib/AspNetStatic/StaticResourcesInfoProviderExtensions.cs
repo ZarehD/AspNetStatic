@@ -12,7 +12,7 @@ the specific language governing permissions and limitations under the License.
 
 /* IMPORTANT NOTE:
  * 
- * The methods implemented in this class are not intende to be 
+ * The methods implemented in this class are not intended to be 
  * comprehensive or even broadly applicable. Their purpose is 
  * to provide a starting point for more complex, meaningful, 
  * and/or broadly applicable implementations contributed by 
@@ -21,7 +21,8 @@ the specific language governing permissions and limitations under the License.
  */
 
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.FileSystemGlobbing;
+using FSGA = Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 namespace AspNetStaticContrib.AspNetStatic;
 
@@ -127,5 +128,134 @@ public static class StaticResourcesInfoProviderExtensions
 			;
 
 		return provider;
+	}
+
+
+	/// <summary>
+	///		Retrieves a collection of <see cref="CssResource"/> for files 
+	///		found in the wwwroot folder based on the specified filters.
+	/// </summary>
+	/// <param name="hostEnvironment">The <see cref="IWebHostEnvironment"/> instance.</param>
+	/// <param name="include">
+	///		The glob filter for files to include.
+	///		Defaults to "**/*.css", if empty.
+	/// </param>
+	/// <param name="exclude">The glob filter for files to exclude.</param>
+	/// <returns>A collection of zero or more <see cref="CssResource"/> objects.</returns>
+	public static IEnumerable<CssResource> GetWebRootCssResources(
+		this IWebHostEnvironment hostEnvironment,
+		string[]? include = default,
+		string[]? exclude = default)
+	{
+		Throw.IfNull(hostEnvironment);
+
+		var webRootPath = hostEnvironment.WebRootPath;
+
+		var routes = GetResourceRoutes(
+			webRootPath,
+			include ?? ["**/*.css"],
+			exclude ?? []);
+
+		return
+			(0 < routes.Length)
+			? routes.Select(x => new CssResource(x))
+			: []
+			;
+	}
+
+	/// <summary>
+	///		Retrieves a collection of <see cref="JsResource"/> for files 
+	///		found in the wwwroot folder based on the specified filters.
+	/// </summary>
+	/// <param name="hostEnvironment">The <see cref="IWebHostEnvironment"/> instance.</param>
+	/// <param name="include">
+	///		The glob filter for files to include.
+	///		Defaults to "**/*.js", if empty.
+	/// </param>
+	/// <param name="exclude">The glob filter for files to exclude.</param>
+	/// <returns>A collection of zero or more <see cref="JsResource"/> objects.</returns>
+	public static IEnumerable<JsResource> GetWebRootJsResources(
+		this IWebHostEnvironment hostEnvironment,
+		string[]? include = default,
+		string[]? exclude = default)
+	{
+		Throw.IfNull(hostEnvironment);
+
+		var webRootPath = hostEnvironment.WebRootPath;
+
+		var routes = GetResourceRoutes(
+			webRootPath,
+			include ?? ["**/*.js"],
+			exclude ?? []);
+
+		return
+			(0 < routes.Length)
+			? routes.Select(x => new JsResource(x))
+			: []
+			;
+	}
+
+	/// <summary>
+	///		Retrieves a collection of <see cref="BinResource"/> for files 
+	///		found in the wwwroot folder based on the specified filters.
+	/// </summary>
+	/// <param name="hostEnvironment">The <see cref="IWebHostEnvironment"/> instance.</param>
+	/// <param name="include">The glob filter for files to include.</param>
+	/// <param name="exclude">The glob filter for files to exclude.</param>
+	/// <returns>A collection of zero or more <see cref="BinResource"/> objects.</returns>
+	public static IEnumerable<BinResource> GetWebRootBinResources(
+		this IWebHostEnvironment hostEnvironment,
+		string[] include,
+		string[]? exclude = default)
+	{
+		Throw.IfNull(hostEnvironment);
+		Throw.InvalidOpWhen(
+			() => 0 == include.Length,
+			"Inclusion filter is empty when adding binary static resources.");
+
+		var webRootPath = hostEnvironment.WebRootPath;
+
+		var routes = GetResourceRoutes(
+			webRootPath,
+			include!,
+			exclude ?? []);
+
+		return
+			(0 < routes.Length)
+			? routes.Select(x => new BinResource(x))
+			: []
+			;
+	}
+
+	/// <summary>
+	///		Retrieves a collection of routes for resources found in 
+	///		the specified root folder using the provided filters.
+	/// </summary>
+	/// <param name="rootPath">The root folder where to start the search.</param>
+	/// <param name="includeFilter">The glob filter for files to include.</param>
+	/// <param name="excludeFilter">The glob filter for files to exclude.</param>
+	/// <returns>A collection containing zero or more resource route entries.</returns>
+	public static string[] GetResourceRoutes(
+		string rootPath,
+		string[] includeFilter,
+		string[] excludeFilter)
+	{
+		Throw.IfNullOrWhitespace(rootPath);
+
+		var matcher = new Matcher();
+		matcher.AddIncludePatterns(includeFilter);
+		matcher.AddExcludePatterns(excludeFilter);
+		var result = matcher.Execute(
+			new FSGA.DirectoryInfoWrapper(
+				new DirectoryInfo(rootPath)));
+
+		return
+			result.HasMatches
+			? result.Files
+				.Select(f => f.Path.Replace(Path.DirectorySeparatorChar, '/')) // as route
+				.Select(f => f.Replace(rootPath, string.Empty))                // relative to root path
+				.ToArray()
+			: []
+			;
 	}
 }
