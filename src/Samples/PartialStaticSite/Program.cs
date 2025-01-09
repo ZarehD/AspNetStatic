@@ -1,6 +1,7 @@
 #define ENABLE_STATIC_PAGE_FALLBACK
 
 using AspNetStatic;
+using AspNetStaticContrib.AspNetStatic;
 using Microsoft.Extensions.Hosting;
 using PartialStaticSite;
 
@@ -18,7 +19,11 @@ builder.Services.AddRouting(
 builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
-	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection()));
+	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection())
+	.Add(builder.Environment.GetWebRootCssResources(["**/site.css", "**/*.min.css"]))
+	.Add(builder.Environment.GetWebRootJsResources())
+	.Add(builder.Environment.GetWebRootBinResources(["**/*.ico"]))
+	);
 
 // Use the "no-ssg" arg to omit static file generation
 // during development (hot-reload, etc.)
@@ -72,6 +77,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
@@ -79,12 +85,12 @@ app.MapRazorPages();
 if (allowSSG)
 {
 	app.GenerateStaticContent(
-	app.Environment.WebRootPath,
-	exitWhenDone: exitWhenDone,
-	alwaysDefaultFile: false,
-	dontUpdateLinks: false,
-	dontOptimizeContent: false,
-	regenerationInterval: regenInterval);
+		app.Environment.WebRootPath,
+		exitWhenDone: exitWhenDone,
+		alwaysDefaultFile: false,
+		dontUpdateLinks: false,
+		dontOptimizeContent: false,
+		regenerationInterval: regenInterval);
 }
 
 app.Run();

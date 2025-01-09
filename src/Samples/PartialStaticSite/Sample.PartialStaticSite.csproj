@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AspNetStaticContrib\AspNetStaticContrib.csproj" />
     <ProjectReference Include="..\..\AspNetStatic\AspNetStatic.csproj" />
   </ItemGroup>
 
