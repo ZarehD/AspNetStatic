@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="21.2.1" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.14" />
   </ItemGroup>
 
   <ItemGroup>
