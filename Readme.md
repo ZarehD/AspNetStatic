@@ -17,21 +17,21 @@ Well, now there is!
 
 AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator.
 
-But wait, there's more!
+#### But wait, there's more!
 
 AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Scenarios_ section below.
 
-Oh, and one more thing!
+#### What about Blazor?
 
-AspNetStatic now works with Blazor websites, thanks to the new Blazor SSR capability in ASP.NET Core 8.
+Yes, AspNetStatic works great with Blazor too.
 
-> :bulb: Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. The rule-of-thumb (for any technology you use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via its HttpClient request), it will work fine.
+> :bulb: Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. The rule-of-thumb (for any tech you want to use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via its http request), it will work fine.
 
 ### No Frameworks. No Engines. No Opinions!
 
 Build your ASP.NET site the way you always have. AspNetStatic doesn't have any opinions about how you should build your server-rendered site.
 AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. 
-AspNetStatic does just one thing, create static files for selected routes in your ASP.NET Core app.
+AspNetStatic does just one thing, create static files for selected routes in your ASP.NET Core project.
 That means you can use whatever framework, component, package, or architectural style you like. Want to use a blog engine? No problem. Want to use a CMS? No problem. Want to create a documentation site using a markdown processor to render page content? No problem! 
 AspNetStatic doesn't care; it will create optimized static files no matter how the content is produced by the server.
 
@@ -42,7 +42,7 @@ AspNetStatic doesn't care; it will create optimized static files no matter how t
 
 It's a piece of cake.
 
-1. Add the Nuget Package to your ASP.NET Core web app project
+1. Add the Nuget Package to your ASP.NET Core project
    ```
    dotnet add package AspNetStatic
    ```
