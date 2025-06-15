@@ -9,30 +9,43 @@
 
 Okay, so you want to create a static website. After doing some research, you learn that all the cool kids are using tools like __Jekyll__, __Hugo__, __Gatsby__, or __Statiq__. 
 But what you also learn is that all of these tools require you to learn an entirely new way of constructing sites and pages. 
-And then it occurs to you, I already know how to use ASP.NET Core to create websites, so why do I need to learn & use a whole other stack just for SSG? Isn't there a better way that lets me use the tools and skills I already have?
+And this is when you'll wonder to yourself, as I did, Why!?
+I already know how to use ASP.NET Core to create websites; why do I need to learn & use a whole other stack just for SSG? 
+Isn't there a better way that lets me use the tools and skills I already have?
+<!-- And then it occurs to you,  -->
 
 Well, now there is!
 
 ### Create a static site using ASP.NET Core
 
-AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator.
+AspNetStatic lets you generate a static website with the same ASP.NET Core tools you love and use every day. 
+Just add this package and tell it which routes (page, css, js, etc.) to process.
+<!-- Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator. -->
+
+AspNetStatic works equally well with Blazor (SSR), Razor Pages, and MVC (conrollers + views).
+
+> :bulb: Blazor pages must not rely on any client-side (JS, WASM) functionality for rendering, or any behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content.
+> The rule-of-thumb (for any tech you want to use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via http request), then it will work fine.
 
 #### But wait, there's more!
 
 AspNetStatic can also be used in a mixed mode configuration where some of the pages in your site are static html files (generated with the same \_layout & page layers that define the look & feel of the rest of your site), while others remain dynamically generated per request. See _Partial Static Site_ under _Scenarios_ section below.
 
-#### What about Blazor?
+<!-- 
+#### Does it work with Blazor?
 
-Yes, AspNetStatic works great with Blazor too.
+Yes, AspNetStatic works great with Blazor.
 
 > :bulb: Blazor pages must not rely on any client-side (JS, WASM) behavior for rendering, or behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content. The rule-of-thumb (for any tech you want to use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via its http request), it will work fine.
+-->
 
 ### No Frameworks. No Engines. No Opinions!
 
-Build your ASP.NET site the way you always have. AspNetStatic doesn't have any opinions about how you should build your server-rendered site.
+Build your ASP.NET site the way you always have. AspNetStatic doesn't have any opinions about how you should structure your server-rendered site.
 AspNetStatic is not a framework. It's not a CMS. There's no blog engine. It has no templating system. 
-AspNetStatic does just one thing, create static files for selected routes in your ASP.NET Core project.
-That means you can use whatever framework, component, package, or architectural style you like. Want to use a blog engine? No problem. Want to use a CMS? No problem. Want to create a documentation site using a markdown processor to render page content? No problem! 
+AspNetStatic does just one thing; create static files for selected routes in your ASP.NET Core project.
+That means you can use whatever framework, component, package, or architectural style you like. 
+Want to use a blog engine? No problem. Want to use a CMS? No problem. Want to create a documentation site using a markdown processor to render page content? No problem! 
 AspNetStatic doesn't care; it will create optimized static files no matter how the content is produced by the server.
 
 
