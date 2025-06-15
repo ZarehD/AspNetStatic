@@ -22,7 +22,7 @@ AspNetStatic lets you generate a static website with the same ASP.NET Core tools
 Just add this package and tell it which routes (page, css, js, etc.) to process.
 <!-- Just add this module and a bit of configuration, and BAM!, you have yourself a static site generator. -->
 
-AspNetStatic works equally well with Blazor (SSR), Razor Pages, and MVC (conrollers + views).
+AspNetStatic works equally well with Blazor (SSR), Razor Pages, and MVC (controllers + views).
 
 > :bulb: Blazor pages must not rely on any client-side (JS, WASM) functionality for rendering, or any behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content.
 > The rule-of-thumb (for any tech you want to use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via http request), then it will work fine.
