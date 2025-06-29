@@ -24,7 +24,9 @@ Just add this package and tell it which routes (page, css, js, etc.) to process.
 
 AspNetStatic works equally well with Blazor (SSR), Razor Pages, and MVC (controllers + views).
 
-> :bulb: Blazor pages must not rely on any client-side (JS, WASM) functionality for rendering, or any behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content.
+<!-- :bulb: -->
+> [!Important]
+> Blazor pages must not rely on any client-side (JS, WASM) functionality for rendering, or any behaviors like showing a placeholder (e.g. a spinner) before rendering the actual content.
 > The rule-of-thumb (for any tech you want to use with AspNetStatic) is that as long as the content has completed rendering by the time AspNetStatic receives it (via http request), then it will work fine.
 
 #### But wait, there's more!
@@ -120,12 +122,15 @@ Keep the following in mind when specifying routes in the `IStaticResourcesInfoPr
 - You can skip content optimization<sup>1</sup> or choose a specific optimization type for routes you add to the `PageResources` collection (see `OptimizationType` property). The default optimization type setting, `OptimizationType.Auto`, automatically applies the appropriate optimization.
 - You can set the encoding for content written to output files for routes you add to the `PageResources` collection (see `OutputEncoding` property). Default is UTF8.
 
-> :bulb: All of the above also applies to routes for CSS, JavaScript, and binary (e.g. image) files specified in the `OtherResources` collection property.
-
+> [!Note]
 > 1: Content optimization options apply only when content optimization is enabled. Please see the __Content Optimization__ section below for details.
+
+> [!Tip]
+> All of the above also applies to routes for CSS, JavaScript, and binary (e.g. image) files specified in the `OtherResources` collection property.
 
 ### Routes vs. Generated Static Files (page resources)
 
+> [!Note]
 > #### Assumes the following:
 >  - Resource Type: PageResource
 >  - Destination root: "__C:\MySite__"
@@ -147,6 +152,7 @@ Url<br/>(route + query) | Always Default<br/>false | Always Default<br/>true
 
 ### Routes vs. Generated Static Files (non-page resources)
 
+> [!Note]
 > #### Assumes the following:
 >  - Resource Type: __CssResource__, __JsResource__, or __BinResource__
 >  - Destination root: "__C:\MySite__"
@@ -174,6 +180,7 @@ Url<br/>(route + query) | Generated File
 
 ### Fallback Middleware: Routes vs. Served Content
 
+> [!Note]
 > #### Assumes the following:
 >  - OutFile: __null, empty, or whitespace__
 >  - Applicable only to __PageResource__ items.
@@ -193,10 +200,11 @@ Url<br/>(route + query) | Is Static Route: false<br/><br/> | Is Static Route: tr
 /blog/articles/post1 | /blog/articles/post1.cshtml | /blog/articles/post1.html | /blog/articles/post1/index..html
 
 
-> :bulb: The same rules apply when links in static files are updated to refer to other generated static pages.
+> [!Tip]
+> The same rules apply when links in static files are updated to refer to other generated static pages.
 
-
-__IMPORTANT NOTE__: In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link URIs based on the routing configuration of your app, so if you're using them, be sure to specify an appropriate value for `alwaysDefaultFile`, as shown below. (NOTE: Specify the same value if/when configuring the fallback middleware).
+> [!Important]
+In ASP.NET Core, UrlHelper (and the asp-* tag helpers) generate link URIs based on the routing configuration of your app, so if you're using them, be sure to specify an appropriate value for `alwaysDefaultFile`, as shown below. (NOTE: Specify the same value if/when configuring the fallback middleware).
 ```c#
 // Sample routes: /, /index, and /page
 //-------------------------------------
@@ -245,7 +253,8 @@ app.GenerateStaticContent(
 
 ## Scenarios
 
-> :bulb: In all scenarios, ensure that routes for static content are unincumbered by authentication or authorization requirements.
+> [!Important]
+> In all scenarios, please ensure that routes for static content are unincumbered by authentication or authorization requirements or anything else that requires user interaction.
 
 ### Static Site Generation (Standalone SSG)
 
@@ -309,7 +318,8 @@ Now you can use the SSG profile to launch your app in SSG mode (to generate stat
 
 In this scenario, you want some of the pages in your ASP.NET Core app to be static, but still want other routes to be served as dynamic content per request (e.g. pages/views, JSON API's, etc.). When the app runs, static (.html) files will be generated for routes you specify. The website will then serve these static files for the specified routes, and dynamic content (as usual) for others.
 
-> :bulb: While static files are being generated, requests to routes for which a static file has not yet been generated will be served as dynamicly generated content (using the source .cshtml page). Once the static file for that route has been generated, it will be used to satisfy subsequent requests.
+> [!Note]
+> While static files are being generated, requests to routes for which a static file has not yet been generated will be served as dynamicly generated content (using the source .cshtml page). Once the static file for that route has been generated, it will be used to satisfy subsequent requests.
 
 The configuration options are generally the same as for a standalone static site, except the following differences:
  - The destination root folder must be `app.Environment.WebRoot` (i.e. wwwroot).
@@ -339,7 +349,8 @@ app.GenerateStaticContent(
 app.Run();
 ```
 
-> :bulb: The fallback middleware only re-routes requests for routes that match entries in the `PageResources` collection, and only if a generated static file exists for that route.
+> [!Note]
+> The fallback middleware only re-routes requests for routes that match entries in the `PageResources` collection, and does so only if a generated static file exists for that route.
 
 
 #### Periodic Regeneration
@@ -381,7 +392,8 @@ An `IOptimizerSelector` implementation can select an optimizer based on the attr
 
 `DefaultOptimizerSelector` uses the resource type and `OptimizationType` information to select an optimizer.
 
-> :bulb: If a given resource requests no optimization (`OptimizationType.None`), or an optimizer implementation is not available for that resource type, `DefaultOptimizerSelector` will return one of the built-in "null" optimizers (`NullMarkupOptimizer`, `NullCssOptimizer`, `NullJsOptimizer`, and `NullBinOptimizer`).
+> [!Note]
+> If a given resource requests no optimization (`OptimizationType.None`), or an optimizer implementation is not available for that resource type, `DefaultOptimizerSelector` will return one of the built-in "null" optimizers (`NullMarkupOptimizer`, `NullCssOptimizer`, `NullJsOptimizer`, and `NullBinOptimizer`).
 
 To use your own custom selector, implement the `IOptimizerSelector` interface and register it in the DI container.
 
@@ -400,7 +412,8 @@ builder.Services.AddDefaultOptimizers(); // register default optimizers & minifi
 builder.Services.AddSingleton<IJsMinifier, YuiJsMinifier>(); // override default minifier
 builder.Services.AddSingleton<IMarkupOPtimizer, MyCustomMarkupOptimizer>()); // override default optimizer
 ```
-> :bulb: If your custom `IOptimizerSelector` implementation injects one or more of the default optimizers provided by AspNetStatic, you must register them by calling `AddDefaultOptimizers()`.
+> [!Important]
+> If your custom `IOptimizerSelector` implementation injects one or more of the default optimizers provided by AspNetStatic, you must register them by calling `AddDefaultOptimizers()`.
 
 
 ### Optimizers
@@ -480,7 +493,9 @@ builder.Services.AddDefaultMinifiers();
 The default optimizers provided by AspNetStatic (`DefaultMarkupOptimizer`, `DefaultCssOptimizer`, and `DefaultJsOptimizer`) use the `WebMarkupMin` package to minify HTML, CSS and JS content.
 To override the default minification settings used by AspNetStatic, register the appropriate objects as described below.
 
-> :flashlight: For details about WebMarkupMin configuration settings, please consult the [WebMarkupMin documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
+<!-- :flashlight: -->
+> [!Tip]
+> For details about WebMarkupMin configuration settings, please consult the [WebMarkupMin documentation](https://github.com/Taritsyn/WebMarkupMin/wiki/).
 
 AspNetStatic uses the default `WebMarkupMin` configuration settings (_determined internally by WebMarkupMin_) for minifying HTML, XHTML, and XML content. To override this behavior, register one or more of the following configuration objects:
 
