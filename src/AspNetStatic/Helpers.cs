@@ -75,12 +75,6 @@ internal static class Helpers
 			exclusions ??= [];
 
 			var pageRoute = page.Route.StripQueryString();
-			var uriKind = UriKind.Relative;
-
-			Throw.InvalidOpWhen(
-				() => !Uri.IsWellFormedUriString(pageRoute, uriKind),
-				SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
-
 			pagePath = pageRoute;
 
 			if (pagePath.EndsWith(Consts.FwdSlash) || pagePath.EndsWith(Consts.BakSlash))
@@ -122,12 +116,6 @@ internal static class Helpers
 		else
 		{
 			var resourceRoute = resource.Route.StripQueryString();
-			var uriKind = UriKind.Relative;
-
-			Throw.InvalidOpWhen(
-				() => !Uri.IsWellFormedUriString(resourceRoute, uriKind),
-				SR.Err_RouteForResourceNotWellFormed.SF(uriKind.ToString()));
-
 			resourcePath = resourceRoute;
 
 			if (resourcePath.EndsWith(Consts.FwdSlash) ||
