@@ -12,7 +12,6 @@ the specific language governing permissions and limitations under the License.
 
 #define USE_PERIODIC_TIMER
 
-using System.IO.Abstractions;
 using AspNetStatic.Optimizer;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -20,7 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
-using WebMarkupMin.Core;
+using System.IO.Abstractions;
 
 namespace AspNetStatic
 {
@@ -105,14 +104,6 @@ namespace AspNetStatic
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
-
-			if (!pageUrlProvider.PageResources.Any())
-			{
-				logger.NoPagesToProcess();
-				return;
-			}
-
 			var optimizerSelector = GetOptimizerSelector(host.Services, dontOptimizeContent);
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
@@ -124,24 +115,39 @@ namespace AspNetStatic
 				{
 					try
 					{
+						var resourceProviders = host.Services.GetServices<IStaticResourcesInfoProvider>().ToList();
+						var serviceProvider = host.Services.GetRequiredService<IServiceProvider>();
+
+						List<ResourceInfoBase> resources = [];
+						foreach (var provider in resourceProviders)
+						{
+							if (provider is DynamicResourceInfoProviderBase dynamicReourceProvider)
+							{
+								await dynamicReourceProvider.DiscoverResourcesAsync(serviceProvider);
+							}
+
+							resources.AddRange(provider.Resources);
+						}
+
 						_httpClient.BaseAddress = new Uri(GetBaseUri(host));
 						_httpClient.Timeout = TimeSpan.FromSeconds(httpTimeoutSeconds);
 						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
 
+						// TODO: Something needs to change here. Create multiple configurations or move some options?
 						var generatorConfig =
 							new StaticGeneratorConfig(
-								pageUrlProvider.Resources,
+								resources,
 								destinationRoot,
 								alwaysDefaultFile,
 								!dontUpdateLinks,
-								pageUrlProvider.DefaultFileName,
-								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
-								pageUrlProvider.DefaultFileExclusions,
+								resourceProviders[0].DefaultFileName,
+								resourceProviders[0].PageFileExtension.EnsureStartsWith('.'),
+								resourceProviders[0].DefaultFileExclusions,
 								!dontOptimizeContent, optimizerSelector,
-								pageUrlProvider.SkipPageResources,
-								pageUrlProvider.SkipCssResources,
-								pageUrlProvider.SkipJsResources,
-								pageUrlProvider.SkipBinResources);
+								resourceProviders[0].SkipPageResources,
+								resourceProviders[0].SkipCssResources,
+								resourceProviders[0].SkipJsResources,
+								resourceProviders[0].SkipBinResources);
 
 						logger.RegenerationConfig(regenerationInterval);
 						var doPeriodicRefresh = regenerationInterval is not null;
