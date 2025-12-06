@@ -16,22 +16,22 @@ namespace AspNetStatic
 	{
 		public static readonly Type TypeOfPageResource = typeof(PageResource);
 
-		public static readonly char BakSlash = '\\';
-		public static readonly char FwdSlash = '/';
-		public static readonly string BSlash = BakSlash.ToString();
-		public static readonly string FSlash = FwdSlash.ToString();
+		public const char BakSlash = '\\';
+		public const char FwdSlash = '/';
+		public const string BSlash = "\\";
+		public const string FSlash = "/";
 
-		public static readonly string AspNetStatic = nameof(AspNetStatic);
+		public const string AspNetStatic = nameof(AspNetStatic);
 
-		public static readonly string Ext_Unk = ".unknown";
-		public static readonly string Ext_Htm = ".html";
-		public static readonly string Ext_Css = ".css";
-		public static readonly string Ext_Js = ".js";
-		public static readonly string Ext_Bin = ".bin";
+		public const string Ext_Unk = ".unknown";
+		public const string Ext_Htm = ".html";
+		public const string Ext_Css = ".css";
+		public const string Ext_Js = ".js";
+		public const string Ext_Bin = ".bin";
 
-		public static readonly string DefaultIndexFile = "index";
-		public static readonly string DefaultIndexFileFullName = $"{DefaultIndexFile}{Ext_Htm}";
+		public const string DefaultIndexFile = "index";
+		public const string DefaultIndexFileFullName = $"{DefaultIndexFile}{Ext_Htm}";
 
-		public static readonly string[] DefaultFileExclusions = { DefaultIndexFile, "default" };
+		public static readonly string[] DefaultFileExclusions = [ DefaultIndexFile, "default" ];
 	}
 }
