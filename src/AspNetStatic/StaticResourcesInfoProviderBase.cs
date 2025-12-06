@@ -19,15 +19,10 @@ public abstract class StaticResourcesInfoProviderBase : IStaticResourcesInfoProv
 	public IEnumerable<ResourceInfoBase> Resources => [.. this.resources];
 
 	public IEnumerable<PageResource> PageResources =>
-		this.resources
-		.Where(r => r?.GetType() == Consts.TypeOfPageResource)
-		.Cast<PageResource>();
+		this.Resources.OfType<PageResource>();
 
 	public IEnumerable<NonPageResource> OtherResources =>
-		this.resources
-		.Where(r => r?.GetType() != Consts.TypeOfPageResource)
-		.Cast<NonPageResource>();
-
+		this.Resources.OfType<NonPageResource>();
 	/// <inheritdoc/>
 	/// <remarks>
 	///		Defaults to "index".

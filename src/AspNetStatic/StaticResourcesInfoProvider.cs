@@ -25,9 +25,7 @@ namespace AspNetStatic
 		{
 			if (resources is not null)
 			{
-				var typeofPage = typeof(PageResource);
-				this.resources.AddRange(resources.Where(r => r?.GetType() == typeofPage).Cast<PageResource>());
-				this.resources.AddRange(resources.Where(r => r?.GetType() != typeofPage).Cast<NonPageResource>());
+				this.resources.AddRange(resources);
 			}
 
 			if (defaultFileName is not null) SetDefaultFileName(defaultFileName);

@@ -19,14 +19,10 @@ internal sealed class StaticGeneratorConfig
 	public List<ResourceInfoBase> Resources { get; } = [];
 
 	public IEnumerable<PageResource> Pages =>
-		this.Resources
-		.Where(r => r?.GetType() == Consts.TypeOfPageResource)
-		.Cast<PageResource>();
+		this.Resources.OfType<PageResource>();
 
 	public IEnumerable<NonPageResource> OtherResources =>
-		this.Resources
-		.Where(r => r?.GetType() != Consts.TypeOfPageResource)
-		.Cast<NonPageResource>();
+		this.Resources.OfType<NonPageResource>();
 
 	public bool SkipPageResources { get; init; }
 
