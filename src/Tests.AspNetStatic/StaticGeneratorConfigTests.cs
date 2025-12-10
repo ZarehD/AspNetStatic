@@ -22,11 +22,11 @@ public class StaticGeneratorConfigTests
 	private static readonly NonPageResource[] _jsFileArray = [new("/file.js")];
 	private static readonly NonPageResource[] _binFileArray = [new("/file.bin")];
 
-	private static readonly List<PageResource> _pages = new(_pageArray);
+	private static readonly List<PageResource> _pages = [.. _pageArray];
 	private static readonly List<NonPageResource> _otherResources =
-		new(_cssFileArray.Concat(_jsFileArray).Concat(_binFileArray));
-	private static readonly List<ResourceInfoBase> _hasPagesNoOther = new(_pageArray);
-	private static readonly List<ResourceInfoBase> _noPagesHasOther = new(_otherResources);
+		[.. _cssFileArray.Concat(_jsFileArray).Concat(_binFileArray)];
+	private static readonly List<ResourceInfoBase> _hasPagesNoOther = [.. _pageArray];
+	private static readonly List<ResourceInfoBase> _noPagesHasOther = [.. _otherResources];
 	private static readonly List<ResourceInfoBase> _hasPagesHasOther = [];
 
 	private static readonly ICssMinifier _cssMinifier = new KristensenCssMinifier();
@@ -223,7 +223,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Null_DefaultFileExt_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				null!, _testFileExt,
@@ -233,7 +233,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Empty_DefaultFileExt_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				string.Empty, _testFileExt,
@@ -243,7 +243,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Whitespace_DefaultFileExt_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				" ", _testFileExt,
@@ -255,7 +255,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Null_DefaultFileName_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				_testFileName, null!,
@@ -265,7 +265,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Empty_DefaultFileName_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				_testFileName, string.Empty,
@@ -275,7 +275,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Whitespace_DefaultFileName_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => new StaticGeneratorConfig(
 				_pages, _destRoot, true, true,
 				_testFileName, " ",
@@ -287,7 +287,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Null_DestRoot_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => new StaticGeneratorConfig(
 				_pages, null!, true, true,
 				true, null));
@@ -296,7 +296,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Empty_DestRoot_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => new StaticGeneratorConfig(
 				_pages, string.Empty, true, true,
 				true, null));
@@ -305,7 +305,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Whitespace_DestRoot_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => new StaticGeneratorConfig(
 				_pages, " ", true, true,
 				true, null));
@@ -316,7 +316,7 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v1_Optimize_NoOptimizer_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => new StaticGeneratorConfig(
 				null, _destRoot, true, true,
 				true, null));
@@ -325,10 +325,51 @@ public class StaticGeneratorConfigTests
 	[TestMethod]
 	public void Ctor_v2_Optimize_NoOptimizer_Shd_Throw()
 	{
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => new StaticGeneratorConfig(
 				null, _destRoot, true, true,
 				_testFileName, _testFileExt, _testFileExclusions,
 				true, null));
+	}
+
+
+	[TestMethod]
+	public void Page_Resources_Are_OfType_PageResource()
+	{
+		var expected = _pages;
+
+		var cfg = new StaticGeneratorConfig(
+			_hasPagesHasOther, _destRoot,
+			createDefaultFile: false,
+			fixupHrefValues: false,
+			_testFileName,
+			_testFileExt,
+			_testFileExclusions,
+			enableOptimization: false);
+
+		var actual = cfg.Pages;
+
+		Assert.AreEqual(expected.Count, actual.Count());
+		CollectionAssert.AreEqual(expected, actual.ToList());
+	}
+
+	[TestMethod]
+	public void NonPage_Resources_Are_OfType_NonPageResource()
+	{
+		var expected = _otherResources;
+
+		var cfg = new StaticGeneratorConfig(
+			_hasPagesHasOther, _destRoot,
+			createDefaultFile: false,
+			fixupHrefValues: false,
+			_testFileName,
+			_testFileExt,
+			_testFileExclusions,
+			enableOptimization: false);
+
+		var actual = cfg.OtherResources;
+
+		Assert.AreEqual(expected.Count, actual.Count());
+		CollectionAssert.AreEqual(expected, actual.ToList());
 	}
 }
