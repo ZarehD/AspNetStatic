@@ -36,7 +36,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "https-no-static": {
+    "https-no-ssg": {
       "commandName": "Project",
       "commandLineArgs": "no-ssg",
       "dotnetRunMessages": true,

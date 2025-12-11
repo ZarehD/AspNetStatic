@@ -24,7 +24,7 @@ public class StaticResourcesInfoProviderTests
 		Assert.AreEqual(Consts.DefaultIndexFile, sut.DefaultFileName, ignoreCase: false);
 		Assert.AreEqual(Consts.Ext_Htm, sut.PageFileExtension, ignoreCase: false);
 
-		Assert.AreEqual(Consts.DefaultFileExclusions.Length, sut.DefaultFileExclusions.Length);
+		Assert.HasCount(Consts.DefaultFileExclusions.Length, sut.DefaultFileExclusions);
 		foreach (var exc in Consts.DefaultFileExclusions)
 		{
 			Assert.IsTrue(sut.DefaultFileExclusions.Contains(exc));
@@ -41,7 +41,7 @@ public class StaticResourcesInfoProviderTests
 		Assert.AreEqual(Test_DefaultFileName, sut.DefaultFileName, ignoreCase: false);
 		Assert.AreEqual(Test_DefaultFileExtension, sut.PageFileExtension, ignoreCase: false);
 
-		Assert.AreEqual(Test_Exclusions.Count, sut.DefaultFileExclusions.Length);
+		Assert.HasCount(Test_Exclusions.Count, sut.DefaultFileExclusions);
 		foreach (var exc in Test_Exclusions)
 		{
 			Assert.IsTrue(sut.DefaultFileExclusions.Contains(exc));
@@ -72,9 +72,9 @@ public class StaticResourcesInfoProviderTests
 	{
 		var sut = GetStandardPagesInfoProvider();
 
-		Assert.ThrowsException<ArgumentNullException>(() => sut.SetDefaultFileName(null!));
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileName(string.Empty));
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileName(" "));
+		Assert.ThrowsExactly<ArgumentNullException>(() => sut.SetDefaultFileName(null!));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileName(string.Empty));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileName(" "));
 	}
 
 	//--
@@ -95,9 +95,9 @@ public class StaticResourcesInfoProviderTests
 	{
 		var sut = GetStandardPagesInfoProvider();
 
-		Assert.ThrowsException<ArgumentNullException>(() => sut.SetDefaultFileExtension(null!));
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExtension(string.Empty));
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExtension(" "));
+		Assert.ThrowsExactly<ArgumentNullException>(() => sut.SetDefaultFileExtension(null!));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileExtension(string.Empty));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileExtension(" "));
 	}
 
 	//--
@@ -110,7 +110,7 @@ public class StaticResourcesInfoProviderTests
 
 		sut.SetDefaultFileExclusions(expected);
 
-		Assert.AreEqual(expected.Length, sut.DefaultFileExclusions.Length);
+		Assert.HasCount(expected.Length, sut.DefaultFileExclusions);
 		foreach (var x in expected)
 		{
 			Assert.IsTrue(
@@ -124,9 +124,9 @@ public class StaticResourcesInfoProviderTests
 	{
 		var sut = GetStandardPagesInfoProvider();
 
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExclusions([null!]));
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExclusions([string.Empty]));
-		Assert.ThrowsException<ArgumentException>(() => sut.SetDefaultFileExclusions([" "]));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileExclusions([null!]));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileExclusions([string.Empty]));
+		Assert.ThrowsExactly<ArgumentException>(() => sut.SetDefaultFileExclusions([" "]));
 	}
 
 	//--

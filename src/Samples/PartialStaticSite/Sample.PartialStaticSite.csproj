@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.14" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.1.0" />
   </ItemGroup>
 
   <ItemGroup>

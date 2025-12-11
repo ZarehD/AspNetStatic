@@ -16,7 +16,7 @@ public class RouteToPathnameTests
 
 	#region GetUrlWithoutQueryString
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow("/", "/")]
 	[DataRow("/page", "/page")]
 	[DataRow("/page/", "/page/")]
@@ -30,13 +30,13 @@ public class RouteToPathnameTests
 		Assert.AreEqual(expected, actual, ignoreCase: true);
 	}
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow(default(string))]
 	[DataRow("")]
 	[DataRow(" ")]
 	public void Test_GetUrlWithoutQueryString_BadInput(string url)
 	{
-		//Assert.ThrowsException<ArgumentException>(() => RouteToPathname.StripQueryString(url));
+		//Assert.ThrowsExactly<ArgumentException>(() => RouteToPathname.StripQueryString(url));
 		Assert.AreEqual(url, url.StripQueryString(), ignoreCase: true);
 	}
 
@@ -44,14 +44,13 @@ public class RouteToPathnameTests
 
 	#region GetPathname v1
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow("file.css", @"\root\file.css")]
 	[DataRow("/file.css", @"\root\file.css")]
 	[DataRow("file.js", @"\root\file.js")]
 	[DataRow("/file.js", @"\root\file.js")]
 	[DataRow("file.bin", @"\root\file.bin")]
 	[DataRow("/file.bin", @"\root\file.bin")]
-	[DataRow("/segment/file.jpg", @"\root\segment\file.jpg")]
 	[DataRow("/segment/file.jpg", @"\root\segment\file.jpg")]
 	public void GetPathname_v1(string route, string expected)
 	{
@@ -65,7 +64,7 @@ public class RouteToPathnameTests
 		Assert.AreEqual(expected, actual, ignoreCase: true);
 	}
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow("/file.xyz", null, @"\root\file.xyz")]
 	[DataRow("/file.xyz", "", @"\root\file.xyz")]
 	[DataRow("/file.xyz", " ", @"\root\file.xyz")]
@@ -94,7 +93,7 @@ public class RouteToPathnameTests
 
 		var action = () => resource!.GetOutFilePathname(_webroot);
 
-		Assert.ThrowsException<ArgumentNullException>(action);
+		Assert.ThrowsExactly<ArgumentNullException>(action);
 	}
 
 	[TestMethod]
@@ -102,13 +101,13 @@ public class RouteToPathnameTests
 	{
 		var resource = new NonPageResource("/file.xyz");
 
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => resource.GetOutFilePathname(_nullString));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => resource.GetOutFilePathname(_emptyString));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => resource.GetOutFilePathname(_whitespace));
 	}
 
@@ -116,7 +115,7 @@ public class RouteToPathnameTests
 
 	#region GetPathname v2
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow("/", false, @"\root\index.html")]
 	[DataRow("/", true, @"\root\index.html")]
 	[DataRow("/index", false, @"\root\index.html")]
@@ -144,7 +143,7 @@ public class RouteToPathnameTests
 		Assert.AreEqual(expected, actual, ignoreCase: true);
 	}
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow("/", null, @"\root\index.html")]
 	[DataRow("/", "", @"\root\index.html")]
 	[DataRow("/", " ", @"\root\index.html")]
@@ -179,7 +178,7 @@ public class RouteToPathnameTests
 			_indexFileName, _pageFileExtension,
 			_exclusions);
 
-		Assert.ThrowsException<ArgumentNullException>(action);
+		Assert.ThrowsExactly<ArgumentNullException>(action);
 	}
 
 	[TestMethod]
@@ -187,19 +186,19 @@ public class RouteToPathnameTests
 	{
 		var page = new PageResource("/");
 
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => page.GetOutFilePathname(
 				_nullString, false,
 				_indexFileName, _pageFileExtension,
 				_exclusions));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => page.GetOutFilePathname(
 				_emptyString, false,
 				_indexFileName, _pageFileExtension,
 				_exclusions));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => page.GetOutFilePathname(
 				_whitespace, false,
 				_indexFileName, _pageFileExtension,
@@ -211,19 +210,19 @@ public class RouteToPathnameTests
 	{
 		var page = new PageResource("/");
 
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => page.GetOutFilePathname(
 				_webroot, false,
 				_nullString, _pageFileExtension,
 				_exclusions));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => page.GetOutFilePathname(
 				_webroot, false,
 				_emptyString, _pageFileExtension,
 				_exclusions));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => page.GetOutFilePathname(
 				_webroot, false,
 				_whitespace, _pageFileExtension,
@@ -235,19 +234,19 @@ public class RouteToPathnameTests
 	{
 		var page = new PageResource("/");
 
-		Assert.ThrowsException<ArgumentNullException>(
+		Assert.ThrowsExactly<ArgumentNullException>(
 			() => page.GetOutFilePathname(
 				_webroot, false,
 				_indexFileName, _nullString,
 				_exclusions));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => page.GetOutFilePathname(
 				_webroot, false,
 				_indexFileName, _emptyString,
 				_exclusions));
 
-		Assert.ThrowsException<ArgumentException>(
+		Assert.ThrowsExactly<ArgumentException>(
 			() => page.GetOutFilePathname(
 				_webroot, false,
 				_indexFileName, _whitespace,
