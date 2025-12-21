@@ -105,11 +105,11 @@ namespace AspNetStatic
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
+			var resourceProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 
-			if (!pageUrlProvider.PageResources.Any())
+			if (!resourceProvider.Resources.Any())
 			{
-				logger.NoPagesToProcess();
+				logger.NoResourcesToProcess();
 				return;
 			}
 
@@ -130,18 +130,18 @@ namespace AspNetStatic
 
 						var generatorConfig =
 							new StaticGeneratorConfig(
-								pageUrlProvider.Resources,
+								resourceProvider.Resources,
 								destinationRoot,
 								alwaysDefaultFile,
 								!dontUpdateLinks,
-								pageUrlProvider.DefaultFileName,
-								pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
-								pageUrlProvider.DefaultFileExclusions,
+								resourceProvider.DefaultFileName,
+								resourceProvider.PageFileExtension.EnsureStartsWith('.'),
+								resourceProvider.DefaultFileExclusions,
 								!dontOptimizeContent, optimizerSelector,
-								pageUrlProvider.SkipPageResources,
-								pageUrlProvider.SkipCssResources,
-								pageUrlProvider.SkipJsResources,
-								pageUrlProvider.SkipBinResources);
+								resourceProvider.SkipPageResources,
+								resourceProvider.SkipCssResources,
+								resourceProvider.SkipJsResources,
+								resourceProvider.SkipBinResources);
 
 						logger.RegenerationConfig(regenerationInterval);
 						var doPeriodicRefresh = regenerationInterval is not null;
@@ -302,11 +302,11 @@ namespace AspNetStatic
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
+			var resourceProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 
-			if (!pageUrlProvider.PageResources.Any())
+			if (!resourceProvider.Resources.Any())
 			{
-				logger.NoPagesToProcess();
+				logger.NoResourcesToProcess();
 				return false;
 			}
 
@@ -318,18 +318,18 @@ namespace AspNetStatic
 			{
 				await StaticGenerator.Execute(
 					new StaticGeneratorConfig(
-						pageUrlProvider.Resources,
+						resourceProvider.Resources,
 						destinationRoot,
 						alwaysDefaultFile,
 						!dontUpdateLinks,
-						pageUrlProvider.DefaultFileName,
-						pageUrlProvider.PageFileExtension.EnsureStartsWith('.'),
-						pageUrlProvider.DefaultFileExclusions,
+						resourceProvider.DefaultFileName,
+						resourceProvider.PageFileExtension.EnsureStartsWith('.'),
+						resourceProvider.DefaultFileExclusions,
 						!dontOptimizeContent, optimizerSelector,
-						pageUrlProvider.SkipPageResources,
-						pageUrlProvider.SkipCssResources,
-						pageUrlProvider.SkipJsResources,
-						pageUrlProvider.SkipBinResources),
+						resourceProvider.SkipPageResources,
+						resourceProvider.SkipCssResources,
+						resourceProvider.SkipJsResources,
+						resourceProvider.SkipBinResources),
 					httpClient,
 					fileSystem,
 					loggerFactory,
@@ -444,15 +444,15 @@ namespace AspNetStatic
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var pageUrlProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
+			var resourceProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
 
-			if (!pageUrlProvider.PageResources.Any())
+			if (!resourceProvider.PageResources.Any())
 			{
 				logger.NoPagesToProcess();
 				return false;
 			}
 
-			var page = pageUrlProvider.PageResources.GetResourceForUrl(pageUrl);
+			var page = resourceProvider.PageResources.GetResourceForUrl(pageUrl);
 
 			if ((page is null) || (page is not PageResource))
 			{
@@ -748,7 +748,19 @@ namespace AspNetStatic
 			this ILogger logger);
 
 		#endregion
-		#region 1012 - PageNotFound
+		#region 1012 - NoResourcesToProcess
+
+		public static void NoResourcesToProcess(
+			this ILogger logger) =>
+			logger.Imp_NoResourcesToProcess();
+
+		[LoggerMessage(EventId = 1012, EventName = "NoResourcesToProcess", Level = LogLevel.Information,
+			Message = "StaticPageGeneratorHost: No resources to process. Exiting...")]
+		private static partial void Imp_NoResourcesToProcess(
+			this ILogger logger);
+
+		#endregion
+		#region 1014 - PageNotFound
 
 		public static void PageNotFound(
 			this ILogger logger,
@@ -756,7 +768,7 @@ namespace AspNetStatic
 			logger.Imp_PageNotFound(
 				pageUrl);
 
-		[LoggerMessage(EventId = 1012, EventName = "PageNotFound", Level = LogLevel.Information,
+		[LoggerMessage(EventId = 1014, EventName = "PageNotFound", Level = LogLevel.Information,
 			Message = "StaticPageGeneratorHost: Could not find page entry for specified url > PageUrl = {PageUrl}")]
 		private static partial void Imp_PageNotFound(
 			this ILogger logger,
