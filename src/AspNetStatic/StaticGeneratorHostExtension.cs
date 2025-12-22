@@ -91,7 +91,10 @@ namespace AspNetStatic
 			bool dontUpdateLinks = default,
 			bool dontOptimizeContent = default,
 			TimeSpan? regenerationInterval = default,
-			ulong httpTimeoutSeconds = c_DefaultHttpTimeoutSeconds)
+			ulong httpTimeoutSeconds = c_DefaultHttpTimeoutSeconds,
+			TimeSpan? processStartDelay = default,
+			EventWaitHandle? processStartSignal = default,
+			short signalTimeoutSeconds = 60)
 		{
 			Throw.IfNull(host);
 			Throw.IfNullOrWhitespace(destinationRoot);
@@ -105,14 +108,6 @@ namespace AspNetStatic
 			var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
 			var logger = loggerFactory.CreateLogger(nameof(StaticGeneratorHostExtension));
 
-			var resourceProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
-
-			if (!resourceProvider.Resources.Any())
-			{
-				logger.NoResourcesToProcess();
-				return;
-			}
-
 			var optimizerSelector = GetOptimizerSelector(host.Services, dontOptimizeContent);
 
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
@@ -124,6 +119,23 @@ namespace AspNetStatic
 				{
 					try
 					{
+						if (processStartDelay is not null)
+						{
+							await Task.Delay(processStartDelay.Value).ConfigureAwait(false);
+						}
+						else
+						{
+							processStartSignal?.WaitOne(TimeSpan.FromSeconds(signalTimeoutSeconds));
+						}
+
+						var resourceProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
+
+						if (!resourceProvider.Resources.Any())
+						{
+							logger.NoResourcesToProcess();
+							return;
+						}
+
 						_httpClient.BaseAddress = new Uri(GetBaseUri(host));
 						_httpClient.Timeout = TimeSpan.FromSeconds(httpTimeoutSeconds);
 						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
@@ -658,7 +670,7 @@ namespace AspNetStatic
 		{
 			if (dontOptimizeContent) return null;
 
-			var result = 
+			var result =
 				services.GetService<IOptimizerSelector>() ??
 				DefaultOptimizerSelectorFactory.Create(services)
 				;
