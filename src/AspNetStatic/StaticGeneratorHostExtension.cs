@@ -83,6 +83,37 @@ namespace AspNetStatic
 		/// <param name="httpTimeoutSeconds">
 		///		The HttpClient request timeout (in seconds) while fetching page content.
 		/// </param>
+		/// <param name="processStartDelay">
+		///		<para>
+		///			Specifies a delay before processing the resource collection in order 
+		///			to allow dynamic resource discovery operations to complete (populating 
+		///			the resource collection at runtime).
+		///		</para>
+		///		<para>
+		///			If specified, this parameter will ltake precedence over 
+		///			the <paramref name="processStartSignal"/> option.
+		///		</para>
+		/// </param>
+		/// <param name="processStartSignal">
+		///		<para>
+		///			An instnance of a WaitHandle that, if specified, will 
+		///			block static generation until it is signaled (set).
+		///		</para>
+		///		<para>
+		///			This option is ignored if a value is specified for
+		///			the <paramref name="processStartDelay"/> parameter.
+		///		</para>
+		/// </param>
+		/// <param name="signalTimeoutSeconds">
+		///		<para>
+		///			Specifies a timeout for how long to wait for the wait-handle 
+		///			specified in <paramref name="processStartSignal"/> to be signaled.
+		///		</para>
+		///		<para>
+		///			Static generation will proceed after the timeout period 
+		///			expires regardless of whether the wait-handle is signaled.
+		///		</para>
+		/// </param>
 		public static void GenerateStaticContent(
 			this IHost host,
 			string destinationRoot,
