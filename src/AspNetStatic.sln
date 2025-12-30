@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetStaticContrib", "AspN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetStaticContrib.Stekeblad", "AspNetStaticContrib.Stekeblad\AspNetStaticContrib.Stekeblad.csproj", "{06EBC2E2-C75C-4E04-B388-42F87B127654}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Stekeblad.PartialStaticSite", "Samples\Stekeblad.PartialStaticSite\Sample.Stekeblad.PartialStaticSite.csproj", "{AB2830D2-DB39-78CD-BF99-001515F1A8B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,14 @@ Global
 		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69EBC1EF-1936-4D13-842C-DC147D7FF730}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06EBC2E2-C75C-4E04-B388-42F87B127654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06EBC2E2-C75C-4E04-B388-42F87B127654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06EBC2E2-C75C-4E04-B388-42F87B127654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06EBC2E2-C75C-4E04-B388-42F87B127654}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB2830D2-DB39-78CD-BF99-001515F1A8B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB2830D2-DB39-78CD-BF99-001515F1A8B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB2830D2-DB39-78CD-BF99-001515F1A8B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB2830D2-DB39-78CD-BF99-001515F1A8B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
