@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net9.0;net8.0;</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  
+  <PropertyGroup>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/ZarehD/AspNetStatic</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ZarehD/AspNetStatic</PackageProjectUrl>
+    <PackageIcon>ProjectIcon.png</PackageIcon>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+
+    <AssemblyName>AspNetStaticContrib.Stekeblad</AssemblyName>
+    <RootNamespace>AspNetStaticContrib.Stekeblad</RootNamespace>
+    <PackageId>AspNetStaticContrib.Stekeblad</PackageId>
+    <Title>AspNetStaticContrib.Stekeblad</Title>
+    <PackageTags>asp.net,core,static,site,generator,ssg,website,html,community,contrib</PackageTags>
+
+    <Authors>Stekeblad, Zareh DerGevorkian</Authors>
+    <Company>Zareh DerGevorkian</Company>
+    <PublisherName>Zareh DerGevorkian</PublisherName>
+    <Product>AspNetStatic</Product>
+    <Copyright>Copyright 2023-2026 Zareh DerGevorkian and contributors. All rights reserved</Copyright>
+    <Description>AspNetStatic community contributed extensions.</Description>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ThrowGuard" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspNetStatic\AspNetStatic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\ProjectIcon.png" Link="ProjectIcon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".\Readme.md" Link="Readme.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

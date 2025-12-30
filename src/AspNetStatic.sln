@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample.BlazorSSG", "Samples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetStaticContrib", "AspNetStaticContrib\AspNetStaticContrib.csproj", "{69EBC1EF-1936-4D13-842C-DC147D7FF730}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetStaticContrib.Stekeblad", "AspNetStaticContrib.Stekeblad\AspNetStaticContrib.Stekeblad.csproj", "{06EBC2E2-C75C-4E04-B388-42F87B127654}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
