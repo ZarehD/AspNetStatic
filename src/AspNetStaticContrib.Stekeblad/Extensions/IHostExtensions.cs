@@ -25,35 +25,19 @@ namespace AspNetStaticContrib.Stekeblad.Extensions
 		/// </param>
 		/// <exception cref="Exception">If retrieving an instance of IStaticResourcesInfoProvider
 		/// does not return an instance of LocatingStaticResourcesInfoProvider
-		/// or if atleast one resource has not manually been added to the ResourcesInfoProvider
-		/// by calling <see cref="StaticResourcesInfoProvider.Add">StaticResourcesInfoProvider.Add</see>
 		/// </exception>
 		public static void LocateStaticResources(this IHost host, EventWaitHandle signal)
 		{
 			var resourceProvider = host.Services.GetService<IStaticResourcesInfoProvider>();
-			if (resourceProvider is not LocatingStaticResourcesInfoProvider empoweredProvider)
+			if (resourceProvider is not LocatingStaticResourcesInfoProvider locatingProvider)
 			{
 				throw new Exception(
 					$"{nameof(LocateStaticResources)} requires a service deriving from {nameof(LocatingStaticResourcesInfoProvider)} " +
 					$"to be registered as the implementation provided when requesting a {nameof(IStaticResourcesInfoProvider)}");
 			}
 
-			if (!empoweredProvider.Resources.Any())
-			{
-				throw new Exception("Due to limitations in AspNetStatic atleast one Resource " +
-					"must have been added without the help of Resource Locators for generation to work");
-			}
-
 			var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-			lifetime.ApplicationStarted.Register(async () => await LocateStaticResourcesAsync(empoweredProvider, host.Services, signal));
-		}
-
-		private static async Task LocateStaticResourcesAsync(
-			LocatingStaticResourcesInfoProvider empoweredProvider,
-			IServiceProvider services,
-			EventWaitHandle signal)
-		{
-			await empoweredProvider.LocateResourcesAsync(services, signal);
+			lifetime.ApplicationStarted.Register(async () => await locatingProvider.LocateResourcesAsync(host.Services, signal));
 		}
 	}
 }
