@@ -1,6 +1,4 @@
-﻿using AspNetStaticContrib.Stekeblad.ResourceLocators.ActionDescriptor;
-using AspNetStaticContrib.Stekeblad.Options;
-using Microsoft.AspNetCore.Hosting;
+﻿using AspNetStaticContrib.Stekeblad.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
@@ -24,20 +22,16 @@ namespace AspNetStaticContrib.Stekeblad.Extensions
 			ContribStekebladOptions options = new();
 			configureOptions(options);
 
-			// Both ActionDescriptor and Sitemap needs the HttpClient
-			if (options.RegisterActionDescriptorResourceLocator
-				|| options.RegisterSitemapResourceLocator)
+			// Sitemap needs the HttpClient
+			if (options.RegisterSitemapResourceLocator)
 			{
 				services.AddHttpClient(Constants.AnscStekeblad, client =>
 				{
 					client.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Constants.AspNetStatic);
 				});
-
 			}
 
-			// ActionDescriptor needs it's special endpoint
-			if (options.RegisterActionDescriptorResourceLocator)
-				services.AddTransient<IStartupFilter, AspNetStaticContribStartupFilter>();
+			// ActionDescriptor does not require any services to be registered
 
 			return services;
 		}

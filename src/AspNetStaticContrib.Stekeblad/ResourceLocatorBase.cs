@@ -56,14 +56,14 @@ namespace AspNetStaticContrib.Stekeblad
 		/// This method gets called by <see cref="LocatingStaticResourcesInfoProvider" />.
 		/// Perform the work of locating resources for the static generator here
 		/// </summary>
-		/// <param name="services">Gives the resource locator access to all
+		/// <param name="serviceProvider">Gives the resource locator access to all
 		/// services registered in the application.</param>
 		/// <param name="locatorFilter">
 		/// Information forwarded from the resource provider, contains flags
 		/// for if any resource type should be skipped.
 		/// </param>
 		/// <returns>All resources this resource locator has discovered.</returns>
-		public abstract Task<IEnumerable<ResourceInfoBase>> LocateResourcesAsync(IServiceProvider services,
+		public abstract Task<IEnumerable<ResourceInfoBase>> LocateResourcesAsync(IServiceProvider serviceProvider,
 			ResourceLocatorFilter locatorFilter);
 
 		/// <summary>
