@@ -19,10 +19,27 @@ builder.Services.AddRouting(
 builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<IStaticResourcesInfoProvider>(
-	new StaticResourcesInfoProvider(SampleStaticPages.GetCollection())
-	.Add(builder.Environment.GetWebRootCssResources(["**/site.css", "**/*.min.css"]))
-	.Add(builder.Environment.GetWebRootJsResources())
-	.Add(builder.Environment.GetWebRootBinResources(["**/*.ico"]))
+	new StaticResourcesInfoProvider()
+	.Add(SampleStaticPages.GetCollection())
+	.Add(builder.Environment.GetWebRootCssResources(
+		["css/**/*.css"]))
+	.Add(builder.Environment.GetWebRootCssResources(
+		["lib/bootstrap/**/*.css"],
+		dontOptimize: true))
+	.Add(builder.Environment.GetWebRootJsResources(
+		["js/**/*.js"]))
+	.Add(builder.Environment.GetWebRootJsResources(
+		["lib/bootstrap/**/*.js",
+		"lib/bootstrap/**/*.js.map",
+		"lib/jquery*/**/*.js",
+		"lib/jquery*/**/*.map"],
+		dontOptimize: true))
+	.Add(builder.Environment.GetWebRootBinResources(
+		["favicon.ico"]))
+	.Add(builder.Environment.GetWebRootBinResources(
+		["lib/bootstrap/license",
+		"lib/jquery*/license.*"],
+		dontOptimize: true))
 	);
 
 // Use the "no-ssg" arg to omit static file generation
