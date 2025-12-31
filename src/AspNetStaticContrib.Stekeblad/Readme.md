@@ -24,12 +24,12 @@ implementation of `IStaticResourcesInfoProvider` you need to use or derive from
 `LocatingStaticResourcesInfoProvider`.
 
 1. Similar to how you add resources, call `AddResourceLocator` to add a resource locator.
-The built-in once also have extension methods for convenience. List of built-in
+The built-in ones also have extension methods for convenience. List of built-in
 resource locators and how to create your own is described further down.
 
-1. The built-in resource locators need one or more services to be registered,
-if you use any of them you need to call and configure
-`builder.AddAspNetStaticContribStekeblad(...)`
+1. To use any of the built-in resource locators they need to be enabled by calling
+`builder.AddAspNetStaticContribStekeblad(Action<ContribStekebladOptions>)`
+and enable the desired locators in the options action.
 
 1. Before calling `app.GenerateStaticContent(...)` you need to add a call to
 `app.LocateStaticResources(EventWaitHandle)`. This is required for resource locators to be executed.
@@ -137,7 +137,7 @@ Use that instance to retrieve all required services, assuming they have been reg
 > Do not manually call `LocateResourcesAsync` on a resource locator, it will be
 called by the `LocatingStaticResourcesInfoProvider` when the application has fully started.
 
-There are four things you need to to in `LocateResourcesAsync`:
+All ResourceLocatorBase implementations must perform the following tasks in `LocateResourcesAsync`:
 
 1. Locate the resources the static site generator needs to know about.
 1. Determine the path to each resource
