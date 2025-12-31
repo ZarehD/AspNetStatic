@@ -156,6 +156,7 @@ namespace AspNetStatic
 						}
 						else
 						{
+							await Task.Yield();
 							processStartSignal?.WaitOne(TimeSpan.FromSeconds(signalTimeoutSeconds));
 						}
 

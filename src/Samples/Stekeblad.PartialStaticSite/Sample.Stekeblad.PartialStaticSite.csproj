@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AspNetStaticContrib.Stekeblad\AspNetStaticContrib.Stekeblad.csproj" />
+    <ProjectReference Include="..\..\AspNetStaticContrib\AspNetStaticContrib.csproj" />
+    <ProjectReference Include="..\..\AspNetStatic\AspNetStatic.csproj" />
+  </ItemGroup>
+
+</Project>

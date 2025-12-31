@@ -1,0 +1,9 @@
+﻿@page "{PostId:int}"
+@model PostsModel
+@{
+	ViewData["Title"] = $"Blog: Post {Model.PostId}";
+}
+<div>
+	<h1>Post @Model.PostId</h1>
+	<p>Content for Post @Model.PostId...</p>
+</div>
