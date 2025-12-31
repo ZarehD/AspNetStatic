@@ -20,6 +20,7 @@ the specific language governing permissions and limitations under the License.
  * 
  */
 
+using AspNetStatic.Optimizer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileSystemGlobbing;
 using FSGA = Microsoft.Extensions.FileSystemGlobbing.Abstractions;
@@ -145,7 +146,8 @@ public static class StaticResourcesInfoProviderExtensions
 	public static IEnumerable<CssResource> GetWebRootCssResources(
 		this IWebHostEnvironment hostEnvironment,
 		string[]? include = default,
-		string[]? exclude = default)
+		string[]? exclude = default,
+		bool dontOptimize = default)
 	{
 		Throw.IfNull(hostEnvironment);
 
@@ -158,7 +160,13 @@ public static class StaticResourcesInfoProviderExtensions
 
 		return
 			(0 < routes.Length)
-			? routes.Select(x => new CssResource(x))
+			? routes.Select(
+				x => new CssResource(x)
+				{
+					OptimizationType = dontOptimize
+					? OptimizationType.None
+					: OptimizationType.Auto
+				})
 			: []
 			;
 	}
@@ -177,7 +185,8 @@ public static class StaticResourcesInfoProviderExtensions
 	public static IEnumerable<JsResource> GetWebRootJsResources(
 		this IWebHostEnvironment hostEnvironment,
 		string[]? include = default,
-		string[]? exclude = default)
+		string[]? exclude = default,
+		bool dontOptimize = default)
 	{
 		Throw.IfNull(hostEnvironment);
 
@@ -190,7 +199,13 @@ public static class StaticResourcesInfoProviderExtensions
 
 		return
 			(0 < routes.Length)
-			? routes.Select(x => new JsResource(x))
+			? routes.Select(
+				x => new JsResource(x)
+				{
+					OptimizationType = dontOptimize
+					? OptimizationType.None
+					: OptimizationType.Auto
+				})
 			: []
 			;
 	}
@@ -206,7 +221,8 @@ public static class StaticResourcesInfoProviderExtensions
 	public static IEnumerable<BinResource> GetWebRootBinResources(
 		this IWebHostEnvironment hostEnvironment,
 		string[] include,
-		string[]? exclude = default)
+		string[]? exclude = default,
+		bool dontOptimize = default)
 	{
 		Throw.IfNull(hostEnvironment);
 		Throw.InvalidOpWhen(
@@ -222,7 +238,13 @@ public static class StaticResourcesInfoProviderExtensions
 
 		return
 			(0 < routes.Length)
-			? routes.Select(x => new BinResource(x))
+			? routes.Select(
+				x => new BinResource(x)
+				{
+					OptimizationType = dontOptimize
+					? OptimizationType.None
+					: OptimizationType.Auto
+				})
 			: []
 			;
 	}
