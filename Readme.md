@@ -267,9 +267,7 @@ __Sample Configuration 1__:
     ```c#
     app.GenerateStaticContent(
       "../SSG_Output",
-      exitWhenDone: true,
-      alwaysDefaultFile: false,
-      dontUpdateLinks: false);
+      exitWhenDone: true); // exit the app after static generation
     ```
 
 __Sample Configuration 2__:
