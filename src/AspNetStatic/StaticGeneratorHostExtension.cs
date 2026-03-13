@@ -725,7 +725,7 @@ namespace AspNetStatic
 #else
 		private static readonly System.Timers.Timer _timer = new();
 #endif
-		private const ulong c_DefaultHttpTimeoutSeconds = 100;
+        private const ulong c_DefaultHttpTimeoutSeconds = 15;
 	}
 
 
