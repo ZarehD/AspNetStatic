@@ -660,6 +660,12 @@ namespace AspNetStatic
 				() => baseUri is null,
 				SR.Err_HostNotHttpService);
 
+            baseUri = baseUri!
+                .Replace("0.0.0.0", "127.0.0.1")
+                .Replace("[::]", "127.0.0.1")
+                .Replace("::0", "::1")
+                ;
+
 			return baseUri!;
 		}
 
