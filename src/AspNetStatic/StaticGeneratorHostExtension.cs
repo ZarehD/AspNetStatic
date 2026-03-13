@@ -126,6 +126,7 @@ namespace AspNetStatic
 			TimeSpan? processStartDelay = default,
 			EventWaitHandle? processStartSignal = default,
 			short signalTimeoutSeconds = 60)
+            string? serverBaseUrl = default)
 		{
 			Throw.IfNull(host);
 			Throw.IfNullOrWhitespace(destinationRoot);
@@ -154,10 +155,10 @@ namespace AspNetStatic
 						{
 							await Task.Delay(processStartDelay.Value).ConfigureAwait(false);
 						}
-						else
+                        else if (processStartSignal is not null)
 						{
 							await Task.Yield();
-							processStartSignal?.WaitOne(TimeSpan.FromSeconds(signalTimeoutSeconds));
+                            processStartSignal.WaitOne(TimeSpan.FromSeconds(signalTimeoutSeconds));
 						}
 
 						var resourceProvider = host.Services.GetRequiredService<IStaticResourcesInfoProvider>();
@@ -168,7 +169,7 @@ namespace AspNetStatic
 							return;
 						}
 
-						_httpClient.BaseAddress = new Uri(GetBaseUri(host));
+                        _httpClient.BaseAddress = new Uri(serverBaseUrl ?? GetBaseUri(host));
 						_httpClient.Timeout = TimeSpan.FromSeconds(httpTimeoutSeconds);
 						_httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, Consts.AspNetStatic);
 
